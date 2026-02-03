@@ -1,9 +1,21 @@
-document.querySelectorAll(".ghe.trong").forEach(btn => {
-    btn.addEventListener("click", function () {
-        document.querySelectorAll(".dang-chon")
-            .forEach(g => g.classList.remove("dang-chon"));
+let selectedSeats = [];
+const pricePerSeat = 75000;
 
-        this.classList.add("dang-chon");
-        document.getElementById("ghe_id").value = this.dataset.id;
-    });
+document.addEventListener("click", function (e) {
+    if (!e.target.classList.contains("seat")) return;
+    if (e.target.classList.contains("booked")) return;
+
+    const seat = e.target.dataset.seat;
+
+    e.target.classList.toggle("selected");
+
+    if (selectedSeats.includes(seat)) {
+        selectedSeats = selectedSeats.filter(s => s !== seat);
+    } else {
+        selectedSeats.push(seat);
+    }
+
+    document.getElementById("seat-input").value = selectedSeats.join(",");
+    document.getElementById("total").innerText =
+        (selectedSeats.length * pricePerSeat).toLocaleString("vi-VN") + " đ";
 });

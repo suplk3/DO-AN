@@ -1,22 +1,20 @@
 <?php
-session_start();
 include "../config/db.php";
+session_start();
 
-$user_id = $_SESSION['user']['id'];
-$suat_id = $_POST['suat_id'];
-$ghe_id = $_POST['ghe_id'];
+$user_id = $_SESSION['user_id'] ?? 1; // test
+$suat_chieu_id = $_POST['suat_chieu_id'];
+$ghe = explode(",", $_POST['ghe']);
 
-$check = mysqli_query($conn,
-    "SELECT * FROM ve 
-     WHERE suat_chieu_id=$suat_id AND ghe_id=$ghe_id");
+foreach ($ghe as $ten_ghe) {
+    $sql = "SELECT id FROM ghe WHERE ten_ghe='$ten_ghe'";
+    $r = mysqli_query($conn, $sql);
+    $ghe_id = mysqli_fetch_assoc($r)['id'];
 
-if (mysqli_num_rows($check) > 0) {
-    echo "❌ Ghế đã được đặt!";
-    exit;
+    mysqli_query($conn, "
+        INSERT INTO ve (user_id, ghe_id, suat_chieu_id)
+        VALUES ($user_id, $ghe_id, $suat_chieu_id)
+    ");
 }
 
-mysqli_query($conn,
-    "INSERT INTO ve(user_id,suat_chieu_id,ghe_id)
-     VALUES($user_id,$suat_id,$ghe_id)");
-
-echo "🎉 Đặt vé thành công!";
+echo "<h2>🎉 Đặt vé thành công!</h2>";

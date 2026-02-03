@@ -68,3 +68,119 @@ nav a {
     text-decoration: none;
     margin-top: 10px;
 }
+.screen {
+    background: #ccc;
+    text-align: center;
+    padding: 10px;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.seat-row {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 8px;
+}
+
+.seat {
+    width: 35px;
+    height: 35px;
+    border: 1px solid #999;
+    margin: 3px;
+    text-align: center;
+    line-height: 35px;
+    cursor: pointer;
+}
+
+.seat.available {
+    background: #eee;
+}
+
+.seat.selected {
+    background: #e71a0f;
+    color: white;
+}
+
+.seat.booked {
+    background: #555;
+    color: white;
+    cursor: not-allowed;
+}
+
+.legend {
+    margin-top: 20px;
+}
+.legend span {
+    margin-right: 20px;
+}
+
+.seat-wrapper {
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.seat-row {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}
+
+.seat {
+    width: 45px;
+    height: 45px;
+    background: #e0e0e0;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.seat:hover {
+    background: #4caf50;
+    color: #fff;
+}
+
+.seat.booked {
+    background: #b71c1c;
+    color: #fff;
+    cursor: not-allowed;
+}
+.seat {
+    width: 45px;
+    height: 45px;
+    border-radius: 6px;
+    background: #e0e0e0;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.seat:hover { background: #4caf50; color: #fff; }
+
+.seat.selected {
+    background: #f44336;
+    color: #fff;
+}
+
+.seat.booked {
+    background: #9e9e9e;
+    color: #fff;
+    cursor: not-allowed;
+}
+
+.checkout {
+    margin-top: 30px;
+    text-align: center;
+}
+
+.checkout button {
+    background: #e50914;
+    color: #fff;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+}
