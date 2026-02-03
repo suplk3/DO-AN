@@ -1,21 +1,70 @@
-.ghe {
-    width: 40px;
-    height: 40px;
-    margin: 5px;
-    background: #ccc;
-    border: none;
-    cursor: pointer;
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f5f5f5;
 }
 
-.ghe.trong {
-    background: #2ecc71;
+header {
+    background: #e71a0f;
+    color: white;
+    padding: 15px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.ghe.da-dat {
-    background: #e74c3c;
-    cursor: not-allowed;
+.logo {
+    font-size: 28px;
+    font-weight: bold;
 }
 
-.ghe.dang-chon {
-    background: #f1c40f;
+nav a {
+    color: white;
+    margin-left: 20px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.container {
+    width: 1200px;
+    margin: 30px auto;
+}
+
+.title {
+    font-size: 22px;
+    border-left: 5px solid #e71a0f;
+    padding-left: 10px;
+    margin-bottom: 20px;
+}
+
+.movies {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 25px;
+}
+
+.movie {
+    background: white;
+    padding: 10px;
+    text-align: center;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.movie img {
+    width: 100%;
+    height: 320px;
+    object-fit: cover;
+}
+
+.movie h3 {
+    font-size: 16px;
+}
+
+.btn {
+    display: inline-block;
+    background: #e71a0f;
+    color: white;
+    padding: 8px 15px;
+    text-decoration: none;
+    margin-top: 10px;
 }
