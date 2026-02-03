@@ -50,3 +50,10 @@ CREATE TABLE ve (
     suat_chieu_id INT,
     ghe_id INT
 );
+INSERT INTO users (ten, email, mat_khau, vai_tro)
+VALUES (
+    'User A',
+    'user@gmail.com',
+    '$2y$10$0kD0d4oQkDFugcfnS4.8NOC/XByH7lO6gf9f.uTe7qH93t/qm.r/.',
+    'user'
+);
