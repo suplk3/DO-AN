@@ -1,86 +1,51 @@
+<?php
+include "ketnoi.php";
+
+$id_phim = $_GET['id_phim'];
+$result = mysqli_query($conn, "SELECT * FROM phim WHERE id = $id_phim");
+$phim = mysqli_fetch_assoc($result);
+?>
 
 <!DOCTYPE html>
-<html lang="vi">
+<html>
 <head>
     <meta charset="UTF-8">
-    <title>Đặt vé xem phim</title>
-    <style>
-        body {
-            font-family: Arial;
-            background: #f2f2f2;
-        }
-        .container {
-            width: 400px;
-            margin: 50px auto;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-        }
-        h2 {
-            text-align: center;
-        }
-        label {
-            font-weight: bold;
-        }
-        select, input, button {
-            width: 100%;
-            padding: 8px;
-            margin: 8px 0;
-        }
-        button {
-            background: #e50914;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        button:hover {
-            background: #b20710;
-        }
-    </style>
+    <title>Đặt vé</title>
 </head>
 <body>
 
-<div class="container">
-    <h2>🎬 Đặt vé xem phim</h2>
+<h2>🎟️ Đặt vé phim: <?= $phim['ten_phim'] ?></h2>
 
-    <form action="#" method="post">
-        <label>Chọn phim:</label>
-        <select name="phim">
-            <option>Avengers</option>
-            <option>Conan</option>
-            <option>Fast & Furious</option>
-        </select>
+<form action="xuly_datve.php" method="post">
+    <input type="hidden" name="ten_phim" value="<?= $phim['ten_phim'] ?>">
 
-        <label>Chọn rạp:</label>
-        <select name="rap">
-            <option>CGV Vincom</option>
-            <option>Lotte Cinema</option>
-        </select>
+    Suất chiếu:
+    <select name="suat_chieu">
+        <option>10:00</option>
+        <option>14:00</option>
+        <option>18:00</option>
+    </select>
+    <br><br>
 
-        <label>Suất chiếu:</label>
-        <select name="suatchieu">
-            <option>10:00</option>
-            <option>13:30</option>
-            <option>18:00</option>
-        </select>
+    Ghế:
+    <select name="ghe">
+        <option>A1</option>
+        <option>A2</option>
+        <option>B1</option>
+        <option>B2</option>
+    </select>
+    <br><br>
 
-        <label>Chọn ghế:</label>
-        <select name="ghe">
-            <option>A1</option>
-            <option>A2</option>
-            <option>B1</option>
-            <option>B2</option>
-        </select>
+    Họ tên:
+    <input type="text" name="hoten" required>
+    <br><br>
 
-        <label>Họ tên:</label>
-        <input type="text" name="hoten" required>
+    SĐT:
+    <input type="text" name="sdt" required>
+    <br><br>
 
-        <label>Số điện thoại:</label>
-        <input type="text" name="sdt" required>
-
-        <button type="submit">Đặt vé</button>
-    </form>
-</div>
+    <button type="submit">Xác nhận đặt vé</button>
+</form>
 
 </body>
 </html>
