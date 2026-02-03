@@ -310,3 +310,35 @@ img {
 .btn-home:hover {
     opacity: 0.85;
 }
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px;
+    background: #111;
+}
+
+.logo {
+    font-size: 26px;
+    font-weight: bold;
+    color: red;
+}
+
+.menu a {
+    color: white;
+    margin-left: 15px;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.menu a:hover {
+    color: #ffcc00;
+}
+
+.admin-btn {
+    background: #ff9800;
+    padding: 6px 12px;
+    border-radius: 6px;
+    color: black !important;
+    font-weight: bold;
+}

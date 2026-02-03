@@ -17,16 +17,17 @@ if (isset($_POST['login'])) {
 
     if ($user) {
         if (password_verify($mat_khau, $user['mat_khau'])) {
+             session_start();
 
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['ten'] = $user['ten'];
             $_SESSION['vai_tro'] = $user['vai_tro'];
-
-            if ($user['vai_tro'] === 'admin') {
-                header("Location: ../admin/phim.php");
+     header("Location: ../user/index.php");
+           /* if ($user['vai_tro'] === 'admin') {
+                header("Location: ../user/index.php");
             } else {
                 header("Location: ../user/index.php");
-            }
+            }*/
             exit;
         } else {
             $error = "Sai mật khẩu";
