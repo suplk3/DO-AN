@@ -1,7 +1,9 @@
+
 <?php
 include '../config/db.php';
 
-$suat_chieu_id = $_GET['suat_chieu_id'] ?? 0;
+$suat_chieu_id = $_GET['suat_id'] ?? 0;
+
 if ($suat_chieu_id == 0) {
     die("Thiếu suất chiếu");
 }
@@ -35,7 +37,7 @@ if (!$result) {
 <h2>CHỌN GHẾ</h2>
 <div class="screen">MÀN HÌNH</div>
 
-<<div class="seat-wrapper">
+<div class="seat-wrapper">
 <?php
 $currentRow = '';
 while ($row = mysqli_fetch_assoc($result)) {
@@ -66,7 +68,8 @@ if ($currentRow != '') echo '</div>';
 
     <form action="dat_ve.php" method="POST">
         <input type="hidden" name="ghe" id="seat-input">
-        <input type="hidden" name="suat_chieu_id" value="<?= $_GET['suat_chieu_id'] ?>">
+        <input type="hidden" name="suat_chieu_id" value="<?= $suat_chieu_id ?>">
+
         <button type="submit">TIẾP TỤC THANH TOÁN</button>
     </form>
 </div>

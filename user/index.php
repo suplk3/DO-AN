@@ -1,5 +1,6 @@
 <?php
 session_start();
+include "../config/db.php";
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -28,12 +29,22 @@ session_start();
     <div class="title">PHIM ĐANG CHIẾU</div>
 
     <div class="movies">
-        <div class="movie">
-            <img src="../assets/images/avengers.jpg">
-            <h3>Avengers: Endgame</h3>
-            <a href="chon_suat.php?phim=1" class="btn">ĐẶT VÉ</a>
-        </div>
+<?php
+$sql = "SELECT * FROM phim";
+$result = mysqli_query($conn, $sql);
+
+while ($row = mysqli_fetch_assoc($result)) {
+?>
+    <div class="movie">
+        <img src="../assets/images/<?= $row['poster'] ?>">
+        <h3><?= $row['ten_phim'] ?></h3>
+        <a href="chon_suat.php?phim_id=<?= $row['id'] ?>" class="btn">
+            ĐẶT VÉ
+        </a>
     </div>
+<?php } ?>
+</div>
+
 </div>
 
 </body>

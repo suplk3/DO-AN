@@ -74,9 +74,10 @@ $q_suat = mysqli_query($conn, $sql_suat);
 
     <?php while($s = mysqli_fetch_assoc($q_suat)): ?>
         <a class="time-btn"
-           href="chon_ghe.php?suat=<?= $s['id'] ?>">
-           <?= $s['gio'] ?> - <?= number_format($s['gia']) ?>đ
-        </a>
+   href="chon_ghe.php?suat_id=<?= $s['id'] ?>">
+   <?= $s['gio'] ?> - <?= number_format($s['gia']) ?>đ
+</a>
+
     <?php endwhile; ?>
 </div>
 
