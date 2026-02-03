@@ -1,7 +1,9 @@
 <?php
-session_start();
-if (!isset($_SESSION['user']) || $_SESSION['user']['vai_tro'] != 'admin') {
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+if (!isset($_SESSION['user_id']) || $_SESSION['vai_tro'] !== 'admin') {
     header("Location: ../auth/login.php");
     exit;
 }
-?>

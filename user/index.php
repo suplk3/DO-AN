@@ -36,12 +36,19 @@ $result = mysqli_query($conn, $sql);
 while ($row = mysqli_fetch_assoc($result)) {
 ?>
     <div class="movie">
-        <img src="../assets/images/<?= $row['poster'] ?>">
-        <h3><?= $row['ten_phim'] ?></h3>
-        <a href="chon_suat.php?phim_id=<?= $row['id'] ?>" class="btn">
-            ĐẶT VÉ
-        </a>
-    </div>
+
+    <a href="chi_tiet_phim.php?id=<?= $row['id'] ?>">
+        <img src="../assets/images/<?= $row['poster'] ?>" alt="<?= $row['ten_phim'] ?>">
+    </a>
+
+    <h3><?= $row['ten_phim'] ?></h3>
+
+    <a href="chon_suat.php?phim_id=<?= $row['id'] ?>" class="btn">
+        ĐẶT VÉ
+    </a>
+
+</div>
+
 <?php } ?>
 </div>
 

@@ -1,24 +1,59 @@
 <?php
 session_start();
-include "../config/db.php";
+require_once '../config/db.php';
 
-if (isset($_POST['dangnhap'])) {
+$error = '';
+
+if (isset($_POST['login'])) {
     $email = $_POST['email'];
-    $mk = $_POST['mat_khau'];
+    $mat_khau = $_POST['mat_khau'];
 
-    $sql = "SELECT * FROM users WHERE email='$email'";
-    $result = mysqli_query($conn, $sql);
-    $user = mysqli_fetch_assoc($result);
+    $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
 
-    if ($user && password_verify($mk, $user['mat_khau'])) {
-        $_SESSION['user'] = $user;
-        header("Location: ../user/index.php");
+    $result = $stmt->get_result();
+    $user = $result->fetch_assoc();
+
+    if ($user) {
+        if (password_verify($mat_khau, $user['mat_khau'])) {
+
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['ten'] = $user['ten'];
+            $_SESSION['vai_tro'] = $user['vai_tro'];
+
+            if ($user['vai_tro'] === 'admin') {
+                header("Location: ../admin/phim.php");
+            } else {
+                header("Location: ../user/index.php");
+            }
+            exit;
+        } else {
+            $error = "Sai mật khẩu";
+        }
+    } else {
+        $error = "Email không tồn tại";
     }
 }
 ?>
 
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Đăng nhập</title>
+</head>
+<body>
+
+<h2>ĐĂNG NHẬP</h2>
+
 <form method="POST">
-    <input name="email">
-    <input name="mat_khau" type="password">
-    <button name="dangnhap">Đăng nhập</button>
+    <input type="email" name="email" placeholder="Email" required><br><br>
+    <input type="password" name="mat_khau" placeholder="Mật khẩu" required><br><br>
+    <button type="submit" name="login">Đăng nhập</button>
 </form>
+
+<p style="color:red"><?= $error ?></p>
+
+</body>
+</html>
