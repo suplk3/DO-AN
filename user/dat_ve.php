@@ -18,3 +18,4 @@ foreach ($ghe as $ten_ghe) {
 }
 
 echo "<h2>🎉 Đặt vé thành công!</h2>";
+echo '<a href="../user/index.php" class="admin-btn">🏠 VỀ TRANG CHÍNH</a>';

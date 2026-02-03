@@ -19,7 +19,8 @@ include "../config/db.php";
         <a href="index.php">🎬 PHIM</a>
 
         <?php if (isset($_SESSION['vai_tro']) && $_SESSION['vai_tro'] === 'admin'): ?>
-            <a href="../admin/phim.php" class="admin-btn">⚙️ QUẢN TRỊ</a>
+            <a href="../admin/phim.php" class="admin-btn">⚙️ QUẢN LÝ PHIM</a>
+             <a href="../admin/suat_chieu.php" class="admin-btn">⚙️ QUẢN LÝ SUẤT CHIẾU</a>
         <?php endif; ?>
 
         <?php if (isset($_SESSION['user_id'])): ?>
