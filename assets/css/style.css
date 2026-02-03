@@ -1,0 +1,21 @@
+.ghe {
+    width: 40px;
+    height: 40px;
+    margin: 5px;
+    background: #ccc;
+    border: none;
+    cursor: pointer;
+}
+
+.ghe.trong {
+    background: #2ecc71;
+}
+
+.ghe.da-dat {
+    background: #e74c3c;
+    cursor: not-allowed;
+}
+
+.ghe.dang-chon {
+    background: #f1c40f;
+}
