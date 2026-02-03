@@ -1,7 +1,8 @@
 <?php
 $conn = mysqli_connect("localhost", "root", "", "movie_ticket");
+mysqli_set_charset($conn, "utf8");
 
 if (!$conn) {
-    die("Kết nối thất bại: " . mysqli_connect_error());
+    die("Kết nối CSDL thất bại");
 }
 ?>
