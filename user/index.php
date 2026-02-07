@@ -25,7 +25,8 @@ include "../config/db.php";
 
         <?php if (isset($_SESSION['user_id'])): ?>
     <span class="hello">👋 Xin chào</span>
-    <a href="#">🎟️ VÉ CỦA TÔI</a>
+    <a href="../user/ve_cua_toi.php" class="admin-btn">VÉ CỦA TÔI</a>       
+
     <a href="../auth/logout.php"
    onclick="return confirm('Bạn có chắc chắn muốn đăng xuất không?');">
    🚪 ĐĂNG XUẤT
