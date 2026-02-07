@@ -24,12 +24,6 @@ $suat_result = mysqli_query($conn, $suat_sql);
 $suats = [];
 while ($r = mysqli_fetch_assoc($suat_result)) $suats[] = $r;
 
-// Lấy id của suất chiếu đầu tiên (nếu có) để link "Đặt vé" nhanh
-$first_suat_id = null;
-if (count($suats) > 0) {
-    $first_suat_id = (int)$suats[0]['id'];
-}
-
 function fmt_date($d){ return $d ? date('d/m/Y', strtotime($d)) : ''; }
 function fmt_time($t){ return $t ? date('H:i', strtotime($t)) : ''; }
 function fmt_money($n){ return $n !== null ? number_format($n,0,',','.') . '₫' : '—'; }

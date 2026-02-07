@@ -2,9 +2,9 @@
 body.user-index{
     --header-default-h:64px;
     --header-shrink-h:48px;
-    background:linear-gradient(180deg,#f6f7fb,#ffffff);
+    background:linear-gradient(180deg,#0a0e27,#121829);
     font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;
-    color:#111;
+    color:#fff;
     -webkit-font-smoothing:antialiased;
     padding-top:var(--header-default-h); /* space for fixed header */
     transition:padding-top .18s ease;
@@ -63,6 +63,7 @@ body.user-index .page-title{
     font-size:28px;
     margin:8px 0 20px;
     letter-spacing:1px;
+    color:#fff;
 }
 
 /* Movies grid: equal height cards */
@@ -74,7 +75,7 @@ body.user-index .movies{
     grid-auto-rows:1fr; /* make each grid row same height */
 }
 body.user-index .movie-card{
-    background:#fff;
+    background:#2d3748;
     border-radius:12px;
     overflow:hidden;
     box-shadow:0 8px 18px rgba(15,23,42,0.06);
@@ -83,7 +84,7 @@ body.user-index .movie-card{
     flex-direction:column;
     height:100%; /* stretch to the grid row height */
 }
-body.user-index .movie-card:hover{transform:translateY(-6px);box-shadow:0 20px 40px rgba(15,23,42,0.08)}
+body.user-index .movie-card:hover{transform:translateY(-6px);box-shadow:0 20px 40px rgba(15,23,42,0.3)}
 
 /* Poster fixed height so all cards align */
 body.user-index .poster{
@@ -103,8 +104,9 @@ body.user-index .card-body{
 body.user-index .movie-title{
     font-size:15px;margin-bottom:6px;line-height:1.2;
     display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+    color:#fff;
 }
-body.user-index .card-meta{font-size:13px;color:#6b7280}
+body.user-index .card-meta{font-size:13px;color:#fff}
 
 /* Actions aligned to bottom */
 body.user-index .card-actions{
@@ -112,10 +114,11 @@ body.user-index .card-actions{
     display:flex;gap:8px;align-items:center;
 }
 body.user-index .btn-primary{background:linear-gradient(180deg,#ff6b6b,#ff4d4f);color:#fff;padding:8px 12px;border-radius:8px;font-weight:700}
-body.user-index .btn-outline{background:transparent;border:1px dashed #e5e7eb;color:#374151;padding:7px 10px;border-radius:8px}
+body.user-index .btn-outline{background:transparent;border:1px dashed #cbd5e1;color:#cbd5e1;padding:7px 10px;border-radius:8px}
+body.user-index .btn-sm{background:transparent;border:1px solid #fff;color:#fff;padding:6px 10px;border-radius:8px;font-weight:600;font-size:12px}
 
 /* Footer */
-body.user-index .footer{margin-top:28px;padding:18px;text-align:center;color:#6b7280;font-size:13px}
+body.user-index .footer{margin-top:28px;padding:18px;text-align:center;color:#cbd5e1;font-size:13px}
 
 /* Responsive tweaks */
 @media(max-width:980px){
