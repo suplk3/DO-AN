@@ -24,6 +24,12 @@ $suat_result = mysqli_query($conn, $suat_sql);
 $suats = [];
 while ($r = mysqli_fetch_assoc($suat_result)) $suats[] = $r;
 
+// Lấy id của suất chiếu đầu tiên (nếu có) để link "Đặt vé" nhanh
+$first_suat_id = null;
+if (count($suats) > 0) {
+    $first_suat_id = (int)$suats[0]['id'];
+}
+
 function fmt_date($d){ return $d ? date('d/m/Y', strtotime($d)) : ''; }
 function fmt_time($t){ return $t ? date('H:i', strtotime($t)) : ''; }
 function fmt_money($n){ return $n !== null ? number_format($n,0,',','.') . '₫' : '—'; }
@@ -151,11 +157,10 @@ function fmt_money($n){ return $n !== null ? number_format($n,0,',','.') . '₫'
 
                         <div class="st-actions">
                             <?php if (isset($_SESSION['user_id'])): ?>
-                                <a href="chon_suat.php?suat_id=<?= $suat_id ?>" class="btn-primary">Đặt ngay</a>
+                                <a href="chon_ghe.php?suat_id=<?= $suat_id ?>" class="btn-primary">Đặt ngay</a>
                             <?php else: ?>
                                 <a href="../auth/login.php" class="btn-outline">Đăng nhập để đặt</a>
                             <?php endif; ?>
-                            <a href="lich_suat.php?phong_id=<?= $phong_id ?>" class="btn-sm">Xem phòng</a>
                         </div>
                     </article>
                 <?php endforeach; ?>
