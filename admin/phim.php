@@ -13,6 +13,7 @@ $result = mysqli_query($conn, "SELECT * FROM phim");
 
 <div class="top-bar">
     <a href="them_phim.php" class="btn btn-add">➕ Thêm phim</a>
+    <a href="reset_id.php" class="btn btn-add" style="background: #ff9800;">🔄 Reset ID</a>
     <a href="../user/index.php" class="btn btn-home">🏠 Trang chính</a>
 </div>
 
