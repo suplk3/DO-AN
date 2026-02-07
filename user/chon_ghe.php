@@ -12,14 +12,15 @@ $sql = "
 SELECT 
     ghe.id,
     ghe.ten_ghe,
-    IF(ve.id IS NULL, 0, 1) AS da_dat
+    EXISTS (
+        SELECT 1 
+        FROM ve 
+        WHERE ve.ghe_id = ghe.id 
+        AND ve.suat_chieu_id = $suat_chieu_id
+    ) AS da_dat
 FROM ghe
-LEFT JOIN ve 
-    ON ghe.id = ve.ghe_id
-    AND ve.suat_chieu_id = $suat_chieu_id
 ORDER BY ghe.ten_ghe
 ";
-
 $result = mysqli_query($conn, $sql);
 if (!$result) {
     die("Lỗi SQL: " . mysqli_error($conn));

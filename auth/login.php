@@ -28,7 +28,7 @@ if (isset($_POST['login'])) {
             } else {
                 header("Location: ../user/index.php");
             }*/
-            exit;
+         //   exit;
         } else {
             $error = "Sai mật khẩu";
         }

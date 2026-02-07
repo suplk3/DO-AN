@@ -1,5 +1,6 @@
 <?php
 include "../config/db.php";
+session_start();
 
 $id = $_GET['id'] ?? 0;
 $sql = "SELECT * FROM phim WHERE id = $id";
@@ -19,7 +20,34 @@ if (!$phim) {
 </head>
 <body>
 
+
+<header class="header">
+    <div class="logo">CGV</div>
+
+    <nav class="menu">
+        <a href="index.php">🎬 PHIM</a>
+
+        <?php if (isset($_SESSION['vai_tro']) && $_SESSION['vai_tro'] === 'admin'): ?>
+            <a href="../admin/phim.php" class="admin-btn">⚙️ QUẢN LÝ PHIM</a>
+             <a href="../admin/suat_chieu.php" class="admin-btn">⚙️ QUẢN LÝ SUẤT CHIẾU</a>
+        <?php endif; ?>
+
+        <?php if (isset($_SESSION['user_id'])): ?>
+    <span class="hello">👋 Xin chào</span>
+    <a href="#">🎟️ VÉ CỦA TÔI</a>
+    <a href="../auth/logout.php"
+   onclick="return confirm('Bạn có chắc chắn muốn đăng xuất không?');">
+   🚪 ĐĂNG XUẤT
+</a>
+<?php else: ?>
+    <a href="../auth/login.php">🔐 ĐĂNG NHẬP</a>
+<?php endif; ?>
+
+    </nav>
+</header>
 <div class="movie-detail">
+
+
 
     <div class="poster">
         <img src="../assets/images/<?= $phim['poster'] ?>" alt="<?= $phim['ten_phim'] ?>">
