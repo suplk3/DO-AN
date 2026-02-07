@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th2 03, 2026 lúc 04:31 PM
+-- Thời gian đã tạo: Th2 07, 2026 lúc 07:16 AM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.0.30
 
@@ -102,7 +102,8 @@ INSERT INTO `phim` (`id`, `ten_phim`, `the_loai`, `thoi_luong`, `mo_ta`, `poster
 (2, 'Avengers: Endgame', 'hài', 123, 'Sau sự kiện Thanos hủy diệt một nửa vũ trụ, các Avengers còn sống sót phải tập hợp lại để đảo ngược thảm họa và mang lại hy vọng cho nhân loại.', 'avengers.jpg'),
 (3, 'Spider-Man: No Way Home', NULL, NULL, NULL, 'spiderman.jpg'),
 (4, 'Batman', NULL, NULL, NULL, 'batman.jpg'),
-(5, 'hẹ hẹ hẹ', 'hài', 123, '123', 'e04104acedd863863ac9.jpg');
+(6, 'PHIM ĐIỆN ẢNH THÁM TỬ LỪNG DANH CONAN: QUẢ BOM CHỌC TRỜI', 'Bí ẩn, Hành Động, Hoạt Hình', 95, 'Phim Điện Ảnh Thám Tử Lừng Danh Conan: Quả Bom Chọc Trời là bộ phim điện ảnh đầu tiên của chuỗi phim điện ảnh Thám Tử Lừng Danh Conan. Phim được chuyển thể dựa trên nguyên tác của Gosho Aoyama, do Kenji Kodama đạo diễn. Kudo Shinichi được kiến trúc sư nổi tiếng Moriya Teiji mời đến buổi tiệc trà tại dinh thự tư nhân. Tuy nhiên, do đã bị thu nhỏ, Shinichi vốn không thể tham gia buổi tiệc này. Thay vào đó, thám tử Mori, Ran và Conan đã cùng nhau đến dự thay cho Shinichi. Cùng lúc đó, Shinichi bất ngờ bị một kẻ ẩn danh thách thức qua điện thoại: cậu phải tìm ra những quả bom được đặt rải rác khắp Tokyo trước khi chúng phát nổ. Liệu cậu ấy có thể tìm thấy và vô hiệu hóa tất cả số bom trước khi quá muộn?', 'poster_conan_qua_bom_choc_troi_6.jpg'),
+(7, 'F1®', 'Hành Động, Tâm Lý', 156, 'Sonny Hayes (Brad Pitt) được mệnh danh là \"Huyền thoại chưa từng được gọi tên\" là ngôi sao sáng giá nhất của FORMULA 1 trong những năm 1990 cho đến khi một vụ tai nạn trên đường đua suýt nữa đã kết thúc sự nghiệp của anh.. Ba mươi năm sau, Sonny trở thành một tay đua tự do, cho đến khi người đồng đội cũ của anh, Ruben Cervantes (Javier Bardem), chủ sở hữu một đội đua F1 đang trên bờ vực sụp đổ, tìm đến anh. Ruben thuyết phục Sonny quay lại với F1® để có một cơ hội cuối cùng cứu lấy đội và khẳng định mình là tay đua xuất sắc nhất thế giới. Anh sẽ thi đấu cùng Joshua Pearce (Damson Idris), tay đua tân binh đầy tham vọng của đội, người luôn muốn tạo ra tốc độ của riêng mình. Tuy nhiên, khi động cơ gầm rú, quá khứ của Sonny sẽ đuổi theo anh và anh nhận ra rằng trong F1, người đồng đội chính là đối thủ cạnh tranh lớn nhất—và con đường chuộc lại lỗi lầm không phải là điều có thể đi một mình. (CHIẾU LẠI từ 06/02/2026)', 'poster_f1_rerun_1_.jpg');
 
 -- --------------------------------------------------------
 
@@ -268,7 +269,7 @@ ALTER TABLE `ghe`
 -- AUTO_INCREMENT cho bảng `phim`
 --
 ALTER TABLE `phim`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT cho bảng `phong_chieu`
