@@ -86,5 +86,25 @@ include "../config/db.php";
     <div>© <?= date('Y') ?> CGV Cinemas — Thiết kế gọn, responsive.</div>
 </footer>
 
+<!-- Header shrink script -->
+<script>
+(function(){
+    const header = document.querySelector('.header');
+    const body = document.querySelector('body.user-index');
+    if(!header || !body) return;
+    const onScroll = () => {
+        if (window.scrollY > 50) {
+            header.classList.add('shrink');
+            body.classList.add('header-shrink');
+        } else {
+            header.classList.remove('shrink');
+            body.classList.remove('header-shrink');
+        }
+    };
+    window.addEventListener('scroll', onScroll, {passive:true});
+    onScroll();
+})();
+</script>
+
 </body>
 </html>
