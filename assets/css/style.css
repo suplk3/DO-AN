@@ -4,9 +4,18 @@ body {
     background: #f5f5f5;
 }
 
+:root{
+    --brand-dark: #0b0b0b; /* header dark */
+    --brand-darker: #000000;
+    --accent-red: #e50914; /* chính: đỏ */
+    --accent-white: #ffffff; /* trắng */
+    --muted: #6b7280;
+    --card-bg: #ffffff;
+}
+
 header {
-    background: #e71a0f;
-    color: white;
+    background: linear-gradient(90deg,var(--brand-dark),var(--brand-darker));
+    color: var(--accent-white);
     padding: 15px 40px;
     display: flex;
     justify-content: space-between;
@@ -16,13 +25,15 @@ header {
 .logo {
     font-size: 28px;
     font-weight: bold;
+    color: var(--accent-red);
 }
 
 nav a {
-    color: white;
+    color: rgba(255,255,255,0.92);
     margin-left: 20px;
     text-decoration: none;
-    font-weight: bold;
+    font-weight: 700;
+    padding:6px 10px;border-radius:8px
 }
 
 .container {
@@ -62,11 +73,12 @@ nav a {
 
 .btn {
     display: inline-block;
-    background: #e71a0f;
-    color: white;
+    background: var(--accent-red);
+    color: var(--accent-white);
     padding: 8px 15px;
     text-decoration: none;
     margin-top: 10px;
+    border-radius:8px;
 }
 .screen {
     background: #ccc;
@@ -263,8 +275,8 @@ a.btn {
     font-size: 14px;
 }
 
-.btn-add { background: #28a745; }
-.btn-home { background: #007bff; }
+.btn-add { background: var(--accent-red); }
+.btn-home { background: var(--accent-white); color:var(--accent-red); border:1px solid var(--accent-red) }
 
 table {
     width: 100%;
@@ -289,18 +301,20 @@ img {
 }
 
 .btn-edit {
-    background: #ffc107;
-    color: black;
+    background: transparent;
+    color: var(--accent-red);
     padding: 6px 10px;
-    border-radius: 4px;
+    border-radius: 6px;
     text-decoration: none;
+    font-weight:700;
+    border:1px solid var(--accent-red);
 }
 
 .btn-delete {
-    background: #dc3545;
-    color: white;
+    background: var(--accent-red);
+    color: var(--accent-white);
     padding: 6px 10px;
-    border-radius: 4px;
+    border-radius: 6px;
     text-decoration: none;
 }
 
@@ -315,13 +329,13 @@ img {
     justify-content: space-between;
     align-items: center;
     padding: 15px 30px;
-    background: #111;
+    background: linear-gradient(90deg,var(--brand-dark),var(--brand-darker));
 }
 
 .logo {
     font-size: 26px;
     font-weight: bold;
-    color: red;
+    color: var(--accent-red);
 }
 
 .menu a {
@@ -398,6 +412,41 @@ body.user-index .footer{margin-top:28px;padding:18px;text-align:center;color:#6b
 .md-poster img { width:320px; height:460px; object-fit:cover; border-radius:10px; box-shadow:0 8px 20px rgba(2,6,23,0.06); }
 .md-info { flex:1; display:flex; flex-direction:column; gap:12px; }
 .md-title { margin:0; font-size:28px; letter-spacing:0.3px; }
+
+/* Improved form and admin controls */
+.form-container{max-width:900px;margin:28px auto;padding:22px;border-radius:12px;background:linear-gradient(180deg,#ffffff,#fbfdff);box-shadow:0 12px 30px rgba(2,6,23,0.06)}
+.form-row{display:flex;gap:14px;margin-bottom:14px;align-items:center}
+label{width:140px;font-weight:700;color:#0f172a}
+input[type=text], input[type=file], textarea, select{flex:1;padding:10px 12px;border:1px solid #e6e9ee;border-radius:10px;background:#fff;transition:box-shadow .12s,border-color .12s}
+textarea{min-height:140px;resize:vertical}
+input[type=text]:focus, textarea:focus{outline:none;box-shadow:0 6px 18px rgba(31,111,235,0.08);border-color:#1f6feb}
+.actions{display:flex;gap:12px;align-items:center;margin-top:6px}
+.btn-primary{background:var(--accent-red);color:#fff;padding:10px 16px;border-radius:10px;border:none;cursor:pointer;font-weight:700;box-shadow:0 6px 18px rgba(255,59,59,0.12)}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 18px 36px rgba(255,59,59,0.12)}
+.btn-secondary{background:#f3f4f6;padding:10px 14px;border-radius:10px;color:#111;border:1px solid #e6e9ee;text-decoration:none}
+.msg{padding:12px;border-radius:10px;margin-bottom:12px;font-weight:600}
+.msg.error{background:#fff2f2;color:#7a1b1b;border:1px solid #ffd6d6}
+.msg.success{background:#f0fdf4;color:#044e2e;border:1px solid #d1fae5}
+.poster-preview{max-width:160px;border-radius:8px;border:1px solid #eef2f7}
+
+@media (max-width:720px){
+    .form-row{flex-direction:column;align-items:stretch}
+    label{width:100%;margin-bottom:6px}
+}
+
+/* Dark outer background for admin edit pages */
+.admin-dark{background:#000;color:var(--accent-white)}
+.admin-dark a{color:var(--accent-white)}
+.admin-dark .form-container{background:#0f1113;color:var(--accent-white);box-shadow:0 20px 60px rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.04)}
+.admin-dark .form-row label{color:var(--accent-white)}
+.admin-dark input[type=text], .admin-dark input[type=file], .admin-dark textarea, .admin-dark select{
+    background:#121416;color:var(--accent-white);border:1px solid rgba(255,255,255,0.06)
+}
+.admin-dark input::placeholder, .admin-dark textarea::placeholder{color:rgba(255,255,255,0.6)}
+.admin-dark .poster-preview{border:1px solid rgba(255,255,255,0.06)}
+.admin-dark .btn-secondary{background:transparent;color:var(--accent-white);border:1px solid rgba(255,255,255,0.06)}
+.admin-dark .btn-home{background:transparent;color:var(--accent-white);border:1px solid rgba(255,255,255,0.06)}
+.admin-dark .msg{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--accent-white)}
 .md-meta { display:flex; gap:10px; flex-wrap:wrap; margin:6px 0; }
 .chip { background:#f1f5f9; color:#334155; padding:6px 10px; border-radius:999px; font-weight:600; font-size:13px; }
 
