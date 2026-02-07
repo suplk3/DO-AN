@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th2 07, 2026 lúc 07:16 AM
+-- Thời gian đã tạo: Th2 07, 2026 lúc 01:56 PM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.0.30
 
@@ -99,11 +99,13 @@ CREATE TABLE `phim` (
 --
 
 INSERT INTO `phim` (`id`, `ten_phim`, `the_loai`, `thoi_luong`, `mo_ta`, `poster`) VALUES
-(2, 'Avengers: Endgame', 'hài', 123, 'Sau sự kiện Thanos hủy diệt một nửa vũ trụ, các Avengers còn sống sót phải tập hợp lại để đảo ngược thảm họa và mang lại hy vọng cho nhân loại.', 'avengers.jpg'),
-(3, 'Spider-Man: No Way Home', NULL, NULL, NULL, 'spiderman.jpg'),
-(4, 'Batman', NULL, NULL, NULL, 'batman.jpg'),
-(6, 'PHIM ĐIỆN ẢNH THÁM TỬ LỪNG DANH CONAN: QUẢ BOM CHỌC TRỜI', 'Bí ẩn, Hành Động, Hoạt Hình', 95, 'Phim Điện Ảnh Thám Tử Lừng Danh Conan: Quả Bom Chọc Trời là bộ phim điện ảnh đầu tiên của chuỗi phim điện ảnh Thám Tử Lừng Danh Conan. Phim được chuyển thể dựa trên nguyên tác của Gosho Aoyama, do Kenji Kodama đạo diễn. Kudo Shinichi được kiến trúc sư nổi tiếng Moriya Teiji mời đến buổi tiệc trà tại dinh thự tư nhân. Tuy nhiên, do đã bị thu nhỏ, Shinichi vốn không thể tham gia buổi tiệc này. Thay vào đó, thám tử Mori, Ran và Conan đã cùng nhau đến dự thay cho Shinichi. Cùng lúc đó, Shinichi bất ngờ bị một kẻ ẩn danh thách thức qua điện thoại: cậu phải tìm ra những quả bom được đặt rải rác khắp Tokyo trước khi chúng phát nổ. Liệu cậu ấy có thể tìm thấy và vô hiệu hóa tất cả số bom trước khi quá muộn?', 'poster_conan_qua_bom_choc_troi_6.jpg'),
-(7, 'F1®', 'Hành Động, Tâm Lý', 156, 'Sonny Hayes (Brad Pitt) được mệnh danh là \"Huyền thoại chưa từng được gọi tên\" là ngôi sao sáng giá nhất của FORMULA 1 trong những năm 1990 cho đến khi một vụ tai nạn trên đường đua suýt nữa đã kết thúc sự nghiệp của anh.. Ba mươi năm sau, Sonny trở thành một tay đua tự do, cho đến khi người đồng đội cũ của anh, Ruben Cervantes (Javier Bardem), chủ sở hữu một đội đua F1 đang trên bờ vực sụp đổ, tìm đến anh. Ruben thuyết phục Sonny quay lại với F1® để có một cơ hội cuối cùng cứu lấy đội và khẳng định mình là tay đua xuất sắc nhất thế giới. Anh sẽ thi đấu cùng Joshua Pearce (Damson Idris), tay đua tân binh đầy tham vọng của đội, người luôn muốn tạo ra tốc độ của riêng mình. Tuy nhiên, khi động cơ gầm rú, quá khứ của Sonny sẽ đuổi theo anh và anh nhận ra rằng trong F1, người đồng đội chính là đối thủ cạnh tranh lớn nhất—và con đường chuộc lại lỗi lầm không phải là điều có thể đi một mình. (CHIẾU LẠI từ 06/02/2026)', 'poster_f1_rerun_1_.jpg');
+(1, 'Avengers: Endgame', ' Hành Động, Khoa Học Viễn Tưởng', 182, 'Sau sự kiện Thanos hủy diệt một nửa vũ trụ, các Avengers còn sống sót phải tập hợp lại để đảo ngược thảm họa và mang lại hy vọng cho nhân loại.', 'avengers.jpg'),
+(2, 'Spider-Man: No Way Home', 'Hành động, Phiêu lưu', 157, 'Lần đầu tiên trong lịch sử điện ảnh của Người Nhện, danh tính của người hùng thân thiện của chúng ta bị tiết lộ, khiến trách nhiệm siêu anh hùng của anh mâu thuẫn với cuộc sống thường nhật và đặt những người anh yêu thương nhất vào nguy hiểm. Khi anh nhờ Doctor Strange giúp đỡ để khôi phục bí mật, phép thuật đã xé toạc một lỗ hổng trong thế giới của họ, giải phóng những kẻ phản diện mạnh nhất từng chiến đấu với Người Nhện trong bất kỳ vũ trụ nào. Giờ đây, Peter sẽ phải vượt qua thử thách lớn nhất từ ​​trước đến nay, điều không chỉ thay đổi tương lai của chính anh mà còn cả tương lai của Đa vũ trụ.', 'ev-content-thumb293.png'),
+(3, 'Batman', 'Hành Động, Tội phạm', 183, 'Bộ phim đưa khán giả dõi theo hành trình phá án và diệt trừ tội phạm của chàng Hiệp sĩ Bóng đêm Batman, với một câu chuyện hoàn toàn khác biệt với những phần phim đã ra mắt trước đây. Thế giới ngầm ở thành phố Gotham xuất hiện một tên tội phạm kỳ lạ tên Riddler chuyên nhắm vào nhân vật tai to mặt lớn. Và sau mỗi lần phạm tội, hắn đều để lại một câu đố bí ẩn cho Batman. Khi bắt tay vào phá giải các câu đố này, Batman dần lật mở những bí ẩn động trời giữa gia đình anh và tên trùm tội phạm Carmine Falcon\r\n', 'batman.jpg'),
+(4, 'PHIM ĐIỆN ẢNH THÁM TỬ LỪNG DANH CONAN: QUẢ BOM CHỌC TRỜI', 'Bí ẩn, Hành Động, Hoạt Hình', 95, 'Phim Điện Ảnh Thám Tử Lừng Danh Conan: Quả Bom Chọc Trời là bộ phim điện ảnh đầu tiên của chuỗi phim điện ảnh Thám Tử Lừng Danh Conan. Phim được chuyển thể dựa trên nguyên tác của Gosho Aoyama, do Kenji Kodama đạo diễn. Kudo Shinichi được kiến trúc sư nổi tiếng Moriya Teiji mời đến buổi tiệc trà tại dinh thự tư nhân. Tuy nhiên, do đã bị thu nhỏ, Shinichi vốn không thể tham gia buổi tiệc này. Thay vào đó, thám tử Mori, Ran và Conan đã cùng nhau đến dự thay cho Shinichi. Cùng lúc đó, Shinichi bất ngờ bị một kẻ ẩn danh thách thức qua điện thoại: cậu phải tìm ra những quả bom được đặt rải rác khắp Tokyo trước khi chúng phát nổ. Liệu cậu ấy có thể tìm thấy và vô hiệu hóa tất cả số bom trước khi quá muộn?', 'poster_conan_qua_bom_choc_troi_6.jpg'),
+(5, 'F1®', 'Hành Động, Tâm Lý', 156, 'Sonny Hayes (Brad Pitt) được mệnh danh là \"Huyền thoại chưa từng được gọi tên\" là ngôi sao sáng giá nhất của FORMULA 1 trong những năm 1990 cho đến khi một vụ tai nạn trên đường đua suýt nữa đã kết thúc sự nghiệp của anh.. Ba mươi năm sau, Sonny trở thành một tay đua tự do, cho đến khi người đồng đội cũ của anh, Ruben Cervantes (Javier Bardem), chủ sở hữu một đội đua F1 đang trên bờ vực sụp đổ, tìm đến anh. Ruben thuyết phục Sonny quay lại với F1® để có một cơ hội cuối cùng cứu lấy đội và khẳng định mình là tay đua xuất sắc nhất thế giới. Anh sẽ thi đấu cùng Joshua Pearce (Damson Idris), tay đua tân binh đầy tham vọng của đội, người luôn muốn tạo ra tốc độ của riêng mình. Tuy nhiên, khi động cơ gầm rú, quá khứ của Sonny sẽ đuổi theo anh và anh nhận ra rằng trong F1, người đồng đội chính là đối thủ cạnh tranh lớn nhất—và con đường chuộc lại lỗi lầm không phải là điều có thể đi một mình. (CHIẾU LẠI từ 06/02/2026)', 'poster_f1_rerun_1_.jpg'),
+(6, 'MƯA ĐỎ', 'Hành Động, Lịch Sử', 124, '“Mưa Đỏ” - Phim truyện điện ảnh về đề tài chiến tranh cách mạng, kịch bản của nhà văn Chu Lai, lấy cảm hứng và hư cấu từ sự kiện 81 ngày đêm chiến đấu anh dũng, kiên cường của nhân dân và cán bộ, chiến sĩ bảo vệ Thành Cổ Quảng Trị năm 1972. Tiểu đội 1 gồm toàn những thanh niên trẻ tuổi và đầy nhiệt huyết là một trong những đơn vị chiến đấu, bám trụ tại trận địa khốc liệt này. Bộ phim là khúc tráng ca bằng hình ảnh, là nén tâm nhang tri ân và tưởng nhớ những người con đã dâng hiến tuổi thanh xuân cho đất nước, mang âm hưởng của tình yêu, tình đồng đội thiêng liêng, là khát vọng hòa bình, hoà hợp dân tộc của nhân dân Việt Nam.', '350x495-muado_1.jpg'),
+(7, 'PANOR: TÀ THUẬT HUYẾT NGẢI 2', 'Hồi hộp, Kinh Dị', 125, 'Sau khi từ bỏ quyền năng của Thần Ba Mắt, cuộc đời Panor được thiết lập lại, nhưng ký ức đã bị xóa sạch. Cô bắt đầu cuộc sống mới như mơ, được học tại trường sư phạm với Piak luôn lặng lẽ theo dõi và giúp đỡ từ xa. Nhưng bình yên ngắn chẳng tày gang, khi có một người bí ẩn luôn nhăm nhe tìm cách đánh thức sức mạnh của Thần Ba Mắt bên trong Panor.', 'poster_panor_ta_thuat_huyen_ngai__1.jpg');
 
 -- --------------------------------------------------------
 
@@ -153,9 +155,10 @@ INSERT INTO `suat_chieu` (`id`, `phim_id`, `phong_id`, `ngay`, `gio`, `gia`) VAL
 (3, 1, 1, '2026-02-05', '19:30:00', 90000),
 (4, 1, 1, '2026-02-06', '10:00:00', 70000),
 (5, 1, 1, '2026-02-06', '20:00:00', 90000),
-(6, 3, NULL, '2026-02-04', '02:12:00', 123000),
-(7, 2, NULL, '2026-02-05', '14:22:00', 75000),
-(8, 4, NULL, '2026-02-06', '14:22:00', 125000);
+(6, 2, NULL, '2026-02-04', '02:12:00', 123000),
+(7, 1, NULL, '2026-02-05', '14:22:00', 75000),
+(8, 3, NULL, '2026-02-06', '14:22:00', 125000),
+(9, 2, NULL, '2026-03-04', '12:22:00', 125000);
 
 -- --------------------------------------------------------
 
@@ -287,7 +290,7 @@ ALTER TABLE `rap`
 -- AUTO_INCREMENT cho bảng `suat_chieu`
 --
 ALTER TABLE `suat_chieu`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT cho bảng `users`
