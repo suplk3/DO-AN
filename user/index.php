@@ -27,19 +27,19 @@ include "../config/db.php";
             <?php endif; ?>
         </nav>
 
-        <div class="actions">
-            <?php if (isset($_SESSION['user_id'])): ?>
-                <span class="hello">👋 <?= htmlspecialchars($_SESSION['ten'] ?? 'Khách') ?></span>
-                <a href="#" class="link">🎟️ VÉ CỦA TÔI</a>
-                <a href="../auth/logout.php" class="btn-ghost"
-                   onclick="return confirm('Bạn có chắc chắn muốn đăng xuất không?');">
-                   🚪 ĐĂNG XUẤT
-                </a>
-            <?php else: ?>
-                <a href="../auth/login.php" class="btn">🔐 ĐĂNG NHẬP</a>
-            <?php endif; ?>
-        </div>
-    </div>
+        <?php if (isset($_SESSION['user_id'])): ?>
+    <span class="hello">👋 Xin chào</span>
+    <a href="../user/ve_cua_toi.php" class="admin-btn">VÉ CỦA TÔI</a>       
+
+    <a href="../auth/logout.php"
+   onclick="return confirm('Bạn có chắc chắn muốn đăng xuất không?');">
+   🚪 ĐĂNG XUẤT
+</a>
+<?php else: ?>
+    <a href="../auth/login.php">🔐 ĐĂNG NHẬP</a>
+<?php endif; ?>
+
+    </nav>
 </header>
 
 <main class="container">
