@@ -7,11 +7,11 @@
     margin: 24px 0;
     border-radius: 14px;
     overflow: hidden;
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5), 
-                0 4px 16px rgba(59, 130, 246, 0.1),
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6), 
+                0 4px 16px rgba(59, 130, 246, 0.15),
                 inset 0 1px 0 rgba(255, 255, 255, 0.05);
-    background: linear-gradient(135deg, #0f1419 0%, #131920 100%);
-    border: 1px solid rgba(59, 130, 246, 0.1);
+    background: linear-gradient(135deg, #0a0e17 0%, #0f1419 50%, #131920 100%);
+    border: 1px solid rgba(59, 130, 246, 0.15);
 }
 
 .action-header {
@@ -266,7 +266,7 @@
     box-shadow: 0 6px 20px rgba(239, 68, 68, 0.6),
                 0 0 0 3px rgba(239, 68, 68, 0.1);
 }
-  
+
 
 .separator {
     color: #64748b;
