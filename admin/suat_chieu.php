@@ -24,7 +24,7 @@ $result = mysqli_query($conn, $sql);
 <link rel="stylesheet" href="../assets/css/style.css">
 <link rel="stylesheet" href="../assets/css/actions.css">
 <style>
-    body { max-width: 1200px; margin: 0 auto; padding: 20px; background: #fff8e6; color: #0f172a; }
+    body { max-width: 1200px; margin: 0 auto; padding: 20px; background: #fff8e6de; color: #0f172a; }
 </style>
 </head>
 <body>
