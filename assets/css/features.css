@@ -19,34 +19,40 @@
 .search-box input {
     width: 100%;
     padding: 14px 16px 14px 42px;
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%);
-    border: 1.5px solid rgba(59, 130, 246, 0.3);
-    border-radius: 10px;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.12) 0%, rgba(59, 130, 246, 0.06) 100%);
+    border: 1.5px solid rgba(59, 130, 246, 0.35);
+    border-radius: 12px;
     color: #e2e8f0;
     font-size: 14px;
     font-weight: 500;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     outline: none;
     height: 100%;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.08);
 }
 
 .search-box input::placeholder {
     color: #64748b;
+    font-weight: 500;
 }
 
 .search-box input:focus {
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0.08) 100%);
-    border-color: rgba(59, 130, 246, 0.6);
-    box-shadow: 0 0 12px rgba(59, 130, 246, 0.3);
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.18) 0%, rgba(59, 130, 246, 0.1) 100%);
+    border-color: rgba(59, 130, 246, 0.7);
+    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.25),
+                0 0 0 3px rgba(59, 130, 246, 0.1);
+    color: #f0f4f8;
 }
 
 .search-icon {
     position: absolute;
-    left: 12px;
+    left: 14px;
     top: 50%;
     transform: translateY(-50%);
     font-size: 16px;
     color: #60a5fa;
+    pointer-events: none;
+    transition: all 0.3s ease;
 }
 
 /* Stats Section */
