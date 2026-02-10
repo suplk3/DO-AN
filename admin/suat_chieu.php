@@ -54,7 +54,7 @@ $result = mysqli_query($conn, $sql);
             <span class="action-movie-icon">🎬</span>
             <span><?= htmlspecialchars($row['ten_phim']) ?></span>
         </div>
-        <div style="color: #e2e8f0; font-weight: 600; text-align: right;">
+        <div class="action-price">
             <?= number_format($row['gia']) ?> đ
         </div>
         <div class="action-buttons">
