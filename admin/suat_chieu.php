@@ -29,7 +29,7 @@ $result = mysqli_query($conn, $sql);
 </head>
 <body>
 
-<h2 style="background: linear-gradient( #0f172a); color: #ffffff; margin-bottom: 20px;width:30px;">🎞️ QUẢN LÝ SUẤT CHIẾU</h2>
+<h2 style="background: linear-gradient( #0f172a); color: #ffffff; margin-bottom: 20px;width:20px;height:80%;">🎞️ QUẢN LÝ SUẤT CHIẾU</h2>
 
 <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
     <a href="them_suat.php" class="btn" style="background: rgba(232, 68, 23, 0.93); color:  white ; padding: 10px 16px; border-radius: 6px; text-decoration: none;">➕ Thêm suất chiếu</a>
