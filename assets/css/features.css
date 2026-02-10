@@ -11,6 +11,9 @@
     flex: 1;
     min-width: 300px;
     position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
 }
 
 .search-box input {
@@ -24,6 +27,7 @@
     font-weight: 500;
     transition: all 0.3s ease;
     outline: none;
+    height: 100%;
 }
 
 .search-box input::placeholder {
