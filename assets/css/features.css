@@ -8,12 +8,14 @@
 }
 
 .search-box {
-    flex: 1;
-    min-width: 300px;
+    /* fixed sensible width with responsive limits */
+    flex: 0 0 280px;
+    min-width: 220px;
+    max-width: 360px;
     position: relative;
     display: flex;
     align-items: center;
-    width: 100%;
+    width: auto;
 }
 
 .search-box input {
