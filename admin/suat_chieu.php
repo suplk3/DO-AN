@@ -29,11 +29,11 @@ $result = mysqli_query($conn, $sql);
 </head>
 <body>
 
-<h2 style="color: #ffffff; margin-bottom: 20px;">🎞️ QUẢN LÝ SUẤT CHIẾU</h2>
+<h2 style="background: linear-gradient(90deg, #ff4d4f, #ff0000); color: #ffffff; margin-bottom: 20px;">🎞️ QUẢN LÝ SUẤT CHIẾU</h2>
 
 <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
-    <a href="them_suat.php" class="btn" style="background: var(--accent-red); color: white; padding: 10px 16px; border-radius: 6px; text-decoration: none;">➕ Thêm suất chiếu</a>
-    <a href="../user/index.php" class="btn" style="background: rgba(255,255,255,0.1); color: white; padding: 10px 16px; border-radius: 6px; text-decoration: none; border: 1px solid rgba(255,255,255,0.2);">🏠 Về trang chính</a>
+    <a href="them_suat.php" class="btn" style="background: rgba(232, 68, 23, 0.93); color:  white ; padding: 10px 16px; border-radius: 6px; text-decoration: none;">➕ Thêm suất chiếu</a>
+    <a href="../user/index.php" class="btn" style="background: rgba(232, 68, 23, 0.93); color: white; padding: 10px 16px; border-radius: 6px; text-decoration: none; border: 1px solid rgba(255,255,255,0.2);">🏠 Về trang chính</a>
 </div>
 
 <div class="actions-section">
