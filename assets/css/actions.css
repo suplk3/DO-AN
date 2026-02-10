@@ -47,6 +47,10 @@
     gap: 6px;
 }
 
+.action-header div:last-child {
+    justify-content: flex-end;
+}
+
 .action-title {
     background: linear-gradient(90deg, #2d3748, #1f2937);
     color: #ffffff;
@@ -262,9 +266,7 @@
     box-shadow: 0 6px 20px rgba(239, 68, 68, 0.6),
                 0 0 0 3px rgba(239, 68, 68, 0.1);
 }
-    color: #ffffff;
-    box-shadow: 0 2px 8px rgba(229, 62, 62, 0.4);
-}
+  
 
 .separator {
     color: #64748b;

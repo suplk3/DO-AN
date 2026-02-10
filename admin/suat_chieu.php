@@ -29,11 +29,11 @@ $result = mysqli_query($conn, $sql);
 </head>
 <body>
 
-<h2 style="background: linear-gradient( #0f172a); color: #ffffff; margin-bottom: 20px;">🎞️ QUẢN LÝ SUẤT CHIẾU</h2>
+<h2 style="background: linear-gradient(135deg, #1a1f2e 0%, #0f172a 100%); color: #ffffff; margin-bottom: 24px; padding: 20px 24px; border-radius: 12px; font-size: 24px; letter-spacing: 1px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.15); margin: 0 0 24px 0;">🎞️ QUẢN LÝ SUẤT CHIẾU</h2>
 
-<div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
-    <a href="them_suat.php" class="btn" style="background: rgba(232, 68, 23, 0.93); color:  white ; padding: 10px 16px; border-radius: 6px; text-decoration: none;">➕ Thêm suất chiếu</a>
-    <a href="../user/index.php" class="btn" style="background: rgba(232, 68, 23, 0.93); color: white; padding: 10px 16px; border-radius: 6px; text-decoration: none; border: 1px solid rgba(255,255,255,0.2);">🏠 Về trang chính</a>
+<div style="display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;">
+    <a href="them_suat.php" class="btn" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; padding: 12px 20px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 14px; border: 1px solid #f87171; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3); transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 8px; letter-spacing: 0.5px;">➕ Thêm suất chiếu</a>
+    <a href="../user/index.php" class="btn" style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0.08) 100%); color: #3b82f6; padding: 12px 20px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 14px; border: 1.5px solid #3b82f6; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2); transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 8px; letter-spacing: 0.5px;">🏠 Về trang chính</a>
 </div>
 
 <div class="actions-section">
