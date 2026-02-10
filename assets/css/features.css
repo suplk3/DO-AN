@@ -8,7 +8,7 @@
 }
 
 .search-box {
-    /* longer fluid width and reduced height for a sleeker bar */
+    /* match button height and expand width: taller and fluid */
     flex: 1 1 75%;
     min-width: 260px;
     max-width: 100%;
@@ -16,22 +16,22 @@
     display: flex;
     align-items: center;
     width: 100%;
-    height: 36px; /* reduced height for compact look */
+    height: 48px; /* match action buttons' visual height */
 }
 
 .search-box input {
     width: 100%;
-    padding: 6px 10px 6px 40px;
+    padding: 10px 14px 10px 44px;
     background: linear-gradient(135deg, rgba(59, 130, 246, 0.12) 0%, rgba(59, 130, 246, 0.06) 100%);
-    border: 1px solid rgba(59, 130, 246, 0.28);
-    border-radius: 8px;
+    border: 1px solid rgba(59, 130, 246, 0.32);
+    border-radius: 10px;
     color: #e2e8f0;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 600;
     transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
     outline: none;
-    height: 36px;
-    box-shadow: 0 4px 10px rgba(59, 130, 246, 0.04);
+    height: 48px;
+    box-shadow: 0 6px 14px rgba(59, 130, 246, 0.05);
 }
 
 .search-box input::placeholder {
