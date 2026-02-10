@@ -22,47 +22,45 @@ $result = mysqli_query($conn, $sql);
 <meta charset="UTF-8">
 <title>Quản lý suất chiếu</title>
 <link rel="stylesheet" href="../assets/css/style.css">
+<link rel="stylesheet" href="../assets/css/actions.css">
+<style>
+    body { max-width: 1200px; margin: 0 auto; padding: 20px; }
+</style>
 </head>
 <body>
 
-<h2>🎞️ QUẢN LÝ SUẤT CHIẾU</h2>
+<h2 style="color: #ffffff; margin-bottom: 20px;">🎞️ QUẢN LÝ SUẤT CHIẾU</h2>
 
-<a href="them_suat.php" class="btn">➕ Thêm suất chiếu</a>
-<a href="../user/index.php" class="btn">🏠 Về trang chính</a>
+<div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+    <a href="them_suat.php" class="btn" style="background: var(--accent-red); color: white; padding: 10px 16px; border-radius: 6px; text-decoration: none;">➕ Thêm suất chiếu</a>
+    <a href="../user/index.php" class="btn" style="background: rgba(255,255,255,0.1); color: white; padding: 10px 16px; border-radius: 6px; text-decoration: none; border: 1px solid rgba(255,255,255,0.2);">🏠 Về trang chính</a>
+</div>
 
-<table border="1" cellpadding="10" cellspacing="0">
-<tr>
-    <th>Phim</th>
-    <th>Ngày</th>
-    <th>Giờ</th>
-    <th>Giá</th>
-    <th>Hành động</th>
-</tr>
+<div class="actions-section">
+    <div class="action-title">Hành động</div>
 
 <?php while ($row = mysqli_fetch_assoc($result)): ?>
-<tr>
-    <td><?= $row['ten_phim'] ?></td>
-    <td><?= date('d/m/Y', strtotime($row['ngay'])) ?></td>
-    <td><?= $row['gio'] ?></td>
-    <td><?= number_format($row['gia']) ?> đ</td>
-    <<td>
-<?php if ($row['so_ve'] == 0): ?>
-    <a href="sua_suat.php?id=<?= $row['id'] ?>">✏️ Sửa</a> |
-    <a href="xoa_suat.php?id=<?= $row['id'] ?>"
-       onclick="return confirm('Xóa suất chiếu này?')">
-       ❌ Xóa
-    </a>
-<?php else: ?>
-    <span style="color:red;font-weight:bold">
-        🔒 Đã có vé
-    </span>
-<?php endif; ?>
-</td>
-
-</tr>
+    <div class="action-row">
+        <div class="action-status">
+            <span class="status-icon">🎬</span>
+            <span><?= htmlspecialchars($row['ten_phim']) ?></span>
+            <span style="color: #94a3b8; margin-left: 10px;"><?= date('d/m/Y', strtotime($row['ngay'])) ?> - <?= $row['gio'] ?></span>
+        </div>
+        <div class="action-buttons">
+            <?php if ($row['so_ve'] == 0): ?>
+                <a href="sua_suat.php?id=<?= $row['id'] ?>" class="btn-action">✏️ Sửa</a>
+                <span class="separator">|</span>
+                <a href="xoa_suat.php?id=<?= $row['id'] ?>" class="btn-action btn-delete-action" onclick="return confirm('Xóa suất chiếu này?')">❌ Xóa</a>
+            <?php else: ?>
+                <div class="action-status">
+                    <span class="status-icon" style="color: #ff4d4f;">🔒</span>
+                    <span class="status-text">Đã có về</span>
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
 <?php endwhile; ?>
-
-</table>
+</div>
 
 </body>
 </html>
