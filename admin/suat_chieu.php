@@ -24,7 +24,12 @@ $result = mysqli_query($conn, $sql);
 <link rel="stylesheet" href="../assets/css/style.css">
 <link rel="stylesheet" href="../assets/css/actions.css">
 <style>
-    body { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    body { 
+        background: #0b1b2b !important; 
+        max-width: 1200px; 
+        margin: 0 auto; 
+        padding: 20px;
+    }
 </style>
 </head>
 <body>
@@ -35,7 +40,6 @@ $result = mysqli_query($conn, $sql);
     <a href="them_suat.php" class="btn" style="background: var(--accent-red); color: white; padding: 10px 16px; border-radius: 6px; text-decoration: none;">➕ Thêm suất chiếu</a>
     <a href="../user/index.php" class="btn" style="background: rgba(255,255,255,0.1); color: white; padding: 10px 16px; border-radius: 6px; text-decoration: none; border: 1px solid rgba(255,255,255,0.2);">🏠 Về trang chính</a>
 </div>
-
 <div class="actions-section">
     <div class="action-header">
         <div>⏰ Khung giờ</div>
