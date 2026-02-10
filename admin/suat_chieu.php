@@ -14,6 +14,26 @@ GROUP BY suat_chieu.id
 ORDER BY ngay, gio
 ";
 $result = mysqli_query($conn, $sql);
+
+// Tính thống kê
+$stats_sql = "
+SELECT 
+    COUNT(DISTINCT suat_chieu.id) AS total_showtimes,
+    COUNT(DISTINCT CASE WHEN COUNT(ve.id) = 0 THEN suat_chieu.id END) AS available_showtimes,
+    COUNT(DISTINCT CASE WHEN COUNT(ve.id) > 0 THEN suat_chieu.id END) AS booked_showtimes,
+    COALESCE(SUM(suat_chieu.gia * (SELECT COUNT(*) FROM ve WHERE ve.suat_chieu_id = suat_chieu.id)), 0) AS total_revenue
+FROM suat_chieu
+LEFT JOIN ve ON ve.suat_chieu_id = suat_chieu.id
+GROUP BY suat_chieu.id
+";
+$stats_result = mysqli_query($conn, "
+SELECT 
+    COUNT(DISTINCT suat_chieu.id) AS total_showtimes,
+    SUM(CASE WHEN (SELECT COUNT(*) FROM ve WHERE ve.suat_chieu_id = suat_chieu.id) = 0 THEN 1 ELSE 0 END) AS available_showtimes,
+    SUM(CASE WHEN (SELECT COUNT(*) FROM ve WHERE ve.suat_chieu_id = suat_chieu.id) > 0 THEN 1 ELSE 0 END) AS booked_showtimes
+FROM suat_chieu
+");
+$stats = mysqli_fetch_assoc($stats_result);
 ?>
 
 <!DOCTYPE html>
@@ -23,17 +43,53 @@ $result = mysqli_query($conn, $sql);
 <title>Quản lý suất chiếu</title>
 <link rel="stylesheet" href="../assets/css/style.css">
 <link rel="stylesheet" href="../assets/css/actions.css">
+<link rel="stylesheet" href="../assets/css/features.css">
 <style>
-    body { max-width: 1200px; margin: 0 auto; padding: 20px; background: linear-gradient(135deg, #0f1419 0%, #1a1f2e 100%); color: #e2e8f0; }
+    body { max-width: 1200px; margin: 0 auto; padding: 20px; background: linear-gradient(135deg, #0a0e17 0%, #0f1419 100%); color: #e2e8f0; }
 </style>
 </head>
 <body>
 
-<h2 style="background: linear-gradient(135deg, #1a1f2e 0%, #0f172a 100%); color: #ffffff; margin-bottom: 24px; padding: 20px 24px; border-radius: 12px; font-size: 24px; letter-spacing: 1px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.15); margin: 0 0 24px 0;">🎞️ QUẢN LÝ SUẤT CHIẾU</h2>
+<div id="notification"></div>
+
+<h2 style="background: linear-gradient(135deg, #1a1f2e 0%, #0f172a 100%); color: #ffffff; margin-bottom: 24px; padding: 20px 24px; border-radius: 12px; font-size: 24px; letter-spacing: 1px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.15);">🎞️ QUẢN LÝ SUẤT CHIẾU</h2>
 
 <div style="display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;">
     <a href="them_suat.php" class="btn" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; padding: 12px 20px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 14px; border: 1px solid #f87171; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3); transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 8px; letter-spacing: 0.5px;">➕ Thêm suất chiếu</a>
     <a href="../user/index.php" class="btn" style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0.08) 100%); color: #3b82f6; padding: 12px 20px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 14px; border: 1.5px solid #3b82f6; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2); transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 8px; letter-spacing: 0.5px;">🏠 Về trang chính</a>
+</div>
+
+<!-- Stats Section -->
+<div class="stats-section">
+    <div class="stat-card total">
+        <div class="stat-icon">🎬</div>
+        <div class="stat-content">
+            <div class="stat-label">Tổng suất chiếu</div>
+            <div class="stat-value"><?= $stats['total_showtimes'] ?? 0 ?></div>
+        </div>
+    </div>
+    <div class="stat-card available">
+        <div class="stat-icon">✓</div>
+        <div class="stat-content">
+            <div class="stat-label">Còn trống</div>
+            <div class="stat-value"><?= $stats['available_showtimes'] ?? 0 ?></div>
+        </div>
+    </div>
+    <div class="stat-card booked">
+        <div class="stat-icon">🔒</div>
+        <div class="stat-content">
+            <div class="stat-label">Đã có vé</div>
+            <div class="stat-value"><?= $stats['booked_showtimes'] ?? 0 ?></div>
+        </div>
+    </div>
+</div>
+
+<!-- Search Bar -->
+<div class="search-section">
+    <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" placeholder="Tìm tên phim, ngày, giờ...">
+    </div>
 </div>
 
 <div class="actions-section">
@@ -72,6 +128,51 @@ $result = mysqli_query($conn, $sql);
     </div>
 <?php endwhile; ?>
 </div>
+
+<script>
+// Search functionality
+const searchInput = document.getElementById('searchInput');
+const actionRows = document.querySelectorAll('.action-row');
+
+searchInput?.addEventListener('keyup', function(e) {
+    const query = e.target.value.toLowerCase();
+    
+    actionRows.forEach(row => {
+        const time = row.querySelector('.action-time span:last-child')?.textContent.toLowerCase() || '';
+        const movie = row.querySelector('.action-movie span:last-child')?.textContent.toLowerCase() || '';
+        const price = row.querySelector('.action-price')?.textContent.toLowerCase() || '';
+        
+        if (time.includes(query) || movie.includes(query) || price.includes(query)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+});
+
+// Notification function
+function showNotification(message, type = 'success') {
+    const notifContainer = document.getElementById('notification');
+    const notif = document.createElement('div');
+    notif.className = `notification ${type}`;
+    notif.innerHTML = `
+        <span>${message}</span>
+        <span class="notification-close" onclick="this.parentElement.classList.add('exit'); setTimeout(() => this.parentElement.remove(), 300)">✕</span>
+    `;
+    notifContainer.appendChild(notif);
+    
+    setTimeout(() => {
+        notif.classList.add('exit');
+        setTimeout(() => notif.remove(), 300);
+    }, 3000);
+}
+
+// Show success notification if redirect from action
+const urlParams = new URLSearchParams(window.location.search);
+if (window.location.href.includes('them_suat') || window.location.href.includes('sua_suat')) {
+    // Optional: show notification based on page state
+}
+</script>
 
 </body>
 </html>
