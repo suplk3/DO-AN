@@ -40,6 +40,7 @@ $result = mysqli_query($conn, $sql);
     <div class="action-header">
         <div>⏰ Khung giờ</div>
         <div>🎬 Tên phim</div>
+        <div>💰 Giá</div>
         <div>⚙️ Hành động</div>
     </div>
 
@@ -52,6 +53,9 @@ $result = mysqli_query($conn, $sql);
         <div class="action-movie">
             <span class="action-movie-icon">🎬</span>
             <span><?= htmlspecialchars($row['ten_phim']) ?></span>
+        </div>
+        <div style="color: #e2e8f0; font-weight: 600; text-align: right;">
+            <?= number_format($row['gia']) ?> đ
         </div>
         <div class="action-buttons">
             <?php if ($row['so_ve'] == 0): ?>
