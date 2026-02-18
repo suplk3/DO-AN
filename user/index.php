@@ -11,6 +11,7 @@ include "../config/db.php";
 <title>CGV Cinemas</title>
 <link rel="stylesheet" href="../assets/css/style.css">
 <link rel="stylesheet" href="../assets/css/user-index.css">
+    <link rel="stylesheet" href="../assets/css/login-modal.css">
 </head>
 <body class="user-index">
 
@@ -36,7 +37,7 @@ include "../config/db.php";
    🚪 ĐĂNG XUẤT
 </a>
 <?php else: ?>
-    <a href="../auth/login.php">🔐 ĐĂNG NHẬP</a>
+    <a href="../auth/login.php" class="open-login-modal">🔐 ĐĂNG NHẬP</a>
 <?php endif; ?>
 
     </nav>
@@ -72,7 +73,7 @@ include "../config/db.php";
                     <?php if (isset($_SESSION['user_id'])): ?>
                         <a href="chon_suat.php?phim_id=<?= $id ?>" class="btn btn-primary">ĐẶT VÉ</a>
                     <?php else: ?>
-                        <a href="../auth/login.php" class="btn btn-outline">ĐĂNG NHẬP ĐỂ ĐẶT VÉ</a>
+                        <a href="../auth/login.php" class="btn btn-outline open-login-modal">ĐĂNG NHẬP ĐỂ ĐẶT VÉ</a>
                     <?php endif; ?>
                     <a href="chi_tiet_phim.php?id=<?= $id ?>" class="btn btn-sm">CHI TIẾT</a>
                 </div>
@@ -105,6 +106,8 @@ include "../config/db.php";
     onScroll();
 })();
 </script>
+
+<script src="../assets/js/login-modal.js"></script>
 
 </body>
 </html>
