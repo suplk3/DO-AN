@@ -36,6 +36,7 @@ function fmt_money($n){ return $n !== null ? number_format($n,0,',','.') . '₫'
 <title><?= htmlspecialchars($phim['ten_phim']) ?></title>
 <link rel="stylesheet" href="../assets/css/style.css">
 <link rel="stylesheet" href="../assets/css/movie-detail.css">
+<link rel="stylesheet" href="../assets/css/login-modal.css">
 </head>
 <body class="movie-detail-page">
 
@@ -59,7 +60,7 @@ function fmt_money($n){ return $n !== null ? number_format($n,0,',','.') . '₫'
                 <a href="../auth/logout.php" class="btn-ghost"
                    onclick="return confirm('Bạn có chắc chắn muốn đăng xuất không?');">🚪 ĐĂNG XUẤT</a>
             <?php else: ?>
-                <a href="../auth/login.php" class="btn">🔐 ĐĂNG NHẬP</a>
+                <a href="../auth/login.php" class="btn open-login-modal">🔐 ĐĂNG NHẬP</a>
             <?php endif; ?>
         </div>
     </div>
@@ -90,7 +91,7 @@ function fmt_money($n){ return $n !== null ? number_format($n,0,',','.') . '₫'
                 <?php if (isset($_SESSION['user_id'])): ?>
                     <a href="chon_suat.php?phim_id=<?= (int)$phim['id'] ?>" class="btn-primary">🎟 Đặt vé</a>
                 <?php else: ?>
-                    <a href="../auth/login.php" class="btn-outline">🔐 Đăng nhập để đặt vé</a>
+                    <a href="../auth/login.php" class="btn-outline open-login-modal">🔐 Đăng nhập để đặt vé</a>
                 <?php endif; ?>
                 <a href="#showtimes" class="btn-sm">📅 Xem suất chiếu</a>
             </div>
@@ -153,7 +154,7 @@ function fmt_money($n){ return $n !== null ? number_format($n,0,',','.') . '₫'
                             <?php if (isset($_SESSION['user_id'])): ?>
                                 <a href="chon_ghe.php?suat_id=<?= $suat_id ?>" class="btn-primary">Đặt ngay</a>
                             <?php else: ?>
-                                <a href="../auth/login.php" class="btn-outline">Đăng nhập để đặt</a>
+                                        <a href="../auth/login.php" class="btn-outline open-login-modal">Đăng nhập để đặt</a>
                             <?php endif; ?>
                         </div>
                     </article>
@@ -166,6 +167,8 @@ function fmt_money($n){ return $n !== null ? number_format($n,0,',','.') . '₫'
 <footer class="footer">
     <div>© <?= date('Y') ?> CGV Cinemas — Thiết kế gọn, responsive.</div>
 </footer>
+
+<script src="/assets/js/login-modal.js"></script>
 
 </body>
 </html>
