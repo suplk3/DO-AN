@@ -37,33 +37,39 @@
 
         // Prevent overlay click from closing when clicking inside the modal
         const modal = overlay.querySelector('.login-modal');
-        if (modal) modal.addEventListener('click', function(e){ e.stopPropagation(); });
+        if (modal) {
+          modal.addEventListener('click', function(e){ e.stopPropagation(); });
+        }
 
-        // No top tabs: both Login and Register are visible by default.
-        // The "Quên mật khẩu?" link will scroll to the Reset form below.
-        overlay.querySelectorAll('.forgot-link').forEach(a=> a.addEventListener('click', function(e){
-          e.preventDefault();
-          const fv = overlay.querySelector('.auth-view[data-view="forgot"]');
-          if (fv) fv.scrollIntoView({behavior:'smooth', block:'center'});
-        }));
+        // Handle switching giữa đăng nhập <-> đăng ký với hiệu ứng trượt
+        const card = overlay.querySelector('.auth-card');
+        function goRegister() {
+          if (!card) return;
+          card.classList.add('show-signup');
+          const reg = overlay.querySelector('.auth-view-register');
+          const input = reg && reg.querySelector('input');
+          if (input) input.focus();
+        }
+        function goLogin() {
+          if (!card) return;
+          card.classList.remove('show-signup');
+          const loginV = overlay.querySelector('.auth-view-login');
+          const input = loginV && loginV.querySelector('input[type="email"]');
+          if (input) input.focus();
+        }
 
-          // Handle switching between login and register from inside the modal
-          overlay.querySelectorAll('.switch-to-register').forEach(btn => btn.addEventListener('click', function(){
-            const loginV = overlay.querySelector('.auth-view[data-view="login"]');
-            const regV = overlay.querySelector('.auth-view[data-view="register"]');
-            if (loginV) loginV.style.display = 'none';
-            if (regV) regV.style.display = '';
-            // focus first input of register
-            const input = regV && regV.querySelector('input'); if (input) input.focus();
-          }));
-
-          overlay.querySelectorAll('.switch-to-login').forEach(btn => btn.addEventListener('click', function(){
-            const loginV = overlay.querySelector('.auth-view[data-view="login"]');
-            const regV = overlay.querySelector('.auth-view[data-view="register"]');
-            if (regV) regV.style.display = 'none';
-            if (loginV) loginV.style.display = '';
-            const input = loginV && loginV.querySelector('input'); if (input) input.focus();
-          }));
+        overlay.querySelectorAll('.switch-to-register').forEach(btn => {
+          btn.addEventListener('click', function(e){
+            e.preventDefault();
+            goRegister();
+          });
+        });
+        overlay.querySelectorAll('.switch-to-login').forEach(btn => {
+          btn.addEventListener('click', function(e){
+            e.preventDefault();
+            goLogin();
+          });
+        });
         // Password show/hide toggle
         overlay.querySelectorAll('.pw-toggle').forEach(function(btn){
           btn.addEventListener('click', function(){
@@ -93,11 +99,8 @@
                 msg.textContent = json.message || 'Đã gửi.';
                 if (!registerForm.querySelector('.register-msg')) registerForm.appendChild(msg);
                 if (json.success){
-                  // auto-switch back to login and optionally prefill email
-                  const loginV = overlay.querySelector('.auth-view[data-view="login"]');
-                  const regV = overlay.querySelector('.auth-view[data-view="register"]');
-                  if (regV) regV.style.display = 'none';
-                  if (loginV) { loginV.style.display = ''; const em = loginV.querySelector('input[type="email"]'); if (em) em.value = fm.get('email') || ''; }
+                  // Sau khi đăng ký thành công: reload sang trang user để người dùng thấy đã đăng nhập
+                  window.location.href = '/testdoan/user/index.php';
                 }
               }).catch(function(err){ console.error(err); });
           });
