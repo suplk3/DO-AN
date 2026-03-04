@@ -37,29 +37,39 @@
 
         // Prevent overlay click from closing when clicking inside the modal
         const modal = overlay.querySelector('.login-modal');
-        if (modal) modal.addEventListener('click', function(e){ e.stopPropagation(); });
+        if (modal) {
+          modal.addEventListener('click', function(e){ e.stopPropagation(); });
+        }
 
-        // Handle switching between login và register với hiệu ứng trượt
+        // Handle switching giữa đăng nhập <-> đăng ký với hiệu ứng trượt
         const card = overlay.querySelector('.auth-card');
-        overlay.querySelectorAll('.switch-to-register').forEach(btn =>
-          btn.addEventListener('click', function () {
-            if (!card) return;
-            card.classList.add('show-signup');
-            const reg = overlay.querySelector('.auth-view-register');
-            const input = reg && reg.querySelector('input');
-            if (input) input.focus();
-          })
-        );
+        function goRegister() {
+          if (!card) return;
+          card.classList.add('show-signup');
+          const reg = overlay.querySelector('.auth-view-register');
+          const input = reg && reg.querySelector('input');
+          if (input) input.focus();
+        }
+        function goLogin() {
+          if (!card) return;
+          card.classList.remove('show-signup');
+          const loginV = overlay.querySelector('.auth-view-login');
+          const input = loginV && loginV.querySelector('input[type="email"]');
+          if (input) input.focus();
+        }
 
-        overlay.querySelectorAll('.switch-to-login').forEach(btn =>
-          btn.addEventListener('click', function () {
-            if (!card) return;
-            card.classList.remove('show-signup');
-            const loginV = overlay.querySelector('.auth-view-login');
-            const input = loginV && loginV.querySelector('input[type="email"]');
-            if (input) input.focus();
-          })
-        );
+        overlay.querySelectorAll('.switch-to-register').forEach(btn => {
+          btn.addEventListener('click', function(e){
+            e.preventDefault();
+            goRegister();
+          });
+        });
+        overlay.querySelectorAll('.switch-to-login').forEach(btn => {
+          btn.addEventListener('click', function(e){
+            e.preventDefault();
+            goLogin();
+          });
+        });
         // Password show/hide toggle
         overlay.querySelectorAll('.pw-toggle').forEach(function(btn){
           btn.addEventListener('click', function(){
@@ -89,13 +99,8 @@
                 msg.textContent = json.message || 'Đã gửi.';
                 if (!registerForm.querySelector('.register-msg')) registerForm.appendChild(msg);
                 if (json.success){
-                  // auto-switch back to login và điền sẵn email
-                  if (card) card.classList.remove('show-signup');
-                  const loginV = overlay.querySelector('.auth-view-login');
-                  if (loginV) {
-                    const em = loginV.querySelector('input[type="email"]');
-                    if (em) em.value = fm.get('email') || '';
-                  }
+                  // Sau khi đăng ký thành công: reload sang trang user để người dùng thấy đã đăng nhập
+                  window.location.href = '/testdoan/user/index.php';
                 }
               }).catch(function(err){ console.error(err); });
           });

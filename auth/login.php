@@ -49,8 +49,8 @@ if (isset($_GET['modal']) && $_GET['modal'] == '1') {
             <div class="auth-inner">
                 <div class="auth-panel auth-panel-form">
                     <div class="auth-view auth-view-login is-active">
-                        <h2 class="auth-heading">Sign In</h2>
-                        <p class="auth-subtitle">Đăng nhập để tiếp tục đặt vé và xem lịch sử.</p>
+                        <h2 class="auth-heading">Đăng nhập</h2>
+                        <p class="auth-subtitle">Hãy đăng nhập để tiếp tục đặt vé và xem lịch sử của bạn.</p>
                         <form method="POST" action="/testdoan/auth/login.php" class="login-form">
                             <div class="input-group">
                                 <input type="email" name="email" placeholder="Email" required>
@@ -59,18 +59,14 @@ if (isset($_GET['modal']) && $_GET['modal'] == '1') {
                                 <input type="password" name="mat_khau" placeholder="Mật khẩu" required>
                                 <span class="icon pw-toggle" title="Hiện/Ẩn">👁</span>
                             </div>
-                            <button type="submit" name="login" class="btn-primary">Đăng nhập</button>
-                            <p class="auth-small">
-                                Chưa có tài khoản?
-                                <button type="button" class="link-btn switch-to-register">Đăng ký ngay</button>
-                            </p>
+                            <button type="submit" name="login" class="btn-primary">Đăng nhập23123</button>
                         </form>
                         <p class="login-error message"><?php echo $error; ?></p>
                     </div>
 
                     <div class="auth-view auth-view-register">
-                        <h2 class="auth-heading">Sign Up</h2>
-                        <p class="auth-subtitle">Tạo tài khoản mới để lưu vé và ưu đãi.</p>
+                        <h2 class="auth-heading">Đăng ký</h2>
+                        <p class="auth-subtitle">Tạo tài khoản mới để lưu vé và nhận nhiều ưu đãi.</p>
                         <form method="POST" action="/testdoan/auth/register.php" class="register-form">
                             <div class="input-group"><input name="ten" placeholder="Tên" required></div>
                             <div class="input-group"><input name="email" type="email" placeholder="Email" required></div>
@@ -78,7 +74,7 @@ if (isset($_GET['modal']) && $_GET['modal'] == '1') {
                             <button name="dangky" class="btn-primary">Đăng ký</button>
                             <p class="auth-small">
                                 Đã có tài khoản?
-                                <button type="button" class="link-btn switch-to-login">Đăng nhập</button>
+                                <button type="button" class="link-btn switch-to-login">Quay lại đăng nhập</button>
                             </p>
                             <p class="register-msg message"></p>
                         </form>
@@ -87,15 +83,11 @@ if (isset($_GET['modal']) && $_GET['modal'] == '1') {
 
                 <div class="auth-panel auth-panel-hero">
                     <div class="hero hero-login">
-                        <h3>Welcome back</h3>
-                        <p>Đăng nhập để xem các suất chiếu mới nhất và những bộ phim yêu thích.</p>
-                        <button type="button" class="hero-btn switch-to-register">Sign Up</button>
+                        <h3>Chào mừng trở lại</h3>
+                        <p>Đăng nhập để cập nhật các suất chiếu mới nhất và những bộ phim bạn yêu thích.</p>
+                        <a href="/testdoan/auth/register.php" class="hero-btn">Đăng ký</a>
                     </div>
-                    <div class="hero hero-register">
-                        <h3>Welcome Back!</h3>
-                        <p>Đã có tài khoản? Chỉ cần đăng nhập để tiếp tục trải nghiệm.</p>
-                        <button type="button" class="hero-btn switch-to-login">Sign In</button>
-                    </div>
+                    <div class="hero hero-register"></div>
                 </div>
             </div>
         </div>
