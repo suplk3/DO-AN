@@ -45,51 +45,57 @@ if (isset($_GET['modal']) && $_GET['modal'] == '1') {
     <div class="login-modal" role="dialog" aria-modal="true">
         <div class="auth-card">
             <button class="login-close" aria-label="Đóng">&times;</button>
-            <div class="auth-avatar">👤</div>
 
-            <div class="auth-views">
-                <div class="auth-view" data-view="login">
-                    <h2>Sign In</h2>
-                    <form method="POST" action="/testdoan/auth/login.php" class="login-form">
-                        <div class="input-group">
-                            <input type="email" name="email" placeholder="Email" required>
-                        </div>
-                        <div class="input-group">
-                            <input type="password" name="mat_khau" placeholder="Mật khẩu" required>
-                            <span class="icon pw-toggle" title="Hiện/Ẩn">👁</span>
-                        </div>
-                        <button type="submit" name="login" class="btn-primary">Đăng nhập</button>
+            <div class="auth-inner">
+                <div class="auth-panel auth-panel-form">
+                    <div class="auth-view auth-view-login is-active">
+                        <h2 class="auth-heading">Sign In</h2>
+                        <p class="auth-subtitle">Đăng nhập để tiếp tục đặt vé và xem lịch sử.</p>
+                        <form method="POST" action="/testdoan/auth/login.php" class="login-form">
+                            <div class="input-group">
+                                <input type="email" name="email" placeholder="Email" required>
+                            </div>
+                            <div class="input-group">
+                                <input type="password" name="mat_khau" placeholder="Mật khẩu" required>
+                                <span class="icon pw-toggle" title="Hiện/Ẩn">👁</span>
+                            </div>
+                            <button type="submit" name="login" class="btn-primary">Đăng nhập</button>
+                            <p class="auth-small">
+                                Chưa có tài khoản?
+                                <button type="button" class="link-btn switch-to-register">Đăng ký ngay</button>
+                            </p>
+                        </form>
+                        <p class="login-error message"><?php echo $error; ?></p>
+                    </div>
 
-                        <div style="display:flex;gap:8px;margin-top:10px;align-items:center;">
-                            <label style="font-weight:400;margin-right:auto;"><input type="checkbox" name="remember"> Ghi nhớ</label>
-                            <a href="#" class="forgot-link" data-view-target="forgot">Quên mật khẩu?</a>
-                        </div>
-
-                        <div style="margin-top:12px;text-align:center;">
-                            <button type="button" class="switch-to-register" style="background:transparent;border:1px solid rgba(255,255,255,0.18);padding:8px 12px;border-radius:8px;color:#fff;cursor:pointer;">Đăng ký</button>
-                        </div>
-                    </form>
-                    <p class="login-error message"><?php echo $error; ?></p>
+                    <div class="auth-view auth-view-register">
+                        <h2 class="auth-heading">Sign Up</h2>
+                        <p class="auth-subtitle">Tạo tài khoản mới để lưu vé và ưu đãi.</p>
+                        <form method="POST" action="/testdoan/auth/register.php" class="register-form">
+                            <div class="input-group"><input name="ten" placeholder="Tên" required></div>
+                            <div class="input-group"><input name="email" type="email" placeholder="Email" required></div>
+                            <div class="input-group"><input name="mat_khau" type="password" placeholder="Mật khẩu" required></div>
+                            <button name="dangky" class="btn-primary">Đăng ký</button>
+                            <p class="auth-small">
+                                Đã có tài khoản?
+                                <button type="button" class="link-btn switch-to-login">Đăng nhập</button>
+                            </p>
+                            <p class="register-msg message"></p>
+                        </form>
+                    </div>
                 </div>
 
-                <div class="auth-view" data-view="register" style="display:none;">
-                    <h2>Sign Up</h2>
-                    <form method="POST" action="/testdoan/auth/register.php" class="register-form">
-                        <div class="input-group"><input name="ten" placeholder="Tên" required></div>
-                        <div class="input-group"><input name="email" type="email" placeholder="Email" required></div>
-                        <div class="input-group"><input name="mat_khau" type="password" placeholder="Mật khẩu" required></div>
-                        <button name="dangky" class="btn-primary">Đăng ký</button>
-                        <div style="margin-top:10px;text-align:center;"><button type="button" class="switch-to-login" style="background:transparent;border:1px solid rgba(255,255,255,0.08);padding:6px 10px;border-radius:8px;color:#fff;cursor:pointer;">Quay lại đăng nhập</button></div>
-                    </form>
-                </div>
-
-                <div class="auth-view" data-view="forgot" style="display:none;">
-                    <h2>Reset</h2>
-                    <form method="POST" action="/testdoan/auth/forgot_password.php" class="forgot-form">
-                        <div class="input-group"><input name="email" type="email" placeholder="Email đã đăng ký" required></div>
-                        <button name="send_reset" class="btn-primary">Gửi liên kết</button>
-                    </form>
-                    <p class="forgot-msg message"></p>
+                <div class="auth-panel auth-panel-hero">
+                    <div class="hero hero-login">
+                        <h3>Welcome back</h3>
+                        <p>Đăng nhập để xem các suất chiếu mới nhất và những bộ phim yêu thích.</p>
+                        <button type="button" class="hero-btn switch-to-register">Sign Up</button>
+                    </div>
+                    <div class="hero hero-register">
+                        <h3>Welcome Back!</h3>
+                        <p>Đã có tài khoản? Chỉ cần đăng nhập để tiếp tục trải nghiệm.</p>
+                        <button type="button" class="hero-btn switch-to-login">Sign In</button>
+                    </div>
                 </div>
             </div>
         </div>
