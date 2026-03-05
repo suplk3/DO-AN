@@ -95,15 +95,6 @@ function fmt_money($n){ return $n !== null ? number_format($n,0,',','.') . '₫'
                 <?php endif; ?>
                 <a href="#showtimes" class="btn-sm">📅 Xem suất chiếu</a>
             </div>
-
-            <div class="md-extra">
-                <h3>Nội dung chi tiết</h3>
-                <?php if (!empty($phim['mo_ta'])): ?>
-                    <p><?= nl2br(htmlspecialchars($phim['mo_ta'])) ?></p>
-                <?php else: ?>
-                    <p><i>Thông tin nội dung đang được cập nhật.</i></p>
-                <?php endif; ?>
-            </div>
         </div>
     </section>
 

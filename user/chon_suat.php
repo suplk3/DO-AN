@@ -33,32 +33,6 @@ $q_suat = mysqli_query($conn, $sql_suat);
 <meta charset="UTF-8">
 <title>Chọn suất chiếu</title>
 <link rel="stylesheet" href="../assets/css/style.css">
-<style>
-.date-list a{
-    padding:8px 15px;
-    margin-right:10px;
-    background:#eee;
-    text-decoration:none;
-    color:black;
-}
-.date-list a.active{
-    background:#e71a0f;
-    color:white;
-}
-.time-btn{
-    display:inline-block;
-    margin:10px;
-    padding:10px 20px;
-    border:2px solid #e71a0f;
-    color:#e71a0f;
-    text-decoration:none;
-    font-weight:bold;
-}
-.time-btn:hover{
-    background:#e71a0f;
-    color:white;
-}
-</style>
 </head>
 <body>
 
@@ -70,7 +44,8 @@ $q_suat = mysqli_query($conn, $sql_suat);
     </nav>
 </header>
 
-<div class="container">
+<div class="container selection-page">
+    <a href="index.php" class="back-home">🏠 Trang chủ</a>
     <div class="title">CHỌN NGÀY</div>
 
     <div class="date-list">
