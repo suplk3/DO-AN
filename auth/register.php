@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['dangky'])) {
         echo '<!doctype html><meta charset="utf-8"><title>Đăng ký thành công</title>';
         echo '<div style="max-width:600px;margin:40px auto;font-family:Arial,Helvetica,sans-serif">';
         echo '<h2>Đăng ký thành công</h2>';
-        echo '<p>Bạn đã được đăng nhập tự động. <a href="/testdoan/user/index.php">Tiếp tục tới trang chính</a></p>';
+        echo '<p>Bạn đã được đăng nhập tự động. <a href="../user/index.php">Tiếp tục tới trang chính</a></p>';
         echo '</div>';
         exit;
     } else {
@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['dangky'])) {
         echo '<div style="max-width:600px;margin:40px auto;font-family:Arial,Helvetica,sans-serif">';
         echo '<h2>Lỗi</h2>';
         echo '<p style="color:red">' . htmlspecialchars($response['message']) . '</p>';
-        echo '<p><a href="/testdoan/auth/register.php">Quay lại</a></p>';
+        echo '<p><a href="register.php">Quay lại</a></p>';
         echo '</div>';
         exit;
     }
@@ -67,9 +67,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['dangky'])) {
 // Modal fragment support
 if (isset($_GET['modal']) && $_GET['modal'] == '1') {
     ?>
+    <?php
+    $authPath = dirname($_SERVER['SCRIPT_NAME']);
+    ?>
     <div class="register-fragment">
         <h2>ĐĂNG KÝ</h2>
-        <form method="POST" class="register-form" action="/testdoan/auth/register.php">
+        <form method="POST" class="register-form" action="<?= $authPath ?>/register.php">
             <div class="input-group"><input name="ten" placeholder="Tên" required></div>
             <div class="input-group"><input name="email" type="email" placeholder="Email" required></div>
             <div class="input-group"><input name="mat_khau" type="password" placeholder="Mật khẩu" required></div>
@@ -88,12 +91,13 @@ if (isset($_GET['modal']) && $_GET['modal'] == '1') {
 <head><meta charset="utf-8"><title>Đăng ký</title></head>
 <body>
 <h2>Đăng ký</h2>
-<form method="POST" action="/testdoan/auth/register.php">
+<?php $authPath = dirname($_SERVER['SCRIPT_NAME']); ?>
+<form method="POST" action="<?= $authPath ?>/register.php">
     <div><label>Tên<br><input name="ten"></label></div>
     <div><label>Email<br><input name="email" type="email"></label></div>
     <div><label>Mật khẩu<br><input name="mat_khau" type="password"></label></div>
     <div><button name="dangky">Đăng ký</button></div>
-    <p><a href="/testdoan/auth/login.php">Đã có tài khoản? Đăng nhập</a></p>
+    <p><a href="<?= $authPath ?>/login.php">Đã có tài khoản? Đăng nhập</a></p>
 </form>
 </body>
 </html>

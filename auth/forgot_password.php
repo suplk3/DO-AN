@@ -23,9 +23,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_reset'])) {
 // If requested as modal fragment, return a small fragment
 if (isset($_GET['modal']) && $_GET['modal'] == '1') {
     ?>
+    <?php $authPath = dirname($_SERVER['SCRIPT_NAME']); ?>
     <div class="forgot-fragment">
         <h2>QUÊN MẬT KHẨU</h2>
-        <form method="POST" action="/testdoan/auth/forgot_password.php" class="forgot-form">
+        <form method="POST" action="<?= $authPath ?>/forgot_password.php" class="forgot-form">
             <input name="email" type="email" placeholder="Email đã đăng ký" required><br>
             <button name="send_reset">Gửi liên kết</button>
         </form>
@@ -38,7 +39,7 @@ if (isset($_GET['modal']) && $_GET['modal'] == '1') {
 ?>
 
 <h2>QUÊN MẬT KHẨU</h2>
-<form method="POST" action="/testdoan/auth/forgot_password.php">
+<form method="POST" action="forgot_password.php">
     <input name="email" type="email" placeholder="Email đã đăng ký">
     <button name="send_reset">Gửi liên kết</button>
 </form>
