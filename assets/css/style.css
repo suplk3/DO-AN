@@ -544,6 +544,19 @@ body.user-index .footer{margin-top:28px;padding:18px;text-align:center;color:#6b
     margin: 0 auto;
     position: relative;
     z-index: 2;
+    /* allow vertical scrolling inside content area */
+    height: calc(100vh - 80px); /* adjust if header height changes */
+    overflow-y: auto;
+}
+
+/* keep header visible while scrolling */
+.ve-page .header {
+    position: sticky;
+    top: 0;
+    background: var(--brand-dark);
+    padding-top: 18px;
+    padding-bottom: 18px;
+    z-index: 3;
 }
 
 .ve-page .header {
@@ -768,12 +781,12 @@ input[type=text]:focus, textarea:focus{outline:none;box-shadow:0 6px 18px rgba(3
 /* Hiệu ứng ngôi sao rơi */
 .star {
     position: absolute;
-    width: 2px;
-    height: 2px;
+    width: 3px;
+    height: 3px;
     background: #fff;
     border-radius: 50%;
     pointer-events: none;
-    z-index: 9999;
+    z-index: 10000; /* above overlay */
     animation: fall linear infinite;
 }
 
@@ -786,4 +799,46 @@ input[type=text]:focus, textarea:focus{outline:none;box-shadow:0 6px 18px rgba(3
         transform: translateY(100vh) rotate(360deg);
         opacity: 0;
     }
+}
+
+/* Scrollbar styling */
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    overflow-y: scroll; /* ensure a scrollbar is always shown */
+}
+
+/* overlay for animation effects */
+#star-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: visible;
+    z-index: 9999;
+}
+
+/* Webkit browsers */
+body::-webkit-scrollbar {
+    width: 8px;
+}
+body::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.1);
+}
+body::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.3);
+    border-radius: 4px;
+}
+body::-webkit-scrollbar-thumb:hover {
+    background: rgba(255,255,255,0.5);
+}
+
+/* Firefox */
+body {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.3) rgba(0,0,0,0.1);
 }
