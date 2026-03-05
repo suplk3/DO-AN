@@ -72,16 +72,14 @@ body.user-index .movies{
     box-sizing:border-box;
     /* Use CSS Grid with auto-fit so cards auto-wrap responsively and stay aligned */
      display:grid;
-     /* Responsive columns: start with flexible sizing, scale down per breakpoint */
-    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+     /* Responsive columns: start with 3-4 on desktop, scale down per breakpoint */
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
     gap:22px;
     align-items:stretch;
     /* center the grid within its container so cards appear balanced on wide screens */
     justify-content:center;
     /* Buộc mỗi hàng có chiều cao cân bằng; .movie-card sẽ giãn đầy ô lưới */
     grid-auto-rows: 1fr;
-    /* prevent horizontal scrollbar from appearing */
-    overflow:hidden;
 }
 body.user-index .movie-card{
     background:#2d3748;

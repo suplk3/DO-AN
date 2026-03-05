@@ -6,9 +6,13 @@ $sql = "
 SELECT 
     suat_chieu.*,
     phim.ten_phim,
+    phong_chieu.ten_phong,
+    rap.ten_rap,
     COUNT(ve.id) AS so_ve
 FROM suat_chieu
 JOIN phim ON suat_chieu.phim_id = phim.id
+LEFT JOIN phong_chieu ON suat_chieu.phong_id = phong_chieu.id
+LEFT JOIN rap ON phong_chieu.rap_id = rap.id
 LEFT JOIN ve ON ve.suat_chieu_id = suat_chieu.id
 GROUP BY suat_chieu.id
 ORDER BY ngay, gio
@@ -95,6 +99,7 @@ $stats = mysqli_fetch_assoc($stats_result);
     <div class="action-header">
         <div>⏰ Khung giờ</div>
         <div>🎬 Tên phim</div>
+        <div>🏢 Rạp</div>
         <div>💰 Giá</div>
         <div>⚙️ Hành động</div>
     </div>
@@ -108,6 +113,10 @@ $stats = mysqli_fetch_assoc($stats_result);
         <div class="action-movie">
             <span class="action-movie-icon">🎬</span>
             <span><?= htmlspecialchars($row['ten_phim']) ?></span>
+        </div>
+        <div class="action-theater">
+            <span class="action-theater-icon">🏢</span>
+            <span><?= htmlspecialchars($row['ten_rap'] ?? 'Không xác định') ?></span>
         </div>
         <div class="action-price">
             <?= number_format($row['gia']) ?> đ
@@ -139,9 +148,10 @@ searchInput?.addEventListener('keyup', function(e) {
     actionRows.forEach(row => {
         const time = row.querySelector('.action-time span:last-child')?.textContent.toLowerCase() || '';
         const movie = row.querySelector('.action-movie span:last-child')?.textContent.toLowerCase() || '';
+        const theater = row.querySelector('.action-theater span:last-child')?.textContent.toLowerCase() || '';
         const price = row.querySelector('.action-price')?.textContent.toLowerCase() || '';
         
-        if (time.includes(query) || movie.includes(query) || price.includes(query)) {
+        if (time.includes(query) || movie.includes(query) || theater.includes(query) || price.includes(query)) {
             row.style.display = '';
         } else {
             row.style.display = 'none';
