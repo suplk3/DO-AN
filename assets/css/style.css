@@ -486,7 +486,167 @@ body.user-index .footer{margin-top:28px;padding:18px;text-align:center;color:#6b
 }
 @media (max-width:420px){
     body.user-index .movies{grid-template-columns:repeat(1,1fr)}
-}/* Movie detail page styles (scoped to .movie-detail-page) */
+}
+
+/* Success message card */
+.message-card {
+    background: #ffffff;
+    padding: 30px 24px;
+    border-radius: 12px;
+    max-width: 500px;
+    margin: 80px auto;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    text-align: center; /* center all text inside */
+}
+
+.message-card a {
+    display: inline-block;
+    margin-top: 20px;
+}
+
+.message-card h2 {
+    color: #2d3748;
+    font-size: 28px;
+    margin-bottom: 12px;
+}
+
+.message-card p {
+    color: #4a5568;
+    font-size: 16px;
+}
+
+/* "Vé của tôi" page styles */
+.ve-page {
+    background: linear-gradient(135deg, #0a0e1a 0%, #0f1729 100%);
+    padding: 24px;
+    padding-bottom: 80px;
+    font-family: Segoe UI, Tahoma, Arial, sans-serif;
+    position: relative;
+    overflow: hidden;
+}
+
+/* subtle pattern on background using pseudo-element */
+.ve-page::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Ccircle cx='10' cy='10' r='1' fill='%23999999'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    opacity: 0.04;
+    pointer-events: none;
+    z-index: 1;
+}
+.ve-page .wrap {
+    max-width: 1100px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+}
+
+.ve-page .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+}
+
+.ve-page .header h1 {
+    font-size: 1.6rem;
+    color: #e2e8f0;
+}
+
+.ve-page .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 18px;
+}
+
+.ve-page .card {
+    background: #1a1f2e;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.3);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    color: #e2e8f0;
+}
+
+.ve-page .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.12);
+}
+
+.ve-page .card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+}
+
+.ve-page .card-body {
+    padding: 14px;
+}
+
+.ve-page .meta {
+    display: flex;
+    justify-content: space-between;
+    color: #cbd5e0;
+    font-size: 0.95rem;
+}
+
+.ve-page .actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    justify-content: space-around;
+}
+
+.ve-page .actions .btn {
+    flex-shrink: 0;
+}
+.ve-page .btn {
+    padding: 9px 12px;
+    border-radius: 8px;
+    border: 0;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.ve-page .btn-print {
+    background: #2b90ff;
+    color: #fff;
+}
+
+.ve-page .btn-cancel {
+    background: #ff4d4f;
+    color: #fff;
+}
+
+.ve-page .empty {
+    background: #1a1f2e;
+    padding: 40px;
+    border-radius: 10px;
+    text-align: center;
+    color: #e2e8f0;
+}
+
+@media print {
+    .ve-page .btn,
+    .ve-page .header { display: none; }
+    .ve-page .card { box-shadow: none; border: 1px solid #ddd; }
+}
+
+/* utility classes for vé page */
+.ve-page .msg { margin-bottom:12px; padding:10px; border-radius:8px; }
+.ve-page .msg-success { background:#e6ffed; color:#1a7a2e; }
+.ve-page .btn-hero { background: linear-gradient(90deg,#667eea,#764ba2); color:#fff; }
+.ve-page .card-title { font-weight:700; font-size:1.05rem; color:#e2e8f0; }
+.ve-page .mt { margin-top:8px; }
+.ve-page .price { margin-top:12px; font-weight:700; color:#0f62fe; }
+.ve-page .btn-save { background:#01a982; color:#fff; }
+
+/* Movie detail page styles (scoped to .movie-detail-page) */
 .movie-detail-page { font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background:#0b1b2b; color:#ffffff; -webkit-font-smoothing:antialiased; }
 
 /* Phim page - dark card theme similar to provided design */
@@ -603,4 +763,27 @@ input[type=text]:focus, textarea:focus{outline:none;box-shadow:0 6px 18px rgba(3
     .md-poster img { width:200px; height:300px; }
     .md-title { font-size:20px; }
     .md-card { padding:14px; gap:14px; }
+}
+
+/* Hiệu ứng ngôi sao rơi */
+.star {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: #fff;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    animation: fall linear infinite;
+}
+
+@keyframes fall {
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+    }
 }
