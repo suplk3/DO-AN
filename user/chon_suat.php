@@ -35,14 +35,17 @@ if (isset($_GET['ngay']) && in_array($_GET['ngay'], $ngay_list, true)) {
     $ngay_chon = date('Y-m-d');
 }
 
-// Lấy suất chiếu theo ngày
+// Lấy suất chiếu theo ngày kèm thông tin rạp
 // nếu danh sách ngày rỗng thì $ngay_chon đã được đặt thành ngày hiện tại ở phía trên
 $ngay_esc = mysqli_real_escape_string($conn, $ngay_chon);
 $sql_suat = "
-SELECT * 
-FROM suat_chieu 
-WHERE phim_id = $phim_id 
-AND ngay = '$ngay_esc'
+SELECT sc.*, pc.rap_id, r.ten_rap, r.dia_chi, r.thanh_pho
+FROM suat_chieu sc
+LEFT JOIN phong_chieu pc ON sc.phong_id = pc.id
+LEFT JOIN rap r ON pc.rap_id = r.id
+WHERE sc.phim_id = $phim_id 
+AND sc.ngay = '$ngay_esc'
+ORDER BY sc.gio
 ";
 $q_suat = mysqli_query($conn, $sql_suat);
 ?>
@@ -109,16 +112,20 @@ body {
 .time-btn{
     display:inline-block;
     margin:5px;
-    padding:10px 20px;
+    padding:12px 16px;
     background:#e71a0f;
     color:#fff;
     text-decoration:none;
     font-weight:bold;
     border-radius:6px;
     transition:background 0.2s;
+    min-width: 140px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(231, 26, 15, 0.3);
 }
 .time-btn:hover{
     background:#c4160e;
+    box-shadow: 0 4px 12px rgba(231, 26, 15, 0.5);
 }
 
 /* empty message card */
@@ -181,10 +188,18 @@ body {
         <div class="time-list">
             <?php 
             if (mysqli_num_rows($q_suat) > 0) {
-                while($s = mysqli_fetch_assoc($q_suat)): ?>
-                    <a class="time-btn" href="chon_ghe.php?suat_id=<?= $s['id'] ?>" title="Chọn ghế">
+                while($s = mysqli_fetch_assoc($q_suat)): 
+                    $rap_name = !empty($s['ten_rap']) ? $s['ten_rap'] : 'Rạp không xác định';
+                    $dia_chi = $s['dia_chi'] ?? '';
+                    $display_title = htmlspecialchars($rap_name);
+                    if (!empty($dia_chi)) {
+                        $display_title .= ' - ' . htmlspecialchars($dia_chi);
+                    }
+                    ?>
+                    <a class="time-btn" href="chon_ghe.php?suat_id=<?= $s['id'] ?>" title="<?= $display_title ?>">
+                        <div style="font-weight: bold; font-size: 13px; margin-bottom: 5px;"><?= htmlspecialchars($rap_name) ?></div>
                         <span class="time"><?= $s['gio'] ?></span>
-                        <span class="price"><?= number_format($s['gia']) ?>đ</span>
+                        <span class="price" style="display: block; font-size: 12px; margin-top: 5px;"><?= number_format($s['gia']) ?>đ</span>
                     </a>
                 <?php endwhile;
             } else {
