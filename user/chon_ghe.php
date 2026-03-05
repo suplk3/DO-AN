@@ -56,6 +56,18 @@ function fmt_money($n){ return $n !== null ? number_format($n,0,',','.') . '₫'
     <title>Chọn ghế - <?= htmlspecialchars($info['ten_phim']) ?></title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/movie-detail.css">
+    <style>
+    /* ensure seat labels are always white for visibility */
+    .seat-selection .seat {
+        color: #fff !important;
+    }
+    .seat-selection .seat.booked {
+        color: #fff !important;
+    }
+    .seat-selection .seat:hover {
+        color: #fff !important;
+    }
+    </style>
 </head>
 <body class="movie-detail-page">
 
