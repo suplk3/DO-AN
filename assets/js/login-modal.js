@@ -41,7 +41,7 @@
           modal.addEventListener('click', function(e){ e.stopPropagation(); });
         }
 
-        // Handle switching giữa đăng nhập <-> đăng ký với hiệu ứng trượt
+        // Handle chuyển giữa form đăng nhập <-> đăng ký trong cùng modal
         const card = overlay.querySelector('.auth-card');
         function goRegister() {
           if (!card) return;
