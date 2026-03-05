@@ -40,6 +40,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['dangky'])) {
 
     $isAjax = (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest');
     if ($isAjax) {
+        if ($response['success']) {
+            $parentDir = dirname(dirname($_SERVER['SCRIPT_NAME']));
+            $response['redirect_url'] = $parentDir . '/user/index.php';
+        }
         header('Content-Type: application/json; charset=utf-8');
         echo json_encode($response);
         exit;

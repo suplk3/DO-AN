@@ -116,11 +116,9 @@
                 msg.textContent = json.message || 'Đã gửi.';
                 if (!registerForm.querySelector('.register-msg')) registerForm.appendChild(msg);
                 if (json.success){
-                  // Sau khi đăng ký thành công: reload sang trang user để người dùng thấy đã đăng nhập
-                  // redirect to project root + /user/index.php
-                  const parts = window.location.pathname.split('/');
-                  const root = parts.length > 1 ? '/' + parts[1] : '';
-                  window.location.href = root + '/user/index.php';
+                  setTimeout(() => {
+                    window.location.href = json.redirect_url;
+                  }, 1500);
                 }
               }).catch(function(err){ console.error(err); });
           });
