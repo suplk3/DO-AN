@@ -59,7 +59,7 @@ if (isset($_GET['modal']) && $_GET['modal'] == '1') {
                                 <input type="password" name="mat_khau" placeholder="Mật khẩu" required>
                                 <span class="icon pw-toggle" title="Hiện/Ẩn">👁</span>
                             </div>
-                            <button type="submit" name="login" class="btn-primary">Đăng nhập23123</button>
+                            <button type="submit" name="login" class="btn-primary">Đăng nhập</button>
                         </form>
                         <p class="login-error message"><?php echo $error; ?></p>
                     </div>
@@ -85,9 +85,13 @@ if (isset($_GET['modal']) && $_GET['modal'] == '1') {
                     <div class="hero hero-login">
                         <h3>Chào mừng trở lại</h3>
                         <p>Đăng nhập để cập nhật các suất chiếu mới nhất và những bộ phim bạn yêu thích.</p>
-                        <a href="/testdoan/auth/register.php" class="hero-btn">Đăng ký</a>
+                        <button type="button" class="hero-btn switch-to-register">Đăng ký</button>
                     </div>
-                    <div class="hero hero-register"></div>
+                    <div class="hero hero-register">
+                        <h3>Tạo tài khoản mới</h3>
+                        <p>Lưu lại lịch sử đặt vé, theo dõi suất chiếu yêu thích và nhận ưu đãi dành riêng cho bạn.</p>
+                        <button type="button" class="hero-btn switch-to-login">Đăng nhập</button>
+                    </div>
                 </div>
             </div>
         </div>

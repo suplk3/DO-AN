@@ -25,7 +25,7 @@
   box-shadow:
     0 24px 60px rgba(15,23,42,0.7),
     0 0 0 1px rgba(148,163,184,0.12);
-  background: #0f172a;
+  background: #020617; /* nền đen chung */
   color: #fff;
 }
 
@@ -47,26 +47,58 @@
   z-index: 10;
 }
 
-.auth-inner {
-  display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.95fr);
-  min-height: 420px;
+/* Khối màu tím trượt qua lại giữa hai bên */
+.auth-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  left: 50%;
+  background: linear-gradient(135deg,#6d28d9,#4f46e5,#2563eb);
+  transform: translateX(0);
+  transition: transform .55s cubic-bezier(0.25,0.8,0.25,1);
+  z-index: 0;
 }
+
+.auth-card.show-signup::before {
+  transform: translateX(-100%); /* kéo khối tím sang trái khi sang form đăng ký */
+}
+
+.auth-inner {
+  display: flex;
+  min-height: 420px;
+  position: relative;
+  z-index: 1; /* nội dung nằm trên lớp màu trượt */
+}
+
+/* Hai panel luôn chiếm 50% khung, giúp bố cục không vỡ */
+.auth-panel-form,
+.auth-panel-hero {
+  flex: 1 0 50%;
+}
+
+/* Mặc định (Đăng nhập): form đen bên trái, panel tím bên phải */
+.auth-panel-form { order: 1; }
+.auth-panel-hero { order: 2; }
+
+/* Khi sang Đăng ký: panel tím sang trái, form đen sang phải */
+.auth-card.show-signup .auth-panel-form { order: 2; }
+.auth-card.show-signup .auth-panel-hero { order: 1; }
 
 .auth-panel {
   position: relative;
-  padding: 40px 40px 32px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .auth-panel-form {
-  background: radial-gradient(circle at top left,#1d2438,#020617 60%);
+  background: transparent; /* nền đen đã ở .auth-card */
 }
 
 .auth-panel-hero {
-  background: linear-gradient(135deg,#6d28d9,#4f46e5,#2563eb);
+  background: transparent;
   color: #e5e7eb;
 }
 
@@ -203,16 +235,22 @@
 .hero-register {
   opacity: 0;
   transform: translateX(40px);
+  /* Ẩn khỏi click khi đang ở trạng thái đăng nhập */
+  pointer-events: none;
 }
 
 .auth-card.show-signup .hero-login {
   opacity: 0;
   transform: translateX(-40px);
+  pointer-events: none;
 }
 
 .auth-card.show-signup .hero-register {
   opacity: 1;
-  transform: translateX(0);
+  /* transform: translateX(0); */
+  /* Cho phép click khi đang ở trạng thái đăng ký */
+  pointer-events: auto;
+  /* padding-left: 10px; */
 }
 
 .hero h3 {
