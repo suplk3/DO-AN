@@ -2,9 +2,9 @@
 session_start();
 include "../config/db.php";
 
-$phim_id = $_GET['phim_id'] ?? 0;
+$phim_id = isset($_GET['phim_id']) ? intval($_GET['phim_id']) : 0;
 
-if ($phim_id == 0) {
+if ($phim_id <= 0) {
     die("Không tìm thấy phim");
 }
 
@@ -16,14 +16,33 @@ WHERE phim_id = $phim_id
 ";
 $q_ngay = mysqli_query($conn, $sql_ngay);
 
-$ngay_chon = $_GET['ngay'] ?? date('Y-m-d');
+// chuyển các ngày vào mảng để dễ xử lý và xác định giá trị mặc định
+$ngay_list = [];
+if ($q_ngay) {
+    while ($row = mysqli_fetch_assoc($q_ngay)) {
+        $ngay_list[] = $row['ngay'];
+    }
+}
+
+// chọn ngày hiện tại từ query string nếu hợp lệ, ngược lại lấy phần tử đầu của danh sách
+$ngay_chon = null;
+if (isset($_GET['ngay']) && in_array($_GET['ngay'], $ngay_list, true)) {
+    $ngay_chon = $_GET['ngay'];
+} elseif (!empty($ngay_list)) {
+    $ngay_chon = $ngay_list[0];
+} else {
+    // không có ngày nào trong database -> sử dụng ngày hôm nay để hiển thị thông báo
+    $ngay_chon = date('Y-m-d');
+}
 
 // Lấy suất chiếu theo ngày
+// nếu danh sách ngày rỗng thì $ngay_chon đã được đặt thành ngày hiện tại ở phía trên
+$ngay_esc = mysqli_real_escape_string($conn, $ngay_chon);
 $sql_suat = "
 SELECT * 
 FROM suat_chieu 
 WHERE phim_id = $phim_id 
-AND ngay = '$ngay_chon'
+AND ngay = '$ngay_esc'
 ";
 $q_suat = mysqli_query($conn, $sql_suat);
 ?>
@@ -35,210 +54,92 @@ $q_suat = mysqli_query($conn, $sql_suat);
 <title>Chọn suất chiếu</title>
 <link rel="stylesheet" href="../assets/css/style.css">
 <style>
+/* layout */
 body {
-    background: linear-gradient(135deg, #0a0e27, #121829);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
-    color: rgba(255,255,255,0.9);
-    margin: 0;
-    padding: 0;
+    background: #12131a;
+    color: #e0e0e0;
 }
-
-header {
-    background: linear-gradient(90deg, var(--brand-dark), var(--brand-darker));
-    padding: 15px 25px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+.container {
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 0 20px;
 }
-
-header .logo {
-    font-size: 28px;
-    font-weight: bold;
-    color: var(--accent-red);
-    letter-spacing: 2px;
+.section {
+    background: #1f2028;
+    border-radius: 8px;
+    padding: 20px 25px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
 }
-
-header nav {
-    display: flex;
-    gap: 20px;
-}
-
-header nav a {
-    color: rgba(255,255,255,0.92);
-    text-decoration: none;
+.section-title {
+    font-size: 20px;
     font-weight: 600;
-    padding: 6px 12px;
-    border-radius: 6px;
-    transition: all 0.2s;
-}
-
-header nav a:hover {
-    background: rgba(229,9,20,0.2);
+    margin-bottom: 15px;
     color: #fff;
 }
 
-.container {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 30px 20px;
-}
-
-.page-title {
-    font-size: 28px;
-    color: var(--accent-red);
-    margin-bottom: 8px;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.page-title::before {
-    content: '';
-    width: 4px;
-    height: 28px;
-    background: var(--accent-red);
-    border-radius: 2px;
-}
-
-.section {
-    margin-bottom: 40px;
-}
-
-.section-title {
-    font-size: 18px;
-    color: rgba(255,255,255,0.95);
-    margin-bottom: 15px;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.section-title::before {
-    content: '';
-    width: 3px;
-    height: 18px;
-    background: var(--accent-red);
-    border-radius: 1px;
-}
-
+/* date list */
 .date-list {
     display: flex;
-    gap: 12px;
     flex-wrap: wrap;
-    padding: 15px;
-    background: rgba(255,255,255,0.05);
-    border-radius: 10px;
-    border: 1px solid rgba(255,255,255,0.1);
+    gap: 10px;
+}
+.date-list a{
+    padding:8px 15px;
+    background:#2c2e38;
+    text-decoration:none;
+    color:#e0e0e0;
+    border-radius:6px;
+    transition:background 0.2s, color 0.2s;
+}
+.date-list a.active{
+    background:#e71a0f;
+    color:white;
+}
+.date-list a:hover{
+    background:#3a3c48;
 }
 
-.date-list a {
-    padding: 10px 16px;
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.15);
-    text-decoration: none;
-    color: rgba(255,255,255,0.8);
-    border-radius: 8px;
-    font-weight: 500;
-    transition: all 0.2s ease;
-    cursor: pointer;
-}
-
-.date-list a:hover {
-    background: rgba(229,9,20,0.2);
-    border-color: rgba(229,9,20,0.3);
-    color: #fff;
-    transform: translateY(-2px);
-}
-
-.date-list a.active {
-    background: linear-gradient(135deg, var(--accent-red), #ff4444);
-    border-color: var(--accent-red);
-    color: #fff;
-    font-weight: 600;
-    box-shadow: 0 4px 12px rgba(229,9,20,0.3);
-}
-
+/* time buttons */
 .time-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
     gap: 12px;
 }
-
-.time-btn {
-    display: flex;
-    flex-direction: column;
-    padding: 16px;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.12);
-    color: rgba(255,255,255,0.85);
-    text-decoration: none;
-    border-radius: 10px;
-    font-weight: 600;
-    transition: all 0.2s ease;
-    text-align: center;
-    cursor: pointer;
+.time-btn{
+    display:inline-block;
+    margin:5px;
+    padding:10px 20px;
+    background:#e71a0f;
+    color:#fff;
+    text-decoration:none;
+    font-weight:bold;
+    border-radius:6px;
+    transition:background 0.2s;
+}
+.time-btn:hover{
+    background:#c4160e;
 }
 
-.time-btn:hover {
-    background: linear-gradient(135deg, rgba(229,9,20,0.15), rgba(229,9,20,0.08));
-    border-color: rgba(229,9,20,0.4);
-    color: #fff;
-    transform: translateY(-3px);
-    box-shadow: 0 6px 16px rgba(229,9,20,0.2);
+/* empty message card */
+.empty-message{
+    text-align:center;
+    padding:30px 10px;
+    color:#bbb;
+}
+.empty-message .icon{
+    font-size:40px;
+    margin-bottom:10px;
 }
 
-.time-btn .time {
-    font-size: 18px;
-    color: #fff;
-    margin-bottom: 6px;
-}
-
-.time-btn .price {
-    font-size: 14px;
-    color: var(--accent-red);
-    font-weight: 700;
-}
-
-.empty-message {
-    text-align: center;
-    padding: 40px;
-    color: rgba(255,255,255,0.6);
-    background: rgba(255,255,255,0.05);
-    border-radius: 10px;
-    border: 1px solid rgba(255,255,255,0.1);
-}
-
-.empty-message .icon {
-    font-size: 40px;
-    margin-bottom: 12px;
-    display: block;
-}
-
-@media (max-width: 768px) {
-    .container {
-        padding: 20px 15px;
+/* responsive tweaks */
+@media (max-width:600px) {
+    .date-list, .time-list {
+        justify-content: center;
     }
-    
-    .page-title {
-        font-size: 24px;
-    }
-    
-    .time-list {
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    }
-    
-    header {
-        flex-direction: column;
-        gap: 12px;
-        align-items: flex-start;
-    }
-    
-    header nav {
-        width: 100%;
-        justify-content: flex-end;
+    .time-btn, .date-list a {
+        flex: 1 0 120px;
+        text-align: center;
     }
 }
 </style>
@@ -255,19 +156,19 @@ header nav a:hover {
 </header>
 
 <div class="container">
-    <div class="page-title">Chọn suất chiếu</div>
+    <div class="title">CHỌN NGÀY</div>
 
     <div class="section">
         <div class="section-title">Chọn ngày</div>
         <div class="date-list">
             <?php 
-            if (mysqli_num_rows($q_ngay) > 0) {
-                while($d = mysqli_fetch_assoc($q_ngay)): ?>
-                    <a href="?phim_id=<?= $phim_id ?>&ngay=<?= $d['ngay'] ?>"
-                       class="<?= ($d['ngay'] == $ngay_chon) ? 'active' : '' ?>">
-                       <?= date('d/m/Y', strtotime($d['ngay'])) ?>
+            if (!empty($ngay_list)) {
+                foreach ($ngay_list as $d): ?>
+                    <a href="?phim_id=<?= $phim_id ?>&ngay=<?= $d ?>"
+                       class="<?= ($d == $ngay_chon) ? 'active' : '' ?>">
+                       <?= date('d/m/Y', strtotime($d)) ?>
                     </a>
-                <?php endwhile;
+                <?php endforeach;
             } else {
                 echo '<div class="empty-message">Không có ngày chiếu nào</div>';
             }
