@@ -140,14 +140,19 @@ if (isset($_GET['debug']) && $_GET['debug'] == '1') {
 	<?php endif; ?>
 </div>
 
+<!-- overlay cho hiệu ứng động -->
+<div id="star-overlay"></div>
+
 <script>
 function createStar() {
+    const overlay = document.getElementById('star-overlay');
+    const parent = overlay || document.body;
     const star = document.createElement('div');
     star.className = 'star';
     star.style.left = Math.random() * 100 + 'vw';
     star.style.animationDuration = Math.random() * 3 + 2 + 's'; // 2-5s
     star.style.animationDelay = Math.random() * 2 + 's';
-    document.body.appendChild(star);
+    parent.appendChild(star);
 
     // Xóa ngôi sao sau khi animation kết thúc
     setTimeout(() => {
