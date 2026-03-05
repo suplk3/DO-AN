@@ -51,7 +51,10 @@ if (isset($_GET['modal']) && $_GET['modal'] == '1') {
                     <div class="auth-view auth-view-login is-active">
                         <h2 class="auth-heading">Đăng nhập</h2>
                         <p class="auth-subtitle">Hãy đăng nhập để tiếp tục đặt vé và xem lịch sử của bạn.</p>
-                        <form method="POST" action="/testdoan/auth/login.php" class="login-form">
+                        <?php // form action always point to this script's directory (works even when fragment is injected)
+                        $authPath = dirname($_SERVER['SCRIPT_NAME']); // e.g. '/testdoan/auth'
+                        ?>
+                        <form method="POST" action="<?= $authPath ?>/login.php" class="login-form">
                             <div class="input-group">
                                 <input type="email" name="email" placeholder="Email" required>
                             </div>
@@ -67,7 +70,10 @@ if (isset($_GET['modal']) && $_GET['modal'] == '1') {
                     <div class="auth-view auth-view-register">
                         <h2 class="auth-heading">Đăng ký</h2>
                         <p class="auth-subtitle">Tạo tài khoản mới để lưu vé và nhận nhiều ưu đãi.</p>
-                        <form method="POST" action="/testdoan/auth/register.php" class="register-form">
+                        <?php // compute auth directory for register action too
+                        $authPath = dirname($_SERVER['SCRIPT_NAME']);
+                        ?>
+                        <form method="POST" action="<?= $authPath ?>/register.php" class="register-form">
                             <div class="input-group"><input name="ten" placeholder="Tên" required></div>
                             <div class="input-group"><input name="email" type="email" placeholder="Email" required></div>
                             <div class="input-group"><input name="mat_khau" type="password" placeholder="Mật khẩu" required></div>

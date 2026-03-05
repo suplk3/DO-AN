@@ -40,6 +40,22 @@
         if (modal) {
           modal.addEventListener('click', function(e){ e.stopPropagation(); });
         }
+        // ensure any generated form posts to the correct auth path
+        const forms = overlay.querySelectorAll('form');
+        if (forms.length) {
+          const parts = window.location.pathname.split('/');
+          const root = parts.length > 1 ? '/' + parts[1] : '';
+          forms.forEach(f => {
+            let act = f.getAttribute('action') || '';
+            // if action is already absolute (starts with / or http) leave it
+            if (/^(\/|https?:)/.test(act)) return;
+            // normalize action: prefix root and auth folder if missing
+            if (!act.match(/^auth\//)) {
+              act = 'auth/' + act;
+            }
+            f.setAttribute('action', root + '/' + act);
+          });
+        }
 
         // Handle chuyển giữa form đăng nhập <-> đăng ký trong cùng modal
         const card = overlay.querySelector('.auth-card');
@@ -89,8 +105,9 @@
         if (registerForm){
           registerForm.addEventListener('submit', function(ev){
             ev.preventDefault();
-            const url = registerForm.getAttribute('action') || '/testdoan/auth/register.php';
+            const url = registerForm.getAttribute('action') || 'register.php';
             const fm = new FormData(registerForm);
+            fm.append('dangky', '1');
             fetch(url, { method: 'POST', body: fm, headers: { 'X-Requested-With': 'XMLHttpRequest' } })
               .then(r=> r.json())
               .then(function(json){
@@ -100,7 +117,10 @@
                 if (!registerForm.querySelector('.register-msg')) registerForm.appendChild(msg);
                 if (json.success){
                   // Sau khi đăng ký thành công: reload sang trang user để người dùng thấy đã đăng nhập
-                  window.location.href = '/testdoan/user/index.php';
+                  // redirect to project root + /user/index.php
+                  const parts = window.location.pathname.split('/');
+                  const root = parts.length > 1 ? '/' + parts[1] : '';
+                  window.location.href = root + '/user/index.php';
                 }
               }).catch(function(err){ console.error(err); });
           });
@@ -111,7 +131,7 @@
         if (forgotForm){
           forgotForm.addEventListener('submit', function(ev){
             ev.preventDefault();
-            const url = forgotForm.getAttribute('action') || '/testdoan/auth/forgot_password.php';
+            const url = forgotForm.getAttribute('action') || 'forgot_password.php';
             const fm = new FormData(forgotForm);
             fetch(url, { method: 'POST', body: fm, headers: { 'X-Requested-With': 'XMLHttpRequest' } })
               .then(r=> r.json())
@@ -134,8 +154,8 @@
     const target = e.target.closest && e.target.closest('.open-login-modal');
     if (!target) return;
     e.preventDefault();
-    // Resolve URL from href or default to /auth/login.php?modal=1
-    let url = target.getAttribute('data-modal-url') || target.getAttribute('href') || '/auth/login.php?modal=1';
+    // Resolve URL from href or default to auth/login.php?modal=1 (relative path)
+    let url = target.getAttribute('data-modal-url') || target.getAttribute('href') || 'auth/login.php?modal=1';
     if (url.indexOf('?') === -1) url += '?modal=1';
     else if (url.indexOf('modal=') === -1) url += '&modal=1';
     openLoginModal(url);
