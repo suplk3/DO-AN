@@ -152,27 +152,70 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         overflow: hidden;
     }
 
+    /* Left decoration */
     .form-section::before {
-        content: '';
+        content: '🎬';
         position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 1px;
-        background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.5), transparent);
-        animation: slideRight 3s ease-in-out infinite;
+        left: -20px;
+        top: 20%;
+        font-size: 80px;
+        opacity: 0.08;
+        animation: float 6s ease-in-out infinite;
+        z-index: 0;
     }
 
-    @keyframes slideRight {
-        0% {
-            left: -100%;
+    /* Right decoration */
+    .form-section::after {
+        content: '🎞️';
+        position: absolute;
+        right: -20px;
+        bottom: 15%;
+        font-size: 80px;
+        opacity: 0.08;
+        animation: float 6s ease-in-out infinite reverse;
+        z-index: 0;
+    }
+
+    @keyframes float {
+        0%, 100% {
+            transform: translateY(0px);
         }
         50% {
-            left: 100%;
+            transform: translateY(30px);
         }
-        100% {
-            left: 100%;
-        }
+    }
+
+    /* Decorative circles left */
+    .form-section {
+        position: relative;
+    }
+
+    .left-decoration,
+    .right-decoration {
+        position: absolute;
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+        z-index: 0;
+    }
+
+    .left-decoration {
+        left: -80px;
+        top: -50px;
+    }
+
+    .right-decoration {
+        right: -80px;
+        bottom: -50px;
+        background: radial-gradient(circle, rgba(229, 9, 20, 0.08) 0%, transparent 70%);
+    }
+
+    /* Form content z-index */
+    .form-title,
+    form {
+        position: relative;
+        z-index: 1;
     }
 
     .form-title {
@@ -327,6 +370,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <div class="page-container">
     <div class="form-section">
+        <div class="left-decoration"></div>
+        <div class="right-decoration"></div>
+        
         <div class="form-title">➕ Thêm suất chiếu mới</div>
 
         <form method="post">
