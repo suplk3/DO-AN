@@ -118,6 +118,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         max-width: 700px;
         margin: 40px auto;
         padding: 0 20px;
+        position: relative;
+    }
+
+    .page-container::before,
+    .page-container::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        width: 2px;
+        height: 100%;
+        background: linear-gradient(180deg, transparent 0%, rgba(59, 130, 246, 0.4) 50%, transparent 100%);
+    }
+
+    .page-container::before {
+        left: 0;
+    }
+
+    .page-container::after {
+        right: 0;
     }
 
     .form-section {
@@ -129,6 +148,31 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     0 4px 16px rgba(59, 130, 246, 0.12),
                     inset 0 1px 0 rgba(255, 255, 255, 0.05);
         backdrop-filter: blur(10px);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .form-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.5), transparent);
+        animation: slideRight 3s ease-in-out infinite;
+    }
+
+    @keyframes slideRight {
+        0% {
+            left: -100%;
+        }
+        50% {
+            left: 100%;
+        }
+        100% {
+            left: 100%;
+        }
     }
 
     .form-title {
