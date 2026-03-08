@@ -119,6 +119,7 @@ while ($row = mysqli_fetch_assoc($result)) {
           </button>";
 }
 
+
 if ($currentRow != '') echo '</div>';
 ?>
         </div>
@@ -160,7 +161,99 @@ if ($currentRow != '') echo '</div>';
     <div>© <?= date('Y') ?> CGV Cinemas — Thiết kế gọn, responsive.</div>
 </footer>
 
-<script src="../assets/js/ghe.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // --- START OF COMBINED SCRIPT LOGIC ---
+
+    const suatChieuId = <?= json_encode($suat_chieu_id) ?>;
+    const giaVe = <?= json_encode($info['gia']) ?>;
+    
+    let selectedSeats = []; // Mảng chứa các ghế đang được chọn bởi người dùng hiện tại
+    
+    const selectedSeatsDisplay = document.getElementById("selected-seats");
+    const totalDisplay = document.getElementById("total");
+    const seatInput = document.getElementById("seat-input");
+    const seatWrapper = document.querySelector(".seat-wrapper");
+
+    // Hàm cập nhật UI (danh sách ghế đã chọn và tổng tiền)
+    function updateCheckoutUI() {
+        selectedSeats.sort(); // Sắp xếp cho đẹp
+        selectedSeatsDisplay.innerText = selectedSeats.length > 0 ? selectedSeats.join(", ") : "Chưa có ghế nào";
+        totalDisplay.innerText = (selectedSeats.length * giaVe).toLocaleString("vi-VN") + " đ";
+        seatInput.value = selectedSeats.join(",");
+    }
+
+    // Xử lý khi người dùng click chọn ghế
+    seatWrapper.addEventListener("click", function (e) {
+        const seatButton = e.target.closest('.seat');
+        
+        if (!seatButton || seatButton.classList.contains("booked")) {
+            return; // Bỏ qua nếu không phải ghế hoặc ghế đã được đặt
+        }
+
+        const seatName = seatButton.dataset.seat;
+        seatButton.classList.toggle("selected");
+
+        if (selectedSeats.includes(seatName)) {
+            // Nếu ghế đã có trong danh sách, loại bỏ nó
+            selectedSeats = selectedSeats.filter(s => s !== seatName);
+        } else {
+            // Nếu chưa có, thêm nó vào
+            selectedSeats.push(seatName);
+        }
+
+        updateCheckoutUI(); // Cập nhật lại UI
+    });
+
+    // Hàm kiểm tra và cập nhật trạng thái ghế từ server (polling)
+    async function updateBookedSeats() {
+        try {
+            const response = await fetch(`../get_seats.php?suat_id=${suatChieuId}&_=${new Date().getTime()}`);
+            if (!response.ok) {
+                console.error("Lỗi khi lấy trạng thái ghế. Status:", response.status);
+                return;
+            }
+            const serverSeats = await response.json();
+
+            let selectionChanged = false; // Cờ để kiểm tra xem lựa chọn có bị thay đổi không
+
+            serverSeats.forEach(serverSeat => {
+                const seatElement = seatWrapper.querySelector(`[data-seat='${serverSeat.ten_ghe}']`);
+                if (!seatElement) return;
+
+                const isBookedOnServer = serverSeat.da_dat === 1;
+                const isBookedOnClient = seatElement.classList.contains('booked');
+
+                // Chỉ cập nhật nếu trạng thái trên server là 'booked' và client chưa cập nhật
+                if (isBookedOnServer && !isBookedOnClient) {
+                    seatElement.classList.add('booked');
+                    seatElement.classList.remove('selected'); // Bỏ chọn nếu người khác đã đặt
+                    seatElement.disabled = true;
+
+                    if (selectedSeats.includes(serverSeat.ten_ghe)) {
+                        selectedSeats = selectedSeats.filter(s => s !== serverSeat.ten_ghe);
+                        selectionChanged = true;
+                    }
+                }
+            });
+
+            if (selectionChanged) {
+                updateCheckoutUI();
+                alert("Một hoặc nhiều ghế bạn đang chọn đã có người khác đặt. Vui lòng kiểm tra lại lựa chọn của bạn.");
+            }
+
+        } catch (error) {
+            console.error("Lỗi khi cập nhật trạng thái ghế:", error);
+        }
+    }
+
+    // --- END OF COMBINED SCRIPT LOGIC ---
+
+    // Khởi chạy
+    updateCheckoutUI(); // Cập nhật UI lần đầu
+    setInterval(updateBookedSeats, 3000); // Cập nhật trạng thái mỗi 3 giây
+});
+</script>
 
 </body>
 </html>
