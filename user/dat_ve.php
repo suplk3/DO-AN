@@ -2,23 +2,77 @@
 include "../config/db.php";
 session_start();
 
-$user_id = $_SESSION['user_id'] ?? 1; // test
-$suat_chieu_id = $_POST['suat_chieu_id'];
-$ghe = explode(",", $_POST['ghe']);
-
-// insert tickets
-foreach ($ghe as $ten_ghe) {
-    $sql = "SELECT id FROM ghe WHERE ten_ghe='$ten_ghe'";
-    $r = mysqli_query($conn, $sql);
-    $ghe_id = mysqli_fetch_assoc($r)['id'];
-
-    mysqli_query($conn, "
-        INSERT INTO ve (user_id, ghe_id, suat_chieu_id)
-        VALUES ($user_id, $ghe_id, $suat_chieu_id)
-    ");
+// --- Basic Input Validation ---
+if (!isset($_POST['suat_chieu_id'], $_POST['ghe']) || empty($_POST['ghe'])) {
+    die("Lỗi: Dữ liệu không hợp lệ. Vui lòng thử lại.");
 }
 
-// fetch show information for confirmation message
+$user_id = $_SESSION['user_id'] ?? 1; // Fallback for testing, ensure user is logged in for production
+$suat_chieu_id = (int)$_POST['suat_chieu_id'];
+$ghe_array = array_filter(explode(",", $_POST['ghe'])); // array_filter to remove empty values
+
+if (empty($ghe_array)) {
+    die("Lỗi: Chưa chọn ghế nào.");
+}
+
+// --- Get phong_id from suat_chieu_id to ensure correct seat context ---
+$phong_id = null;
+$stmt = mysqli_prepare($conn, "SELECT phong_id FROM suat_chieu WHERE id = ?");
+mysqli_stmt_bind_param($stmt, "i", $suat_chieu_id);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+if ($row = mysqli_fetch_assoc($result)) {
+    $phong_id = (int)$row['phong_id'];
+}
+mysqli_stmt_close($stmt);
+
+if (!$phong_id) {
+    die("Lỗi: Suất chiếu không tồn tại.");
+}
+
+// --- Begin Transaction for Atomic Inserts ---
+mysqli_begin_transaction($conn);
+
+try {
+    // --- Prepare statements for security and performance ---
+    $get_ghe_id_stmt = mysqli_prepare($conn, "SELECT id FROM ghe WHERE ten_ghe = ? AND phong_id = ?");
+    $insert_ve_stmt = mysqli_prepare($conn, "INSERT INTO ve (user_id, ghe_id, suat_chieu_id) VALUES (?, ?, ?)");
+
+    foreach ($ghe_array as $ten_ghe) {
+        // Find ghe_id securely
+        mysqli_stmt_bind_param($get_ghe_id_stmt, "si", $ten_ghe, $phong_id);
+        mysqli_stmt_execute($get_ghe_id_stmt);
+        $result_ghe = mysqli_stmt_get_result($get_ghe_id_stmt);
+        $ghe_row = mysqli_fetch_assoc($result_ghe);
+
+        if (!$ghe_row) {
+            // If seat doesn't exist in this room, rollback and fail
+            throw new Exception("Ghế '{$ten_ghe}' không tồn tại trong phòng này.");
+        }
+        $ghe_id = (int)$ghe_row['id'];
+
+        // Insert ticket securely
+        mysqli_stmt_bind_param($insert_ve_stmt, "iii", $user_id, $ghe_id, $suat_chieu_id);
+        if (!mysqli_stmt_execute($insert_ve_stmt)) {
+            // If any insert fails, rollback and fail
+            throw new Exception("Không thể đặt ghế '{$ten_ghe}'. Có thể ghế đã được người khác đặt.");
+        }
+    }
+
+    // If all insertions were successful, commit the transaction
+    mysqli_commit($conn);
+
+    // Close prepared statements
+    mysqli_stmt_close($get_ghe_id_stmt);
+    mysqli_stmt_close($insert_ve_stmt);
+
+} catch (Exception $e) {
+    // An error occurred, rollback all changes
+    mysqli_rollback($conn);
+    die("Đã xảy ra lỗi trong quá trình đặt vé: " . $e->getMessage());
+}
+
+// --- Fetch show information for confirmation message (already safe) ---
 $info = null;
 $sql = "SELECT p.ten_phim, sc.ngay, sc.gio
         FROM suat_chieu sc
@@ -29,14 +83,15 @@ if ($r) {
     $info = mysqli_fetch_assoc($r);
 }
 
-// formatted values for template
-$seat_list = htmlspecialchars(implode(", ", $ghe));
+// Formatted values for template
+$seat_list = htmlspecialchars(implode(", ", $ghe_array));
 $movie_name = $info['ten_phim'] ?? '';
 $show_datetime = '';
 if ($info) {
     $show_datetime = date('d/m/Y', strtotime($info['ngay'])) . ' ' . date('H:i', strtotime($info['gio']));
 }
 
+mysqli_close($conn);
 ?>
 
 <!DOCTYPE html>
@@ -71,6 +126,7 @@ if ($info) {
     }
   }
 </style>
+
 </head>
 <body class="user-index">
 <header class="header">
