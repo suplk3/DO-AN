@@ -132,14 +132,13 @@ function fmt_money($n){ return $n !== null ? number_format($n,0,',','.') . '₫'
 
                         <div class="st-body">
                             <div class="st-room"><?= htmlspecialchars($s['ten_rap'] ?: 'Rạp chưa đặt') ?> — <?= htmlspecialchars($s['ten_phong'] ?: 'Phòng') ?></div>
-                            <div class="st-seats">
-                                <?php if (is_null($total_seats)): ?>
-                                    <span class="badge">Ghế: Không xác định</span>
-                                <?php else: ?>
-                                    <span class="badge available"><?= $available ?> / <?= $total_seats ?> trống</span>
-                                <?php endif; ?>
-                            </div>
-                        </div>
+                                                            <div class="st-seats">
+                                                            <?php if (is_null($total_seats) || $total_seats == 0): ?>
+                                                                <span class="badge">Ghế: Không xác định</span>
+                                                            <?php else: ?>
+                                                                <span class="badge available"><?= $available ?> / <?= $total_seats ?> trống</span>
+                                                            <?php endif; ?>
+                                                        </div>                        </div>
 
                         <div class="st-actions">
                             <?php if (isset($_SESSION['user_id'])): ?>
