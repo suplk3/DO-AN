@@ -18,6 +18,7 @@ SELECT
         AND ve.suat_chieu_id = $suat_chieu_id
     ) AS da_dat
 FROM ghe
+WHERE ghe.phong_id = (SELECT phong_id FROM suat_chieu WHERE id = $suat_chieu_id LIMIT 1)
 ORDER BY ghe.ten_ghe
 ";
 $result = mysqli_query($conn, $sql);

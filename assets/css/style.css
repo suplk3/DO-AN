@@ -629,7 +629,7 @@ body.user-index .footer{margin-top:28px;padding:18px;text-align:center;color:#6b
 .form-container{max-width:900px;margin:28px auto;padding:22px;border-radius:12px;background:linear-gradient(180deg,#ffffff,#fbfdff);box-shadow:0 12px 30px rgba(2,6,23,0.06)}
 .form-row{display:flex;gap:14px;margin-bottom:14px;align-items:center}
 label{width:140px;font-weight:700;color:#0f172a}
-input[type=text], input[type=file], textarea, select{flex:1;padding:10px 12px;border:1px solid #e6e9ee;border-radius:10px;background:#fff;transition:box-shadow .12s,border-color .12s}
+input[type=text], input[type=file], textarea, select{flex:1;padding:10px 12px;border:1px solid #e6e9ee;border-radius:10px;background: #2a2525;transition:box-shadow .12s,border-color .12s}
 textarea{min-height:140px;resize:vertical}
 input[type=text]:focus, textarea:focus{outline:none;box-shadow:0 6px 18px rgba(31,111,235,0.08);border-color:#1f6feb}
 .actions{display:flex;gap:12px;align-items:center;margin-top:6px}
