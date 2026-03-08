@@ -102,10 +102,10 @@ $notShowingCount = max(0, $count - $showingCount);
         .stat-card.total .number { color: #60a5fa; }
         .stat-card.filter-showing .number { color: #06d6a0; }
         .stat-card.pending .number { color: #fbbf24; }
-        .stat-card.filter-showing {
+        .stat-card.clickable {
             cursor: pointer;
         }
-        .stat-card.filter-showing:hover {
+        .stat-card.clickable:hover {
             transform: translateY(-2px);
             border-color: rgba(96, 165, 250, 0.55);
             box-shadow: 0 16px 32px rgba(30, 64, 175, 0.28);
@@ -497,21 +497,21 @@ $notShowingCount = max(0, $count - $showingCount);
 
     <!-- Thống kê nhanh -->
     <div class="quick-stats">
-        <div class="stat-card total">
+        <div class="stat-card total clickable" title="Nhấn để hiện tất cả phim" onclick="showAllMovies()">
             <span class="stat-icon">🎬</span>
             <div>
                 <div class="label">Tổng phim</div>
                 <div class="number"><?= $count ?></div>
             </div>
         </div>
-        <div class="stat-card filter-showing" title="Nhấn để lọc phim đã chiếu" onclick="showOnlyShowingMovies()">
+        <div class="stat-card filter-showing clickable" title="Nhấn để lọc phim đã chiếu" onclick="showOnlyShowingMovies()">
             <span class="stat-icon">✓</span>
             <div>
                 <div class="label">Đã chiếu</div>
                 <div class="number"><?= $showingCount ?></div>
             </div>
         </div>
-        <div class="stat-card pending">
+        <div class="stat-card pending clickable" title="Nhấn để lọc phim chưa có suất" onclick="showOnlyNotShowingMovies()">
             <span class="stat-icon">⏸</span>
             <div>
                 <div class="label">Chưa có suất</div>
@@ -728,6 +728,25 @@ function showOnlyShowingMovies() {
     const statusFilter = document.getElementById('statusFilter');
     if (!statusFilter) return;
     statusFilter.value = 'showing';
+    filterMovies();
+}
+
+function showOnlyNotShowingMovies() {
+    const statusFilter = document.getElementById('statusFilter');
+    if (!statusFilter) return;
+    statusFilter.value = 'not_showing';
+    filterMovies();
+}
+
+function showAllMovies() {
+    const searchInput = document.getElementById('searchInput');
+    const genreFilter = document.getElementById('genreFilter');
+    const statusFilter = document.getElementById('statusFilter');
+
+    if (searchInput) searchInput.value = '';
+    if (genreFilter) genreFilter.value = '';
+    if (statusFilter) statusFilter.value = '';
+
     filterMovies();
 }
 </script>
