@@ -5,6 +5,22 @@ include "../config/db.php";
 
 $result = mysqli_query($conn, "SELECT * FROM phim ORDER BY id DESC");
 $count = mysqli_num_rows($result);
+
+$showingMovieIds = array();
+$showingResult = mysqli_query(
+    $conn,
+    "SELECT DISTINCT phim_id
+     FROM suat_chieu
+     WHERE phim_id IS NOT NULL"
+);
+
+if ($showingResult) {
+    while ($showingRow = mysqli_fetch_assoc($showingResult)) {
+        $showingMovieIds[(int)$showingRow['phim_id']] = true;
+    }
+}
+
+$showingCount = count($showingMovieIds);
 ?>
 
 <!DOCTYPE html>
@@ -39,11 +55,16 @@ $count = mysqli_num_rows($result);
         .stat-card{background:rgba(255,255,255,0.05);padding:12px 18px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);text-align:center;min-width:120px}
         .stat-card .number{font-size:20px;font-weight:700;color:var(--accent-red)}
         .stat-card .label{font-size:12px;color:rgba(255,255,255,0.7);margin-top:2px}
+        .stat-card.filter-showing{cursor:pointer;transition:all .2s ease}
+        .stat-card.filter-showing:hover{background:rgba(229,9,20,0.12);transform:translateY(-1px)}
         .empty-state{text-align:center;padding:40px 20px;color:rgba(255,255,255,0.6)}
         .empty-state .icon{font-size:48px;margin-bottom:15px;display:block}
         .empty-state .message{font-size:16px;margin-bottom:10px}
         .empty-state .action{margin-top:20px}
         .genre-badge{background:rgba(229,9,20,0.2);color:#fff;padding:4px 8px;border-radius:12px;font-size:12px;border:1px solid rgba(229,9,20,0.3)}
+        .status-badge{display:inline-block;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:700;border:1px solid transparent}
+        .status-badge.showing{background:rgba(16,185,129,.16);color:#34d399;border-color:rgba(16,185,129,.4)}
+        .status-badge.not-showing{background:rgba(239,68,68,.12);color:#f87171;border-color:rgba(239,68,68,.35)}
         .movie-title{font-weight:500}
         .empty-row{display:none}
         .no-results{text-align:center;padding:40px;color:rgba(255,255,255,0.6);font-style:italic}
@@ -74,9 +95,9 @@ $count = mysqli_num_rows($result);
             <div class="number"><?= $count ?></div>
             <div class="label">Tổng phim</div>
         </div>
-        <div class="stat-card">
-            <div class="number">0</div>
-            <div class="label">Đang chiếu</div>
+        <div class="stat-card filter-showing" title="Nhấn để lọc phim đã chiếu" onclick="showOnlyShowingMovies()">
+            <div class="number"><?= $showingCount ?></div>
+            <div class="label">Đã chiếu</div>
         </div>
     </div>
 
@@ -109,6 +130,13 @@ $count = mysqli_num_rows($result);
                 ?>
             </select>
         </div>
+        <div class="filter-select">
+            <select id="statusFilter" onchange="filterMovies()">
+                <option value="">Tất cả trạng thái</option>
+                <option value="showing">Đã chiếu</option>
+                <option value="not_showing">Chưa có suất chiếu</option>
+            </select>
+        </div>
     </div>
 
     <?php if (!empty($_SESSION['success'])): ?>
@@ -136,13 +164,14 @@ $count = mysqli_num_rows($result);
                     <th>Tên phim</th>
                     <th>Thể loại</th>
                     <th>Poster</th>
+                    <th>Trạng thái</th>
                     <th>Hành động</th>
                 </tr>
             </thead>
             <tbody id="movieTableBody">
                 <?php 
                 if ($count === 0) {
-                    echo '<tr class="empty-row"><td colspan="5">
+                    echo '<tr class="empty-row"><td colspan="6">
                         <div class="empty-state">
                             <div class="icon">🎬</div>
                             <div class="message">Chưa có phim nào trong hệ thống</div>
@@ -155,8 +184,12 @@ $count = mysqli_num_rows($result);
                     </td></tr>';
                 } else {
                     while ($row = mysqli_fetch_assoc($result)): 
+                        $isShowing = isset($showingMovieIds[(int)$row['id']]);
                 ?>
-                <tr class="movie-row" data-genres="<?= htmlspecialchars(str_replace(',', '|', $row['the_loai'])) ?>" data-title="<?= htmlspecialchars(strtolower($row['ten_phim'])) ?>">
+                <tr class="movie-row"
+                    data-genres="<?= htmlspecialchars(str_replace(',', '|', $row['the_loai'])) ?>"
+                    data-title="<?= htmlspecialchars(strtolower($row['ten_phim'])) ?>"
+                    data-showing="<?= $isShowing ? '1' : '0' ?>">
                     <td><strong>#<?= $row['id'] ?></strong></td>
                     <td class="movie-title"><?= htmlspecialchars($row['ten_phim']) ?></td>
                     <td>
@@ -175,6 +208,13 @@ $count = mysqli_num_rows($result);
                             <img src="../assets/images/<?= htmlspecialchars($row['poster']) ?>" alt="poster" loading="lazy">
                         <?php else: ?>
                             <span style="color:rgba(255,255,255,0.4);font-style:italic">Chưa có ảnh</span>
+                        <?php endif; ?>
+                    </td>
+                    <td>
+                        <?php if ($isShowing): ?>
+                            <span class="status-badge showing">Đã chiếu</span>
+                        <?php else: ?>
+                            <span class="status-badge not-showing">Chưa có suất</span>
                         <?php endif; ?>
                     </td>
                     <td>
@@ -210,14 +250,16 @@ document.addEventListener('DOMContentLoaded', function() {
 function filterMovies() {
     const searchInput = document.getElementById('searchInput');
     const genreFilter = document.getElementById('genreFilter');
+    const statusFilter = document.getElementById('statusFilter');
     
-    if (!searchInput || !genreFilter) {
+    if (!searchInput || !genreFilter || !statusFilter) {
         console.error('Không tìm thấy element search hoặc filter');
         return;
     }
     
     const searchValue = searchInput.value.toLowerCase().trim();
     const genreValue = genreFilter.value.trim();
+    const statusValue = statusFilter.value.trim();
     const rows = document.querySelectorAll('.movie-row');
     const tbody = document.getElementById('movieTableBody');
     
@@ -233,6 +275,7 @@ function filterMovies() {
     rows.forEach(row => {
         const title = (row.dataset.title || '').toLowerCase();
         const genresStr = (row.dataset.genres || ''); // Sử dụng data-genres
+        const isShowing = row.dataset.showing === '1';
         
         // Tách các genre từ chuỗi (được ngăn cách bằng |)
         const genres = genresStr.split('|').map(g => g.trim().toLowerCase()).filter(g => g.length > 0);
@@ -247,9 +290,19 @@ function filterMovies() {
         } else {
             matchGenre = genres.some(g => g === genreValue.toLowerCase());
         }
+
+        // Kiểm tra trạng thái chiếu
+        let matchStatus = false;
+        if (statusValue === '') {
+            matchStatus = true;
+        } else if (statusValue === 'showing') {
+            matchStatus = isShowing;
+        } else if (statusValue === 'not_showing') {
+            matchStatus = !isShowing;
+        }
         
         // Hiển thị hoặc ẩn hàng
-        if (matchSearch && matchGenre) {
+        if (matchSearch && matchGenre && matchStatus) {
             row.style.display = 'table-row';
             visibleCount++;
         } else {
@@ -262,13 +315,20 @@ function filterMovies() {
         const noResults = document.createElement('tr');
         noResults.className = 'no-results';
         noResults.innerHTML = `
-            <td colspan="5" style="text-align:center;padding:40px;color:rgba(255,255,255,0.6);">
+            <td colspan="6" style="text-align:center;padding:40px;color:rgba(255,255,255,0.6);">
                 <div style="font-size:32px;margin-bottom:10px">🔍</div>
                 <div>Không tìm thấy phim nào phù hợp</div>
             </td>
         `;
         tbody.appendChild(noResults);
     }
+}
+
+function showOnlyShowingMovies() {
+    const statusFilter = document.getElementById('statusFilter');
+    if (!statusFilter) return;
+    statusFilter.value = 'showing';
+    filterMovies();
 }
 
 // Hàm thêm hiệu ứng hover
