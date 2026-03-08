@@ -2,38 +2,30 @@
 include "check_admin.php";
 include "../config/db.php";
 
-$id = $_GET['id'] ?? 0;
-$check = mysqli_fetch_assoc(
-    mysqli_query($conn,
-    "SELECT COUNT(*) AS tong FROM ve WHERE suat_chieu_id = $id")
-);
-
-if ($check['tong'] > 0) {
-    die("Không thể sửa suất chiếu đã có vé!");
-}
-
-// Lấy suất chiếu hiện tại
-$suat = mysqli_fetch_assoc(
-    mysqli_query($conn, "SELECT * FROM suat_chieu WHERE id = $id")
-);
-
-// Danh sách phim
 $phim = mysqli_query($conn, "SELECT * FROM phim");
+$raps = mysqli_query($conn, "SELECT * FROM rap");
+// load halls for initial state (first theater)
+$phong_chieu = [];
+if ($raps && $r = mysqli_fetch_assoc($raps)) {
+    $firstRapId = $r['id'];
+    $phong_chieu_result = mysqli_query($conn, "SELECT * FROM phong_chieu WHERE rap_id = $firstRapId");
+    while ($row = mysqli_fetch_assoc($phong_chieu_result)) {
+        $phong_chieu[] = $row;
+    }
+}
+// rewind $raps pointer for later loop
+mysqli_data_seek($raps, 0);
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $phim_id = $_POST['phim_id'];
+    $rap_id = $_POST['rap_id'];
+    $phong_id = $_POST['phong_id'];
     $ngay = $_POST['ngay'];
     $gio = $_POST['gio'];
     $gia = $_POST['gia'];
 
-    $sql = "
-    UPDATE suat_chieu SET
-        phim_id = '$phim_id',
-        ngay = '$ngay',
-        gio = '$gio',
-        gia = '$gia'
-    WHERE id = $id
-    ";
+    $sql = "INSERT INTO suat_chieu (phim_id, phong_id, ngay, gio, gia)
+            VALUES ('$phim_id', '$phong_id', '$ngay', '$gio', '$gia')";
     mysqli_query($conn, $sql);
 
     header("Location: suat_chieu.php");
@@ -45,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sửa suất chiếu - Cinema Management</title>
+    <title>Thêm suất chiếu - Cinema Management</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -115,6 +107,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             font-weight: 700;
             color: #ffffff;
             letter-spacing: 0.5px;
+        }
+
+        .header-subtitle {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 2px;
         }
 
         .header-actions {
@@ -199,9 +197,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             color: rgba(255, 255, 255, 0.7);
         }
 
+        /* Form grid */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
         /* Form group */
         .form-group {
-            margin-bottom: 24px;
             position: relative;
         }
 
@@ -245,6 +256,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             color: #ffffff;
         }
 
+        /* Full width fields */
+        .form-group-full {
+            grid-column: 1 / -1;
+        }
+
         /* Action buttons */
         .form-actions {
             display: flex;
@@ -268,7 +284,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             gap: 8px;
             min-width: 160px;
             justify-content: center;
-            text-decoration: none;
         }
 
         .btn-primary {
@@ -318,9 +333,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             animation: float 8s ease-in-out infinite reverse;
         }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(20px); }
+        /* Loading animation */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .loading {
+            animation: pulse 2s infinite;
         }
 
         /* Responsive */
@@ -362,12 +382,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <header class="admin-header">
         <div class="header-content">
             <i class="fas fa-film header-icon"></i>
-            <div class="header-title">Quản lý suất chiếu</div>
+            <div>
+                <div class="header-title">Quản lý suất chiếu</div>
+                <div class="header-subtitle">Thêm suất chiếu mới</div>
+            </div>
         </div>
         <div class="header-actions">
             <a href="suat_chieu.php" class="btn-secondary">
                 <i class="fas fa-arrow-left"></i>
-                Về trang chính
+                Quay lại
             </a>
         </div>
     </header>
@@ -379,62 +402,85 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             <div class="form-header">
                 <h1 class="form-title">
-                    <i class="fas fa-edit"></i>
-                    Sửa suất chiếu
+                    <i class="fas fa-plus-circle"></i>
+                    Thêm suất chiếu
                 </h1>
-                <p class="form-subtitle">Cập nhật thông tin suất chiếu</p>
+                <p class="form-subtitle">Điền thông tin để tạo suất chiếu mới</p>
             </div>
 
-            <form method="post" id="editShowtimeForm">
-                <div class="form-group">
-                    <label class="form-label" for="phim_id">
-                        <i class="fas fa-film"></i> Phim
-                    </label>
-                    <select name="phim_id" id="phim_id" class="form-select" required>
-                        <?php 
-                        mysqli_data_seek($phim, 0);
-                        while ($p = mysqli_fetch_assoc($phim)): ?>
-                            <option value="<?= $p['id'] ?>"
-                                <?= ($p['id'] == $suat['phim_id']) ? 'selected' : '' ?>>
-                                <?= htmlspecialchars($p['ten_phim']) ?>
-                            </option>
-                        <?php endwhile; ?>
-                    </select>
-                </div>
+            <form method="post" id="addShowtimeForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label" for="phim_id">
+                            <i class="fas fa-film"></i> Phim
+                        </label>
+                        <select name="phim_id" id="phim_id" class="form-select" required>
+                            <option value="">-- Chọn phim --</option>
+                            <?php while ($p = mysqli_fetch_assoc($phim)): ?>
+                                <option value="<?= $p['id'] ?>">
+                                    <?= htmlspecialchars($p['ten_phim']) ?>
+                                </option>
+                            <?php endwhile; ?>
+                        </select>
+                    </div>
 
-                <div class="form-group">
-                    <label class="form-label" for="ngay">
-                        <i class="fas fa-calendar-alt"></i> Ngày chiếu
-                    </label>
-                    <input type="date" name="ngay" id="ngay" class="form-input"
-                           value="<?= $suat['ngay'] ?>" required>
-                </div>
+                    <div class="form-group">
+                        <label class="form-label" for="rap_id">
+                            <i class="fas fa-building"></i> Rạp chiếu
+                        </label>
+                        <select name="rap_id" id="rapSelect" class="form-select" required>
+                            <option value="">-- Chọn rạp --</option>
+                            <?php
+                            mysqli_data_seek($raps, 0);
+                            while ($r = mysqli_fetch_assoc($raps)): ?>
+                                <option value="<?= $r['id'] ?>"><?= htmlspecialchars($r['ten_rap']) ?></option>
+                            <?php endwhile; ?>
+                        </select>
+                    </div>
 
-                <div class="form-group">
-                    <label class="form-label" for="gio">
-                        <i class="fas fa-clock"></i> Giờ chiếu
-                    </label>
-                    <input type="time" name="gio" id="gio" class="form-input"
-                           value="<?= $suat['gio'] ?>" required>
-                </div>
+                    <div class="form-group">
+                        <label class="form-label" for="phong_id">
+                            <i class="fas fa-door-open"></i> Phòng chiếu
+                        </label>
+                        <select name="phong_id" id="phongSelect" class="form-select" required>
+                            <option value="">-- Chọn phòng --</option>
+                            <?php foreach ($phong_chieu as $pc): ?>
+                                <option value="<?= $pc['id'] ?>"><?= htmlspecialchars($pc['ten_phong']) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
 
-                <div class="form-group">
-                    <label class="form-label" for="gia">
-                        <i class="fas fa-dollar-sign"></i> Giá vé (VNĐ)
-                    </label>
-                    <input type="number" name="gia" id="gia" class="form-input"
-                           value="<?= $suat['gia'] ?>" min="0" required>
+                    <div class="form-group">
+                        <label class="form-label" for="ngay">
+                            <i class="fas fa-calendar-alt"></i> Ngày chiếu
+                        </label>
+                        <input type="date" name="ngay" id="ngay" class="form-input" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="gio">
+                            <i class="fas fa-clock"></i> Giờ chiếu
+                        </label>
+                        <input type="time" name="gio" id="gio" class="form-input" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="gia">
+                            <i class="fas fa-dollar-sign"></i> Giá vé (VNĐ)
+                        </label>
+                        <input type="number" name="gia" id="gia" class="form-input" placeholder="Nhập giá vé" min="0" required>
+                    </div>
                 </div>
 
                 <div class="form-actions">
                     <button type="submit" class="btn btn-primary" id="submitBtn">
                         <i class="fas fa-save"></i>
-                        Lưu thay đổi
+                        Lưu suất chiếu
                     </button>
-                    <a href="suat_chieu.php" class="btn btn-secondary-form">
+                    <button type="button" class="btn btn-secondary-form" onclick="window.location.href='suat_chieu.php'">
                         <i class="fas fa-times"></i>
                         Hủy bỏ
-                    </a>
+                    </button>
                 </div>
             </form>
         </div>
@@ -442,10 +488,34 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     <script>
         // Loading state for form submission
-        document.getElementById('editShowtimeForm').addEventListener('submit', function(e) {
+        document.getElementById('addShowtimeForm').addEventListener('submit', function(e) {
             const submitBtn = document.getElementById('submitBtn');
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang lưu...';
+            submitBtn.classList.add('loading');
             submitBtn.disabled = true;
+        });
+
+        // Dynamic room loading
+        document.getElementById('rapSelect').addEventListener('change', function() {
+            const rapId = this.value;
+            const phongSelect = document.getElementById('phongSelect');
+
+            if (!rapId) {
+                phongSelect.innerHTML = '<option value="">-- Chọn phòng --</option>';
+                return;
+            }
+
+            // Show loading
+            phongSelect.innerHTML = '<option value="">Đang tải...</option>';
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', 'load_phong.php?rap_id=' + rapId, true);
+            xhr.onload = function() {
+                if (this.status == 200) {
+                    phongSelect.innerHTML = '<option value="">-- Chọn phòng --</option>' + this.responseText;
+                }
+            };
+            xhr.send();
         });
 
         // Auto-focus first field
