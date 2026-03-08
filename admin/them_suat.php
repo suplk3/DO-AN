@@ -41,43 +41,73 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 </head>
 <body>
 
-<h2>➕ THÊM SUẤT CHIẾU</h2>
+<div class="container">
+    <h2 class="title">➕ THÊM SUẤT CHIẾU</h2>
 
-<form method="post">
-    <label>Phim:</label><br>
-    <select name="phim_id" required>
-        <?php while ($p = mysqli_fetch_assoc($phim)): ?>
-            <option value="<?= $p['id'] ?>">
-                <?= $p['ten_phim'] ?>
-            </option>
-        <?php endwhile; ?>
-    </select><br><br>
+    <div class="form-container">
+        <form method="post">
+            <div class="form-group">
+                <label for="phim_id">Phim:</label>
+                <select name="phim_id" id="phim_id" required>
+                    <?php while ($p = mysqli_fetch_assoc($phim)): ?>
+                        <option value="<?= $p['id'] ?>">
+                            <?= $p['ten_phim'] ?>
+                        </option>
+                    <?php endwhile; ?>
+                </select>
+            </div>
 
-    <label>Rạp:</label><br>
-    <select name="rap_id" id="rapSelect" required>
-        <?php while ($r = mysqli_fetch_assoc($raps)): ?>
-            <option value="<?= $r['id'] ?>"><?= htmlspecialchars($r['ten_rap']) ?></option>
-        <?php endwhile; ?>
-    </select><br><br>
+            <div class="form-group">
+                <label for="rap_id">Rạp:</label>
+                <select name="rap_id" id="rapSelect" required>
+                    <?php while ($r = mysqli_fetch_assoc($raps)): ?>
+                        <option value="<?= $r['id'] ?>"><?= htmlspecialchars($r['ten_rap']) ?></option>
+                    <?php endwhile; ?>
+                </select>
+            </div>
 
-    <label>Phòng chiếu:</label><br>
-    <select name="phong_id" id="phongSelect" required>
-        <?php foreach ($phong_chieu as $pc): ?>
-            <option value="<?= $pc['id'] ?>"><?= htmlspecialchars($pc['ten_phong']) ?></option>
-        <?php endforeach; ?>
-    </select><br><br>
+            <div class="form-group">
+                <label for="phong_id">Phòng chiếu:</label>
+                <select name="phong_id" id="phongSelect" required>
+                    <?php foreach ($phong_chieu as $pc): ?>
+                        <option value="<?= $pc['id'] ?>"><?= htmlspecialchars($pc['ten_phong']) ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
 
-    <label>Ngày chiếu:</label><br>
-    <input type="date" name="ngay" required><br><br>
+            <div class="form-group">
+                <label for="ngay">Ngày chiếu:</label>
+                <input type="date" name="ngay" id="ngay" required>
+            </div>
 
-    <label>Giờ chiếu:</label><br>
-    <input type="time" name="gio" required><br><br>
+            <div class="form-group">
+                <label for="gio">Giờ chiếu:</label>
+                <input type="time" name="gio" id="gio" required>
+            </div>
 
-    <label>Giá vé:</label><br>
-    <input type="number" name="gia" required><br><br>
+            <div class="form-group">
+                <label for="gia">Giá vé:</label>
+                <input type="number" name="gia" id="gia" required>
+            </div>
 
-    <button class="btn">Lưu suất chiếu</button>
-</form>
+            <button type="submit" class="btn-submit">Lưu suất chiếu</button>
+        </form>
+    </div>
+</div>
+
+<script>
+document.getElementById('rapSelect').addEventListener('change', function() {
+    var rapId = this.value;
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', 'load_phong.php?rap_id=' + rapId, true);
+    xhr.onload = function() {
+        if (this.status == 200) {
+            document.getElementById('phongSelect').innerHTML = this.responseText;
+        }
+    };
+    xhr.send();
+});
+</script>
 
 </body>
 </html>
