@@ -50,6 +50,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         color: #ffffff;
         min-height: 100vh;
+        position: relative;
+        overflow-x: hidden;
+    }
+
+    .admin-header,
+    .page-container {
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Dot pattern background */
+    body {
+        background-image: 
+            radial-gradient(circle, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+            radial-gradient(circle, rgba(59, 130, 246, 0.02) 1px, transparent 1px),
+            linear-gradient(135deg, #0b1b2b 0%, #0f172a 100%);
+        background-size: 
+            50px 50px,
+            80px 80px,
+            100% 100%;
+        background-position: 
+            0 0,
+            25px 25px,
+            0 0;
     }
 
     .admin-header {
@@ -60,6 +84,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         justify-content: space-between;
         align-items: center;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        position: relative;
+        z-index: 10;
     }
 
     .header-left {
@@ -119,6 +145,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         margin: 40px auto;
         padding: 0 20px;
         position: relative;
+        z-index: 10;
     }
 
     .page-container::before,
