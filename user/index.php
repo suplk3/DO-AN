@@ -7,8 +7,9 @@ include "../config/db.php";
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CGV Cinemas</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 <link rel="stylesheet" href="../assets/css/style.css">
 <link rel="stylesheet" href="../assets/css/user-index.css">
     <link rel="stylesheet" href="../assets/css/login-modal.css">
@@ -17,30 +18,31 @@ include "../config/db.php";
 
 <header class="header">
     <div class="header-inner">
-        <div class="logo">CGV</div>
+        <a href="index.php" class="logo">CGV</a>
 
-        <nav class="menu">
-            <a href="index.php" class="nav-link active">🎬 PHIM</a>
+        <nav class="header-nav">
+            <div class="header-nav-left">
+                <a href="index.php" class="nav-link active">🎬 PHIM</a>
+                <?php if (isset($_SESSION['vai_tro']) && $_SESSION['vai_tro'] === 'admin'): ?>
+                    <a href="../admin/phim.php" class="nav-link admin">⚙️ QUẢN LÝ PHIM</a>
+                    <a href="../admin/suat_chieu.php" class="nav-link admin">⚙️ QUẢN LÝ SUẤT CHIẾU</a>
+                <?php endif; ?>
+            </div>
 
-            <?php if (isset($_SESSION['vai_tro']) && $_SESSION['vai_tro'] === 'admin'): ?>
-                <a href="../admin/phim.php" class="nav-link admin">⚙️ QUẢN LÝ PHIM</a>
-                <a href="../admin/suat_chieu.php" class="nav-link admin">⚙️ QUẢN LÝ SUẤT CHIẾU</a>
-            <?php endif; ?>
+            <div class="header-nav-right">
+                <?php if (isset($_SESSION['user_id'])): ?>
+                    <span class="hello">👋 Xin chào, <?= htmlspecialchars($_SESSION['ten_nguoi_dung'] ?? 'bạn') ?></span>
+                    <a href="../user/ve_cua_toi.php" class="btn btn-sm">VÉ CỦA TÔI</a>
+                    <a href="../auth/logout.php" class="btn btn-sm btn-outline"
+                       onclick="return confirm('Bạn có chắc chắn muốn đăng xuất không?');">
+                        ĐĂNG XUẤT
+                    </a>
+                <?php else: ?>
+                    <a href="../auth/login.php" class="btn btn-sm open-login-modal">🔐 ĐĂNG NHẬP</a>
+                <?php endif; ?>
+            </div>
         </nav>
-
-        <?php if (isset($_SESSION['user_id'])): ?>
-    <span class="hello">👋 Xin chào</span>
-    <a href="../user/ve_cua_toi.php" class="admin-btn">VÉ CỦA TÔI</a>       
-
-    <a href="../auth/logout.php"
-   onclick="return confirm('Bạn có chắc chắn muốn đăng xuất không?');">
-   🚪 ĐĂNG XUẤT
-</a>
-<?php else: ?>
-    <a href="../auth/login.php" class="open-login-modal">🔐 ĐĂNG NHẬP</a>
-<?php endif; ?>
-
-    </nav>
+    </div>
 </header>
 
 <main class="container">
@@ -106,7 +108,7 @@ include "../config/db.php";
     onScroll();
 })();
 </script>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 <script src="../assets/js/login-modal.js"></script>
 
 </body>
