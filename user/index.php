@@ -22,23 +22,42 @@ include "../config/db.php";
 
         <nav class="header-nav">
             <div class="header-nav-left">
-                <a href="index.php" class="nav-link active">🎬 PHIM</a>
+                <a href="index.php" class="nav-link active">
+                    <span class="icon">🎬</span>
+                    <span class="text">PHIM</span>
+                </a>
                 <?php if (isset($_SESSION['vai_tro']) && $_SESSION['vai_tro'] === 'admin'): ?>
-                    <a href="../admin/phim.php" class="nav-link admin">⚙️ QUẢN LÝ PHIM</a>
-                    <a href="../admin/suat_chieu.php" class="nav-link admin">⚙️ QUẢN LÝ SUẤT CHIẾU</a>
+                    <a href="../admin/phim.php" class="nav-link admin">
+                        <span class="icon">🎬</span>
+                        <span class="text">QUẢN LÝ PHIM</span>
+                    </a>
+                    <a href="../admin/suat_chieu.php" class="nav-link admin">
+                        <span class="icon">📅</span>
+                        <span class="text">QUẢN LÝ SUẤT CHIẾU</span>
+                    </a>
                 <?php endif; ?>
             </div>
 
             <div class="header-nav-right">
                 <?php if (isset($_SESSION['user_id'])): ?>
-                    <span class="hello">👋 Xin chào, <?= htmlspecialchars($_SESSION['ten_nguoi_dung'] ?? 'bạn') ?></span>
-                    <a href="../user/ve_cua_toi.php" class="btn btn-sm">VÉ CỦA TÔI</a>
+                    <span class="hello">
+                        <span class="icon">👋</span>
+                        <span class="text">Xin chào, <?= htmlspecialchars($_SESSION['ten_nguoi_dung'] ?? 'bạn') ?></span>
+                    </span>
+                    <a href="../user/ve_cua_toi.php" class="btn btn-sm">
+                        <span class="icon">🎟️</span>
+                        <span class="text">VÉ CỦA TÔI</span>
+                    </a>
                     <a href="../auth/logout.php" class="btn btn-sm btn-outline"
                        onclick="return confirm('Bạn có chắc chắn muốn đăng xuất không?');">
-                        ĐĂNG XUẤT
+                        <span class="icon">🚪</span>
+                        <span class="text">ĐĂNG XUẤT</span>
                     </a>
                 <?php else: ?>
-                    <a href="../auth/login.php" class="btn btn-sm open-login-modal">🔐 ĐĂNG NHẬP</a>
+                    <a href="../auth/login.php" class="btn btn-sm open-login-modal">
+                        <span class="icon">🔐</span>
+                        <span class="text">ĐĂNG NHẬP</span>
+                    </a>
                 <?php endif; ?>
             </div>
         </nav>
