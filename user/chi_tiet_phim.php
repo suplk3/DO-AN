@@ -42,27 +42,49 @@ function fmt_money($n){ return $n !== null ? number_format($n,0,',','.') . '₫'
 
 <header class="header">
     <div class="header-inner">
-        <div class="logo">CGV</div>
+        <a href="index.php" class="logo">CGV</a>
 
-        <nav class="menu">
-            <a href="index.php" class="nav-link">🎬 PHIM</a>
+        <nav class="header-nav">
+            <div class="header-nav-left">
+                <a href="index.php" class="nav-link">
+                    <span class="icon">🎬</span>
+                    <span class="text">PHIM</span>
+                </a>
+                <?php if (isset($_SESSION['vai_tro']) && $_SESSION['vai_tro'] === 'admin'): ?>
+                    <a href="../admin/phim.php" class="nav-link admin">
+                        <span class="icon">🎬</span>
+                        <span class="text">QUẢN LÝ PHIM</span>
+                    </a>
+                    <a href="../admin/suat_chieu.php" class="nav-link admin">
+                        <span class="icon">📅</span>
+                        <span class="text">QUẢN LÝ SUẤT CHIẾU</span>
+                    </a>
+                <?php endif; ?>
+            </div>
 
-            <?php if (isset($_SESSION['vai_tro']) && $_SESSION['vai_tro'] === 'admin'): ?>
-                <a href="../admin/phim.php" class="nav-link admin">⚙️ QUẢN LÝ PHIM</a>
-                <a href="../admin/suat_chieu.php" class="nav-link admin">⚙️ QUẢN LÝ SUẤT CHIẾU</a>
-            <?php endif; ?>
+            <div class="header-nav-right">
+                <?php if (isset($_SESSION['user_id'])): ?>
+                    <span class="hello">
+                        <span class="icon">👋</span>
+                        <span class="text">Xin chào, <?= htmlspecialchars($_SESSION['ten'] ?? 'Khách') ?></span>
+                    </span>
+                    <a href="ve_cua_toi.php" class="btn">
+                        <span class="icon">🎟️</span>
+                        <span class="text">VÉ CỦA TÔI</span>
+                    </a>
+                    <a href="../auth/logout.php" class="btn btn-outline"
+                       onclick="return confirm('Bạn có chắc chắn muốn đăng xuất không?');">
+                        <span class="icon">🚪</span>
+                        <span class="text">ĐĂNG XUẤT</span>
+                    </a>
+                <?php else: ?>
+                    <a href="../auth/login.php" class="btn open-login-modal">
+                        <span class="icon">🔐</span>
+                        <span class="text">ĐĂNG NHẬP</span>
+                    </a>
+                <?php endif; ?>
+            </div>
         </nav>
-
-        <div class="actions">
-            <?php if (isset($_SESSION['user_id'])): ?>
-                <span class="hello">👋 <?= htmlspecialchars($_SESSION['ten'] ?? 'Khách') ?></span>
-                <a href="#" class="link">🎟️ VÉ CỦA TÔI</a>
-                <a href="../auth/logout.php" class="btn-ghost"
-                   onclick="return confirm('Bạn có chắc chắn muốn đăng xuất không?');">🚪 ĐĂNG XUẤT</a>
-            <?php else: ?>
-                <a href="../auth/login.php" class="btn open-login-modal">🔐 ĐĂNG NHẬP</a>
-            <?php endif; ?>
-        </div>
     </div>
 </header>
 
@@ -157,6 +179,26 @@ function fmt_money($n){ return $n !== null ? number_format($n,0,',','.') . '₫'
 <footer class="footer">
     <div>© <?= date('Y') ?> CGV Cinemas — Thiết kế gọn, responsive.</div>
 </footer>
+
+<!-- Header shrink script -->
+<script>
+(function(){
+    const header = document.querySelector('.header');
+    const body = document.querySelector('body.movie-detail-page');
+    if(!header || !body) return;
+    const onScroll = () => {
+        if (window.scrollY > 50) {
+            header.classList.add('shrink');
+            body.classList.add('header-shrink');
+        } else {
+            header.classList.remove('shrink');
+            body.classList.remove('header-shrink');
+        }
+    };
+    window.addEventListener('scroll', onScroll, {passive:true});
+    onScroll();
+})();
+</script>
 
 <script src="/assets/js/login-modal.js"></script>
 

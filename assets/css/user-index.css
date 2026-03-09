@@ -66,28 +66,163 @@ body.user-index .actions{margin-left:auto;display:flex;gap:10px;align-items:cent
 .header-nav-left, .header-nav-right {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
+}
+
+/* Nav link với icon và hover effects */
+.header-nav-left .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    font-size: 14px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.85);
+    text-decoration: none;
+    border-radius: 10px;
+    transition: all 0.25s ease;
+    position: relative;
+    overflow: hidden;
+}
+.header-nav-left .nav-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+    opacity: 0;
+    transition: opacity 0.25s ease;
+}
+.header-nav-left .nav-link:hover {
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 77, 79, 0.3);
+}
+.header-nav-left .nav-link:hover::before {
+    opacity: 1;
+}
+.header-nav-left .nav-link.active {
+    background: rgba(255, 77, 79, 0.2);
+    color: #fff;
+}
+.header-nav-left .nav-link.active::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 3px;
+    background: #ff4d4f;
+    border-radius: 2px;
+}
+
+/* Admin badge */
+.header-nav-left .nav-link.admin {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    padding: 8px 12px;
+}
+.header-nav-left .nav-link.admin:hover {
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+/* Right side - User info */
+.header-nav-right {
+    gap: 10px;
 }
 .header-nav-right .hello {
     font-size: 14px;
-    color: rgba(255, 255, 255, 0.7);
-}
-.header-nav-right .btn {
+    color: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    gap: 6px;
     padding: 6px 12px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+}
+
+/* Button styles với gradient và effects */
+.header-nav-right .btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
     font-size: 13px;
     font-weight: 600;
     text-decoration: none;
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    background: linear-gradient(135deg, #ff6b6b, #ff4d4f);
     color: #fff;
-    border: 1px solid transparent;
+    border: none;
+    transition: all 0.25s ease;
+    position: relative;
+    overflow: hidden;
+}
+.header-nav-right .btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s ease;
+}
+.header-nav-right .btn:hover::before {
+    left: 100%;
+}
+.header-nav-right .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 77, 79, 0.4);
 }
 .header-nav-right .btn-outline {
     background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: none;
 }
-.header-nav-right .btn:hover {
-    background: rgba(255, 255, 255, 0.15);
+.header-nav-right .btn-outline:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.5);
+    box-shadow: none;
+}
+
+/* Mobile - Icon only mode */
+@media(max-width:768px) {
+    .header-nav-left .nav-link {
+        padding: 8px 10px;
+    }
+    .header-nav-left .nav-link span.text,
+    .header-nav-left .nav-link.admin span {
+        display: none;
+    }
+    .header-nav-left .nav-link::after {
+        display: none;
+    }
+    
+    /* Hiển thị icon cho mobile */
+    .header-nav-left .nav-link .icon {
+        display: inline-block;
+    }
+    
+    .header-nav-right .hello span:not(.icon) {
+        display: none;
+    }
+    .header-nav-right .hello {
+        padding: 6px 8px;
+    }
+    
+    .header-nav-right .btn span.text,
+    .header-nav-right .btn-outline span.text {
+        display: none;
+    }
+    .header-nav-right .btn,
+    .header-nav-right .btn-outline {
+        padding: 8px 10px;
+        min-width: 36px;
+        justify-content: center;
+    }
 }
 
 
