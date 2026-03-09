@@ -45,14 +45,51 @@ body.user-index .logo{
     font-size:20px;
     color:#ff4d4f;
     transition:font-size .18s ease,transform .18s ease;
+    text-decoration: none;
+    flex-shrink: 0; /* Prevent logo from shrinking */
 }
 body.user-index .header.shrink .logo{
     font-size:16px;
 }
 body.user-index .menu{display:flex;gap:12px;align-items:center}
-body.user-index .nav-link{color:rgba(255,255,255,0.9);padding:6px 10px;border-radius:8px}
+body.user-index .nav-link{color:rgba(255,255,255,0.9);padding:6px 10px;border-radius:8px; text-decoration: none;}
 body.user-index .nav-link.active{background:rgba(255,255,255,0.06)}
 body.user-index .actions{margin-left:auto;display:flex;gap:10px;align-items:center}
+
+/* New Header Navigation Styles */
+.header-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+.header-nav-left, .header-nav-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.header-nav-right .hello {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+}
+.header-nav-right .btn {
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border: 1px solid transparent;
+}
+.header-nav-right .btn-outline {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.header-nav-right .btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
 
 /* Container */
 body.user-index .container{max-width:1200px;margin:28px auto;padding:0 16px}
@@ -67,32 +104,23 @@ body.user-index .page-title{
 }
 
 /* Movies grid: equal height cards */
-body.user-index .movies{
-    width:100%;
-    box-sizing:border-box;
-    /* Use CSS Grid with auto-fit so cards auto-wrap responsively and stay aligned */
-     display:grid;
-     /* Responsive columns: start with 3-4 on desktop, scale down per breakpoint */
-    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-    gap:22px;
-    align-items:stretch;
-    /* center the grid within its container so cards appear balanced on wide screens */
-    justify-content:center;
-    /* Buộc mỗi hàng có chiều cao cân bằng; .movie-card sẽ giãn đầy ô lưới */
-    grid-auto-rows: 1fr;
+body.user-index .movies {
+    display: grid;
+    /* Create a responsive grid that fits as many columns as possible, with a minimum width of 220px */
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 22px;
+    align-items: stretch;
 }
-body.user-index .movie-card{
-    background:#2d3748;
-    border-radius:12px;
-    overflow:hidden;
-    box-shadow:0 8px 18px rgba(15,23,42,0.06);
-    transition:transform .16s,box-shadow .16s;
-    display:flex;
-    flex-direction:column;
-    /* Allow grid to size cards responsively without max-width constraint */
-    width:100%;
-    /* Đảm bảo card giãn đầy ô lưới (để chiều cao hàng đồng đều) */
-    height:100%;
+
+body.user-index .movie-card {
+    background: #2d3748;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+    transition: transform .16s, box-shadow .16s;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 /* Remove explicit column-calculation media queries and rely on grid auto-fit for
@@ -137,26 +165,51 @@ body.user-index .footer{margin-top:28px;padding:18px;text-align:center;color:#cb
 /* Responsive tweaks */
 @media(max-width:1100px){
     body.user-index .poster{height:240px}
-    /* Force exactly 3 columns on mid-size displays */
-    body.user-index .movies{
-        grid-template-columns:repeat(3,minmax(0,1fr));
-        justify-content:center;
+}
+
+@media(max-width:768px) {
+    .header-nav-left .nav-link.admin {
+        display: none; /* Hide admin links on smaller screens to save space */
+    }
+    .header-inner {
+        gap: 10px !important;
     }
 }
+
+/* On tablets and phones, switch to 2 columns */
 @media(max-width:640px){
     body.user-index .header-inner{flex-wrap:wrap;gap:8px;padding:8px 12px}
-    body.user-index .movies{
-        gap:14px;
-        /* two cards per row on smaller viewports */
-        grid-template-columns:repeat(2,minmax(0,1fr));
-        justify-content:center;
-    }
     body.user-index{padding-top:92px}
-    body.user-index .poster{height:200px}
-}
-@media(max-width:420px){
+    
     body.user-index .movies{
-        grid-template-columns:repeat(1,minmax(0,1fr));
+        gap: 14px;
+        /* two cards per row on smaller viewports as requested */
+        grid-template-columns: repeat(2, 1fr);
     }
+    body.user-index .poster{height:200px}
+
+    /* Adjust header on small screens */
+    .header-nav-left .nav-link {
+        font-size: 12px;
+        padding: 4px 6px;
+    }
+    .header-nav-right .hello {
+        display: none; /* Hide greeting on very small screens */
+    }
+    .header-nav-right {
+        gap: 6px;
+    }
+}
+
+/* On very small phones, you might want to switch to a single column.
+   For now, per user request, we will keep it at 2 columns.
+@media(max-width:360px){
+    body.user-index .movies {
+        grid-template-columns: repeat(1, 1fr);
+    }
+}
+*/
+
+@media(max-width:420px){
     body.user-index .page-title{font-size:20px}
 }

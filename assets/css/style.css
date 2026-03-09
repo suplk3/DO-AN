@@ -36,10 +36,10 @@ nav a {
     padding:6px 10px;border-radius:8px
 }
 
-.container {
+/* .container {
     width: 1200px;
     margin: 30px auto;
-}
+} */
 
 .title {
     font-size: 22px;
@@ -48,11 +48,11 @@ nav a {
     margin-bottom: 20px;
 }
 
-.movies {
+/* .movies {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 25px;
-}
+} */
 
 .movie {
     background: white;
