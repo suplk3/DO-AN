@@ -29,6 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $the_loai = trim($_POST['the_loai'] ?? '');
     $thoi_luong = trim($_POST['thoi_luong'] ?? '');
     $noi_dung = trim($_POST['noi_dung'] ?? '');
+    $ngay_khoi_chieu = !empty($_POST['ngay_khoi_chieu']) ? $_POST['ngay_khoi_chieu'] : null;
 
     if ($ten === '') {
         $errors[] = 'Tên phim là bắt buộc.';
@@ -60,10 +61,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
+    // Handle banner upload nếu có
+    $banner = $phim['banner'];
+    if (!empty($_FILES['banner']['name'])) {
+        if ($_FILES['banner']['error'] === UPLOAD_ERR_OK) {
+            $allowed = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/gif' => 'gif'];
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $mime = finfo_file($finfo, $_FILES['banner']['tmp_name']);
+            finfo_close($finfo);
+
+            if (!array_key_exists($mime, $allowed)) {
+                $errors[] = 'Định dạng banner không hợp lệ. Chỉ cho phép JPG, PNG, GIF.';
+            } else {
+                $ext = $allowed[$mime];
+                $bannerName = time() . '_banner_' . bin2hex(random_bytes(6)) . '.' . $ext;
+                $dest = __DIR__ . '/../assets/images/' . $bannerName;
+                if (!move_uploaded_file($_FILES['banner']['tmp_name'], $dest)) {
+                    $errors[] = 'Không thể lưu banner. Vui lòng thử lại.';
+                } else {
+                    $banner = $bannerName;
+                }
+            }
+        } else {
+            $errors[] = 'Lỗi khi upload banner.';
+        }
+    }
+
     if (empty($errors)) {
-        $sql = "UPDATE phim SET ten_phim = ?, the_loai = ?, thoi_luong = ?, mo_ta = ?, poster = ? WHERE id = ?";
+        $sql = "UPDATE phim SET ten_phim = ?, the_loai = ?, thoi_luong = ?, mo_ta = ?, poster = ?, banner = ?, ngay_khoi_chieu = ? WHERE id = ?";
         $stmt = mysqli_prepare($conn, $sql);
-        mysqli_stmt_bind_param($stmt, 'sssssi', $ten, $the_loai, $thoi_luong, $noi_dung, $poster, $id);
+        mysqli_stmt_bind_param($stmt, 'sssssssi', $ten, $the_loai, $thoi_luong, $noi_dung, $poster, $banner, $ngay_khoi_chieu, $id);
         $ok = mysqli_stmt_execute($stmt);
         mysqli_stmt_close($stmt);
 
@@ -155,6 +182,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="form-row">
             <label for="poster">Thay poster</label>
             <input id="poster" type="file" name="poster" accept="image/*">
+        </div>
+
+        <div class="form-row">
+            <label>Banner hiện tại</label>
+            <?php if (!empty($phim['banner']) && file_exists(__DIR__ . '/../assets/images/' . $phim['banner'])): ?>
+                <img class="poster-preview" src="../assets/images/<?= htmlspecialchars($phim['banner']) ?>" alt="banner">
+            <?php else: ?>
+                <div style="color:#6b7280">Chưa có banner</div>
+            <?php endif; ?>
+        </div>
+
+        <div class="form-row">
+            <label for="banner">Thay banner</label>
+            <input id="banner" type="file" name="banner" accept="image/*">
+            <small style="color: #6b7280; margin-left: 10px;">Banner hiển thị ở trang chủ</small>
+        </div>
+
+        <div class="form-row">
+            <label for="ngay_khoi_chieu">Ngày khởi chiếu</label>
+            <input id="ngay_khoi_chieu" type="date" name="ngay_khoi_chieu" value="<?= htmlspecialchars($phim['ngay_khoi_chieu'] ?? '') ?>">
+            <small style="color: #6b7280; margin-left: 10px;">Để trống nếu là phim đang chiếu</small>
         </div>
 
         <div class="actions">

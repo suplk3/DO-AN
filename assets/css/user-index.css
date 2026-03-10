@@ -348,3 +348,240 @@ body.user-index .footer{margin-top:28px;padding:18px;text-align:center;color:#cb
 @media(max-width:420px){
     body.user-index .page-title{font-size:20px}
 }
+
+/* Banner Carousel Styles */
+.banner-carousel {
+    position: relative;
+    width: 100%;
+    height: 400px;
+    overflow: hidden;
+    border-radius: 16px;
+    margin-bottom: 32px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.banner-slides {
+    width: 100%;
+    height: 100%;
+}
+
+.banner-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 0.6s ease-in-out;
+    transform: scale(1.02);
+}
+
+.banner-slide.active {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.banner-slide a {
+    display: block;
+    width: 100%;
+    height: 100%;
+    text-decoration: none;
+}
+
+.banner-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.banner-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 40px 30px;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.4) 60%, transparent 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.banner-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    letter-spacing: 0.5px;
+}
+
+.banner-cta {
+    display: inline-block;
+    padding: 10px 24px;
+    background: linear-gradient(135deg, #ff6b6b, #ff4d4f);
+    color: #fff;
+    font-weight: 600;
+    font-size: 14px;
+    border-radius: 25px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(255, 77, 79, 0.4);
+}
+
+.banner-slide:hover .banner-cta {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 77, 79, 0.6);
+}
+
+/* Navigation buttons */
+.banner-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 48px;
+    height: 48px;
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(8px);
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.banner-nav:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.banner-prev {
+    left: 16px;
+}
+
+.banner-next {
+    right: 16px;
+}
+
+/* Dots */
+.banner-dots {
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    z-index: 10;
+}
+
+.banner-dot {
+    width: 10px;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.banner-dot.active,
+.banner-dot:hover {
+    background: #fff;
+    transform: scale(1.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .banner-carousel {
+        height: 280px;
+        border-radius: 12px;
+    }
+    
+    .banner-title {
+        font-size: 20px;
+    }
+    
+    .banner-overlay {
+        padding: 24px 20px;
+    }
+    
+    .banner-cta {
+        padding: 8px 18px;
+        font-size: 13px;
+    }
+    
+    .banner-nav {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .banner-carousel {
+        height: 200px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+    
+    .banner-title {
+        font-size: 16px;
+    }
+    
+    .banner-overlay {
+        padding: 16px 14px;
+    }
+    
+    .banner-cta {
+        padding: 6px 14px;
+        font-size: 12px;
+    }
+    
+    .banner-nav {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+    }
+    
+    .banner-prev {
+        left: 8px;
+    }
+    
+    .banner-next {
+        right: 8px;
+    }
+}
+
+/* Release date style for upcoming movies */
+.release-date {
+    font-size: 13px;
+    color: #fbbf24;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+}
+
+.release-date .label {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.release-date .date {
+    font-weight: 600;
+    background: rgba(251, 191, 36, 0.15);
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+/* No movies message */
+.no-movies {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 16px;
+}
