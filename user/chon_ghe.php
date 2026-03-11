@@ -68,6 +68,55 @@ function fmt_money($n){ return $n !== null ? number_format($n,0,',','.') . '₫'
     .seat-selection .seat:hover {
         color: #fff !important;
     }
+
+    /* responsive adjustments for mobile/narrow screens */
+    @media (max-width: 768px) {
+        /* shrink seat buttons and allow wrapping */
+        .seat-row {
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+        .seat-wrapper {
+            overflow-x: auto; /* allow horizontal scrolling if needed */
+            padding-bottom: 10px;
+        }
+        .seat {
+            width: 32px;
+            height: 32px;
+            margin: 2px;
+            font-size: 10px;
+        }
+        .screen {
+            font-size: 14px;
+            padding: 6px;
+            margin-bottom: 12px;
+        }
+        .showtime-info h2 {
+            font-size: 18px;
+        }
+        .showtime-info p {
+            font-size: 12px;
+            line-height: 1.3;
+        }
+        .checkout {
+            font-size: 14px;
+            padding: 0 10px;
+        }
+        .checkout button {
+            width: 100%;
+            padding: 10px 0;
+            font-size: 16px;
+        }
+        .movie-info-card {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .movie-poster img {
+            max-width: 180px;
+            margin-bottom: 10px;
+        }
+    }
     </style>
 </head>
 <body class="movie-detail-page">
