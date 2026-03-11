@@ -64,6 +64,9 @@ if (isset($_GET['modal']) && $_GET['modal'] == '1') {
                                 <input type="password" name="mat_khau" placeholder="Mật khẩu" required>
                                 <span class="icon pw-toggle" title="Hiện/Ẩn">👁</span>
                             </div>
+                            <div class="input-group" style="margin-top:4px; text-align:right;">
+                                <a class="forgot-link" href="<?= $authPath ?>/quen_mat_khau.php">Quên mật khẩu?</a>
+                            </div>
                             <button type="submit" name="login" class="btn-primary">Đăng nhập</button>
                         </form>
                         <p class="login-error message" style="color:#f87171;font-weight:600;"><?php echo $error; ?></p>

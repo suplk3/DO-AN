@@ -36,6 +36,22 @@
     });
   }
 
+  // add forgot link in modal/inline if not present
+  function ensureForgotLinks(scope){
+    (scope || document).querySelectorAll('.login-form').forEach(function(f){
+      if (f.querySelector('.forgot-link')) return;
+      const wrapper = document.createElement('div');
+      wrapper.style.textAlign = 'right';
+      wrapper.style.marginTop = '4px';
+      const a = document.createElement('a');
+      a.className = 'forgot-link';
+      a.href = (f.getAttribute('action') || 'auth/login.php').replace('login.php','quen_mat_khau.php');
+      a.textContent = 'Quên mật khẩu?';
+      wrapper.appendChild(a);
+      f.insertBefore(wrapper, f.querySelector('.btn-primary'));
+    });
+  }
+
   function openLoginModal(url){
     fetch(url)
       .then(function(res){ return res.text(); })
@@ -189,6 +205,7 @@
           });
         }
         // Handle login form via AJAX to keep modal in place
+        ensureForgotLinks(overlay);
         bindLoginForms(overlay);
       })
       .catch(function(err){ console.error('Lỗi tải modal đăng nhập:', err); });
@@ -207,8 +224,8 @@
 
   // Bind any login form already present on page (standalone login page)
   if (document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', function(){ bindLoginForms(document); });
+    document.addEventListener('DOMContentLoaded', function(){ ensureForgotLinks(document); bindLoginForms(document); });
   } else {
-    bindLoginForms(document);
+    ensureForgotLinks(document); bindLoginForms(document);
   }
 })();
