@@ -154,7 +154,7 @@ body {
 <body>
 
 <header>
-    <div class="logo">🎬 CGV</div>
+    <div class="logo">🎬 TTVH</div>
     <nav>
         <a href="index.php">PHIM</a>
         <?php

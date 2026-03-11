@@ -44,7 +44,20 @@ $total_amount = $Price * $seat_count;
 <link rel="stylesheet" href="../assets/css/style.css">
 <link rel="stylesheet" href="../assets/css/user-index.css">
 <style>
-/* payment layout */
+body {
+    background-color: #121212;
+    color: #7FFF00;
+}
+.header {
+    background-color: #1e1e1e;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+.logo {
+    color: #7FFF00;
+}
+.nav-link, .link {
+    color: #7FFF00;
+}
 .container {
     display: flex;
     flex-wrap: wrap;
@@ -57,22 +70,25 @@ $total_amount = $Price * $seat_count;
 }
 .left {
     flex: 1 1 60%;
-    background: #fff;
+    background: #1e1e1e;
     padding: 20px;
     border-radius: 8px;
+    border: 1px solid #333;
 }
 .right {
     flex: 1 1 35%;
-    background: #f9f9f9;
+    background: #1e1e1e;
     padding: 20px;
     border-radius: 8px;
     position: relative;
+    border: 1px solid #333;
 }
 .section-title {
     font-size: 18px;
     font-weight: 600;
     margin-top: 10px;
     margin-bottom: 8px;
+    color: #7FFF00;
 }
 .input-group {
     margin-bottom: 12px;
@@ -80,17 +96,48 @@ $total_amount = $Price * $seat_count;
 .input-group label {
     display: block;
     margin-bottom: 4px;
+    color: #bbb;
 }
 .input-group input[type="text"],
 .input-group select {
     width: 100%;
     padding: 8px;
-    border: 1px solid #ccc;
+    border: 1px solid #444;
     border-radius: 4px;
+    background-color: #2c2c2c;
+    color: #7FFF00;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+.input-group input[type="text"]:focus,
+.input-group select:focus {
+    border-color: #bb86fc;
+    box-shadow: 0 0 5px rgba(187, 134, 252, 0.5);
+    outline: none;
+}
+.payment-methods {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 8px;
 }
 .payment-methods label {
-    display: block;
-    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    background-color: #2c2c2c;
+    padding: 10px;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+    border: 1px solid #444;
+    color: #FFFFFF;
+    cursor: pointer;
+}
+.payment-methods label input {
+    margin-right: 8px;
+}
+.payment-methods label:hover {
+    background-color: #383838;
+}
+#qr-payment p {
+    color: #FFFFFF;
 }
 .summary-row {
     display: flex;
@@ -99,7 +146,7 @@ $total_amount = $Price * $seat_count;
 }
 .summary-row.total {
     font-weight: 600;
-    border-top: 1px solid #ccc;
+    border-top: 1px solid #444;
     padding-top: 6px;
 }
 .countdown {
@@ -107,18 +154,26 @@ $total_amount = $Price * $seat_count;
     margin-top: 20px;
     font-size: 16px;
     font-weight: bold;
+    color: #bb86fc;
 }
 .btn-next {
-    background: #e71a0f;
-    color: #fff;
+    background: #bb86fc;
+    color: #121212;
     padding: 10px 20px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
     font-size: 16px;
+    font-weight: bold;
+    transition: background-color 0.3s, transform 0.2s;
+}
+.btn-next:hover:not(:disabled) {
+    background: #a96ef6;
+    transform: translateY(-2px);
 }
 .btn-next:disabled {
-    background: #aaa;
+    background: #555;
+    color: #888;
     cursor: not-allowed;
 }
 
@@ -127,20 +182,22 @@ $total_amount = $Price * $seat_count;
     width: 100%;
     border-radius: 4px;
     margin-bottom: 12px;
+    border: 1px solid #333;
 }
 .movie-desc {
     margin-top: 12px;
     font-size: 14px;
-    color: #555;
+    color: #bbb;
 }
 
 /* left-side movie summary */
 .movie-summary {
-    background: #fff;
+    background: #1e1e1e;
     padding: 15px;
     border-radius: 8px;
     margin-bottom: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border: 1px solid #333;
+    box-shadow: none;
 }
 .left-poster {
     max-width: 120px;
@@ -150,16 +207,28 @@ $total_amount = $Price * $seat_count;
 }
 .left-desc {
     font-size: 14px;
-    color: #333;
+    color: #bbb;
     clear: both;
     margin-top: 10px;
+}
+h2, h3 {
+    color: #7FFF00;
+}
+strong {
+    color: #7FFF00;
+}
+.right h3 {
+    color: #7FFF00;
+}
+.right div, .right .summary-row {
+    color: #FFFFFF;
 }
 </style>
 </head>
 <body class="user-index">
 <header class="header">
     <div class="header-inner">
-        <div class="logo">CGV</div>
+        <div class="logo">TTVH</div>
         <nav class="menu">
             <a href="index.php" class="nav-link">🎬 PHIM</a>
         </nav>
@@ -192,8 +261,8 @@ $total_amount = $Price * $seat_count;
                     <input type="text" id="voucher" name="voucher" placeholder="Nhập mã giảm giá">
                 </div>
                 <div class="input-group">
-                    <label for="cgv_points">Điểm CGV</label>
-                    <input type="text" id="cgv_points" name="cgv_points" placeholder="Số điểm">
+                    <label for="ttvh_points">Điểm TTVH</label>
+                    <input type="text" id="ttvh_points" name="ttvh_points" placeholder="Số điểm">
                 </div>
             </div>
 
@@ -210,10 +279,40 @@ $total_amount = $Price * $seat_count;
                 <div class="payment-methods">
                     <label><input type="radio" name="payment_method" value="card"> ATM card (Thẻ nội địa)</label>
                     <label><input type="radio" name="payment_method" value="visa"> Thẻ quốc tế (Visa, Master, Amex, JCB)</label>
-                    <label><input type="radio" name="payment_method" value="momo"> Mã MMCGV - 5K</label>
                     <label><input type="radio" name="payment_method" value="zalopay"> ZaloPay</label>
                     <label><input type="radio" name="payment_method" value="vnpay"> VNPAY</label>
-                    <label><input type="radio" name="payment_method" value="s"> Giảm đến 50.000đ</label>
+                </div>
+
+                <!-- Payment Details Container -->
+                <div id="payment-details" style="display: none; margin-top: 20px;">
+                    <!-- QR Code for ZaloPay/VNPAY -->
+                    <div id="qr-payment" style="display: none; text-align: center;">
+                        <p>Quét mã QR bằng ứng dụng tương ứng để thanh toán</p>
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=Example" alt="QR Code" id="qr-code-image" style="max-width: 250px; border: 1px solid #444; border-radius: 4px; margin: 0 auto; display: block;">
+                        <p id="qr-message" style="margin-top: 10px;"></p>
+                    </div>
+
+                    <!-- Card Form for ATM/Visa -->
+                    <div id="card-payment" style="display: none;">
+                        <div class="input-group">
+                            <label for="card_number">Số thẻ</label>
+                            <input type="text" id="card_number" name="card_number" placeholder="Nhập số thẻ">
+                        </div>
+                        <div class="input-group">
+                            <label for="card_name">Tên chủ thẻ</label>
+                            <input type="text" id="card_name" name="card_name" placeholder="Tên in trên thẻ">
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <div class="input-group" style="flex: 1;">
+                                <label for="card_expiry">Ngày hết hạn</label>
+                                <input type="text" id="card_expiry" name="card_expiry" placeholder="MM / YY">
+                            </div>
+                            <div class="input-group" style="flex: 1;">
+                                <label for="card_cvv">Mã bảo mật (CVV)</label>
+                                <input type="text" id="card_cvv" name="card_cvv" placeholder="CVV">
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -221,6 +320,7 @@ $total_amount = $Price * $seat_count;
                 <label><input type="checkbox" id="agree" name="agree"> Tôi đồng ý với điều khoản sử dụng và mua vé cho người có độ tuổi phù hợp</label>
             </div>
 
+            <div id="validation-message" style="color: #ffcc80; margin-bottom: 10px; display: none;">Vui lòng đồng ý điều khoản và chọn hình thức thanh toán.</div>
             <button type="submit" id="btn-submit" class="btn-next" disabled>Hoàn tất thanh toán</button>
         </form>
     </div>
@@ -248,18 +348,38 @@ $total_amount = $Price * $seat_count;
 </main>
 
 <footer class="footer">
-    <div>© <?= date('Y') ?> CGV Cinemas — Thiết kế gọn, responsive.</div>
+    <div>© <?= date('Y') ?> TTVH Cinemas — Thiết kế gọn, responsive.</div>
 </footer>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const agree = document.getElementById('agree');
     const btn = document.getElementById('btn-submit');
-    agree.addEventListener('change', () => {
-        btn.disabled = !agree.checked;
-    });
+    const paymentMethods = document.querySelectorAll('input[name="payment_method"]');
+    const validationMessage = document.getElementById('validation-message');
+    let hasInteracted = false;
 
-    // countdown timer 10 minutes
+    function validate() {
+        const isAgreed = agree.checked;
+        const paymentMethodSelected = document.querySelector('input[name="payment_method"]:checked') !== null;
+        const isValid = isAgreed && paymentMethodSelected;
+        
+        btn.disabled = !isValid;
+
+        // Only show the validation message after the first user interaction
+        if (hasInteracted) {
+            validationMessage.style.display = isValid ? 'none' : 'block';
+        }
+    }
+
+    function handleInteraction() {
+        if (!hasInteracted) {
+            hasInteracted = true;
+        }
+        validate();
+    }
+    
+    // --- Countdown Timer Logic ---
     let seconds = 600;
     const timeEl = document.getElementById('time');
     function updateTimer() {
@@ -275,6 +395,52 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     const timer = setInterval(updateTimer, 1000);
     updateTimer();
+
+    // --- Payment Method UI and Validation Logic ---
+    const paymentDetailsContainer = document.getElementById('payment-details');
+    const qrPayment = document.getElementById('qr-payment');
+    const cardPayment = document.getElementById('card-payment');
+    const qrCodeImage = document.getElementById('qr-code-image');
+    const qrMessage = document.getElementById('qr-message');
+
+    const qrSources = {
+        zalopay: {
+            src: 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=zalopay-payment-for-total-<?= $total_amount ?>',
+            message: 'Sử dụng ZaloPay để quét mã.'
+        },
+        vnpay: {
+            src: 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=vnpay-payment-for-total-<?= $total_amount ?>',
+            message: 'Sử dụng VNPAY hoặc ứng dụng ngân hàng hỗ trợ VNPAY-QR để quét mã.'
+        }
+    };
+
+    agree.addEventListener('change', handleInteraction);
+
+    paymentMethods.forEach(method => {
+        method.addEventListener('change', function() {
+            handleInteraction();
+
+            // Show payment-specific UI
+            paymentDetailsContainer.style.display = 'block';
+            const selectedMethod = this.value;
+
+            qrPayment.style.display = 'none';
+            cardPayment.style.display = 'none';
+
+            if (selectedMethod === 'zalopay' || selectedMethod === 'vnpay') {
+                qrPayment.style.display = 'block';
+                qrCodeImage.src = qrSources[selectedMethod].src;
+                qrMessage.textContent = qrSources[selectedMethod].message;
+            } else if (selectedMethod === 'card' || selectedMethod === 'visa') {
+                cardPayment.style.display = 'block';
+            } else {
+                 paymentDetailsContainer.style.display = 'none';
+            }
+        });
+    });
+
+    // Initial validation check on page load (without showing the message)
+    validate();
 });
 </script>
 
