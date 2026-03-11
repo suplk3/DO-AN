@@ -43,14 +43,17 @@ include "../config/db.php";
             </div>
 
             <div class="header-nav-right">
-                <?php if (isset($_SESSION['user_id'])): ?>
+                <?php if (isset($_SESSION['user_id'])):
+                    $is_admin = (isset($_SESSION['vai_tro']) && $_SESSION['vai_tro'] === 'admin');
+                    $ticket_label = $is_admin ? 'QUẢN LÝ USER' : 'VÉ CỦA TÔI';
+                ?>
                     <span class="hello">
                         <span class="icon">👋</span>
                         <span class="text">Xin chào, <?= htmlspecialchars($_SESSION['ten_nguoi_dung'] ?? 'bạn') ?></span>
                     </span>
                     <a href="../user/ve_cua_toi.php" class="btn btn-sm">
                         <span class="icon">🎟️</span>
-                        <span class="text">VÉ CỦA TÔI</span>
+                        <span class="text"><?= $ticket_label ?></span>
                     </a>
                     <a href="../auth/logout.php" class="btn btn-sm btn-outline"
                        onclick="return confirm('Bạn có chắc chắn muốn đăng xuất không?');">

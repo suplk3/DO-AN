@@ -78,8 +78,12 @@ function fmt_money($n){ return $n !== null ? number_format($n,0,',','.') . '₫'
         <nav class="menu">
             <a href="index.php" class="nav-link">🎬 PHIM</a>
         </nav>
+        <?php
+        $is_admin = (isset($_SESSION['vai_tro']) && $_SESSION['vai_tro'] === 'admin');
+        $ticket_label = $is_admin ? 'QUẢN LÝ USER' : 'VÉ CỦA TÔI';
+        ?>
         <div class="actions">
-            <a href="ve_cua_toi.php" class="link">🎟️ VÉ CỦA TÔI</a>
+            <a href="ve_cua_toi.php" class="link">🎟️ <?= $ticket_label ?></a>
         </div>
     </div>
 </header>
