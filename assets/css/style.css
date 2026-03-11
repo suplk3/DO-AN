@@ -131,13 +131,16 @@ nav a {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    margin: auto;
 }
 
 .seat-row {
     display: flex;
     justify-content: center;
     gap: 8px;
+}
+
+.seat-row {
+    margin: auto;
 }
 
 .seat {
