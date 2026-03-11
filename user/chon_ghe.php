@@ -19,7 +19,10 @@ SELECT
     ) AS da_dat
 FROM ghe
 WHERE ghe.phong_id = (SELECT phong_id FROM suat_chieu WHERE id = $suat_chieu_id LIMIT 1)
-ORDER BY ghe.ten_ghe
+-- order by row letter then seat number for natural ordering
+ORDER BY
+    LEFT(ghe.ten_ghe, 1),
+    CAST(SUBSTRING(ghe.ten_ghe, 2) AS UNSIGNED)
 ";
 $result = mysqli_query($conn, $sql);
 if (!$result) {
