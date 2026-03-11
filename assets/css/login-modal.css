@@ -215,6 +215,33 @@
   margin-top: 8px;
   min-height: 18px;
 }
+.login-toast {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #111827;
+  border: 1px solid #fca5a5;
+  color: #fecdd3;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  font-size: 13px;
+}
+.login-toast .toast-icon {
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  background: #f59e0b;
+  color: #fff;
+  font-weight: 800;
+  font-size: 12px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
 
 /* Right hero side */
 .hero {
