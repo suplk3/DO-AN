@@ -144,6 +144,14 @@
             const url = registerForm.getAttribute('action') || 'register.php';
             const fm = new FormData(registerForm);
             fm.append('dangky', '1');
+            const pass = (registerForm.querySelector('input[name=\"mat_khau\"]')?.value || '').trim();
+            if (pass.length < 3) {
+              const msg = registerForm.querySelector('.register-msg') || document.createElement('p');
+              msg.className = 'register-msg message';
+              msg.textContent = 'Mật khẩu phải từ 3 ký tự trở lên.';
+              if (!registerForm.querySelector('.register-msg')) registerForm.appendChild(msg);
+              return;
+            }
             fetch(url, { method: 'POST', body: fm, headers: { 'X-Requested-With': 'XMLHttpRequest' } })
               .then(r=> r.json())
               .then(function(json){
