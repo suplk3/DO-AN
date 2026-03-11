@@ -216,8 +216,6 @@ body {
     </div>
 </header>
 
-<?php /* removed duplicate legacy header */ ?>
-
 <div class="container">
     <div class="title">CHỌN NGÀY</div>
 
