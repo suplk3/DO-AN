@@ -116,6 +116,7 @@ function fmt_money($n){ return $n !== null ? number_format($n,0,',','.') . '₫'
                     <a href="../auth/login.php" class="btn-outline open-login-modal">🔐 Đăng nhập để đặt vé</a>
                 <?php endif; ?>
                 <a href="#showtimes" class="btn-sm">📅 Xem suất chiếu</a>
+                <a href="index.php" class="btn-outline">🏠 Về trang chính</a>
             </div>
         </div>
     </section>
