@@ -72,6 +72,13 @@ function fmt_money($n){ return $n !== null ? number_format($n,0,',','.') . '₫'
         color: #fff !important;
     }
 
+    /* placeholder for equal‑width rows */
+    .seat.empty {
+        visibility: hidden;
+        background: transparent;
+        cursor: default;
+    }
+
     /* responsive adjustments for mobile/narrow screens */
     @media (max-width: 768px) {
         /* shrink seat buttons and allow wrapping */
@@ -155,28 +162,37 @@ function fmt_money($n){ return $n !== null ? number_format($n,0,',','.') . '₫'
 
         <div class="seat-wrapper">
 <?php
-$currentRow = '';
+// build nested array of seats grouped by row letter
+$rows = [];
 while ($row = mysqli_fetch_assoc($result)) {
     $rowChar = substr($row['ten_ghe'], 0, 1);
-
-    if ($currentRow != $rowChar) {
-        if ($currentRow != '') echo '</div>';
-        echo "<div class='seat-row'>";
-        $currentRow = $rowChar;
-    }
-
-    $class = $row['da_dat'] ? 'seat booked' : 'seat';
-
-    echo "<button 
-            class='$class' 
-            data-seat='{$row['ten_ghe']}'
-            ".($row['da_dat'] ? 'disabled' : '').">
-            {$row['ten_ghe']}
-          </button>";
+    $rows[$rowChar][] = $row;
 }
 
+// determine maximum count so every row can be padded
+$maxCount = 0;
+foreach ($rows as $r) {
+    $maxCount = max($maxCount, count($r));
+}
 
-if ($currentRow != '') echo '</div>';
+foreach ($rows as $rowChar => $rowSeats) {
+    echo "<div class='seat-row'>";
+    foreach ($rowSeats as $r) {
+        $class = $r['da_dat'] ? 'seat booked' : 'seat';
+        echo "<button 
+                class='$class' 
+                data-seat='{$r['ten_ghe']}'
+                ".($r['da_dat'] ? 'disabled' : '').">
+                {$r['ten_ghe']}
+              </button>";
+    }
+    // pad with empty placeholders to reach maxCount
+    $pad = $maxCount - count($rowSeats);
+    for ($i = 0; $i < $pad; $i++) {
+        echo "<div class='seat empty'></div>";
+    }
+    echo "</div>";
+}
 ?>
         </div>
 
