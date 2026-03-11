@@ -63,14 +63,17 @@ function fmt_money($n){ return $n !== null ? number_format($n,0,',','.') . '₫'
             </div>
 
             <div class="header-nav-right">
-                <?php if (isset($_SESSION['user_id'])): ?>
+                <?php if (isset($_SESSION['user_id'])):
+                    $is_admin = (isset($_SESSION['vai_tro']) && $_SESSION['vai_tro'] === 'admin');
+                    $ticket_label = $is_admin ? 'QUẢN LÝ USER' : 'VÉ CỦA TÔI';
+                ?>
                     <span class="hello">
                         <span class="icon">👋</span>
                         <span class="text">Xin chào, <?= htmlspecialchars($_SESSION['ten'] ?? 'Khách') ?></span>
                     </span>
                     <a href="ve_cua_toi.php" class="btn">
                         <span class="icon">🎟️</span>
-                        <span class="text">VÉ CỦA TÔI</span>
+                        <span class="text"><?= $ticket_label ?></span>
                     </a>
                     <a href="../auth/logout.php" class="btn btn-outline"
                        onclick="return confirm('Bạn có chắc chắn muốn đăng xuất không?');">

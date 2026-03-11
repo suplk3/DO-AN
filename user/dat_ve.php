@@ -184,7 +184,11 @@ mysqli_close($conn);
         <div class="actions">
         <?php if (isset($_SESSION['user_id'])): ?>
             <span class="hello">👋 Xin chào</span>
-            <a href="ve_cua_toi.php" class="admin-btn">VÉ CỦA TÔI</a>
+        <?php
+        $is_admin = (isset($_SESSION['vai_tro']) && $_SESSION['vai_tro'] === 'admin');
+        $ticket_label = $is_admin ? 'QUẢN LÝ USER' : 'VÉ CỦA TÔI';
+        ?>
+        <a href="ve_cua_toi.php" class="admin-btn"><?= $ticket_label ?></a>
             <a href="../auth/logout.php" onclick="return confirm('Bạn có chắc chắn muốn đăng xuất không?');">🚪 ĐĂNG XUẤT</a>
         <?php else: ?>
             <a href="../auth/login.php" class="open-login-modal">🔐 ĐĂNG NHẬP</a>

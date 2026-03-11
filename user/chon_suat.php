@@ -157,7 +157,11 @@ body {
     <div class="logo">🎬 CGV</div>
     <nav>
         <a href="index.php">PHIM</a>
-        <a href="ve_cua_toi.php">VÉ CỦA TÔI</a>
+        <?php
+        $is_admin = (isset($_SESSION['vai_tro']) && $_SESSION['vai_tro'] === 'admin');
+        $ticket_label = $is_admin ? 'QUẢN LÝ USER' : 'VÉ CỦA TÔI';
+        ?>
+        <a href="ve_cua_toi.php"><?= $ticket_label ?></a>
         <a href="../auth/logout.php">ĐĂNG XUẤT</a>
     </nav>
 </header>
