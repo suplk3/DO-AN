@@ -31,7 +31,7 @@ body.user-index.header-shrink{
     padding-top:calc(var(--header-shrink-h) + 8px);
 }
 body.user-index .header-inner{
-    max-width:1200px;
+    max-width:1280px;
     margin:0 auto;
     height:100%;
     display:flex;
@@ -74,15 +74,17 @@ body.user-index .actions{margin-left:auto;display:flex;gap:10px;align-items:cent
     display: flex;
     align-items: center;
     gap: 6px;
-    padding: 8px 14px;
+    padding: 12px 16px;
     font-size: 14px;
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.85);
+    font-weight: 700;
+    color: #e5e7eb;
     text-decoration: none;
-    border-radius: 10px;
+    border-radius: 12px;
     transition: all 0.25s ease;
     position: relative;
     overflow: hidden;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
 }
 .header-nav-left .nav-link::before {
     content: '';
@@ -104,33 +106,33 @@ body.user-index .actions{margin-left:auto;display:flex;gap:10px;align-items:cent
     opacity: 1;
 }
 .header-nav-left .nav-link.active {
-    background: rgba(255, 77, 79, 0.2);
+    background: linear-gradient(135deg,#7c7cf5,#9b79f8);
     color: #fff;
+    border-color: transparent;
 }
 .header-nav-left .nav-link.active::after {
     content: '';
     position: absolute;
-    bottom: 4px;
+    bottom: 8px;
     left: 50%;
     transform: translateX(-50%);
-    width: 20px;
+    width: 24px;
     height: 3px;
-    background: #ff4d4f;
+    background: rgba(255,255,255,0.9);
     border-radius: 2px;
 }
 
 /* Admin badge */
 .header-nav-left .nav-link.admin {
-    padding: 8px 12px;
-    background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: none;
-    color: rgba(255,255,255,0.88);
+    padding: 12px 16px;
+    background: linear-gradient(135deg,#6d28d9,#8b5cf6);
+    border: 1px solid rgba(255,255,255,0.12);
+    box-shadow: 0 8px 22px rgba(99,102,241,0.35);
+    color: #fff;
 }
 .header-nav-left .nav-link.admin:hover {
-    box-shadow: none;
-    background: rgba(255, 255, 255, 0.08);
-    color: #fff;
+    box-shadow: 0 10px 24px rgba(99,102,241,0.5);
+    filter: brightness(1.04);
 }
 
 /* Right side - User info */
@@ -139,13 +141,13 @@ body.user-index .actions{margin-left:auto;display:flex;gap:10px;align-items:cent
 }
 .header-nav-right .hello {
     font-size: 14px;
-    color: rgba(255, 255, 255, 0.8);
+    color: rgba(255, 255, 255, 0.9);
     display: flex;
     align-items: center;
     gap: 6px;
     padding: 6px 12px;
     background: rgba(255, 255, 255, 0.08);
-    border-radius: 20px;
+    border-radius: 16px;
 }
 
 /* Button styles với gradient và effects */
@@ -153,12 +155,12 @@ body.user-index .actions{margin-left:auto;display:flex;gap:10px;align-items:cent
     display: flex;
     align-items: center;
     gap: 6px;
-    padding: 7px 12px;
-    font-size: 12px;
-    font-weight: 600;
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 700;
     text-decoration: none;
-    border-radius: 9px;
-    background: linear-gradient(135deg, #ff6b6b, #ff4d4f);
+    border-radius: 12px;
+    background: linear-gradient(135deg,#ef4444,#f87171);
     color: #fff;
     border: none;
     transition: all 0.25s ease;
@@ -186,9 +188,9 @@ body.user-index .actions{margin-left:auto;display:flex;gap:10px;align-items:cent
     background: transparent;
     border: 1px solid rgba(255, 255, 255, 0.3);
     box-shadow: none;
-    padding: 7px 12px;
-    font-size: 12px;
-    border-radius: 9px;
+    padding: 10px 16px;
+    font-size: 13px;
+    border-radius: 12px;
 }
 .header-nav-right .btn-outline:hover {
     background: rgba(255, 255, 255, 0.1);

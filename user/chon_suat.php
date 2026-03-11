@@ -62,6 +62,24 @@ body {
     background: #12131a;
     color: #e0e0e0;
 }
+.header-inner{
+    display:flex;
+    align-items:center;
+    gap:16px;
+}
+.header-nav{
+    margin-left:auto;
+    display:flex;
+    align-items:center;
+    gap:16px;
+    flex-wrap:wrap;
+}
+.header-nav-left,
+.header-nav-right{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
 .container {
     max-width: 900px;
     margin: 30px auto;
@@ -153,18 +171,52 @@ body {
 </head>
 <body>
 
-<header>
-    <div class="logo">🎬 CGV</div>
-    <nav>
-        <a href="index.php">PHIM</a>
-        <?php
-        $is_admin = (isset($_SESSION['vai_tro']) && $_SESSION['vai_tro'] === 'admin');
-        $ticket_label = $is_admin ? 'QUẢN LÝ USER' : 'VÉ CỦA TÔI';
-        ?>
-        <a href="ve_cua_toi.php"><?= $ticket_label ?></a>
-        <a href="../auth/logout.php">ĐĂNG XUẤT</a>
-    </nav>
+<header class="header">
+    <div class="header-inner">
+        <a href="index.php" class="logo">CGV</a>
+        <nav class="header-nav">
+            <div class="header-nav-left">
+                <a href="index.php" class="nav-link">
+                    <span class="icon">🎬</span>
+                    <span class="text">PHIM</span>
+                </a>
+                <a href="sap_chieu.php" class="nav-link">
+                    <span class="icon">🗓️</span>
+                    <span class="text">SẮP CHIẾU</span>
+                </a>
+            </div>
+            <div class="header-nav-right">
+                <?php if (isset($_SESSION['user_id'])):
+                    $is_admin = (isset($_SESSION['vai_tro']) && $_SESSION['vai_tro'] === 'admin');
+                    $ticket_label = $is_admin ? 'QUẢN LÝ USER' : 'VÉ CỦA TÔI';
+                    $my_ticket_label = 'VÉ CỦA TÔI';
+                ?>
+                    <a href="../user/ve_cua_toi.php" class="btn btn-sm">
+                        <span class="icon">🎟️</span>
+                        <span class="text"><?= $my_ticket_label ?></span>
+                    </a>
+                    <?php if ($is_admin): ?>
+                    <a href="../user/quan_ly_user.php" class="btn btn-sm">
+                        <span class="icon">🎫</span>
+                        <span class="text"><?= $ticket_label ?></span>
+                    </a>
+                    <?php endif; ?>
+                    <a href="../auth/logout.php" class="btn btn-sm btn-outline" onclick="return confirm('Bạn có chắc chắn muốn đăng xuất không?');">
+                        <span class="icon">🚪</span>
+                        <span class="text">ĐĂNG XUẤT</span>
+                    </a>
+                <?php else: ?>
+                    <a href="../auth/login.php" class="btn btn-sm open-login-modal">
+                        <span class="icon">🔐</span>
+                        <span class="text">ĐĂNG NHẬP</span>
+                    </a>
+                <?php endif; ?>
+            </div>
+        </nav>
+    </div>
 </header>
+
+<?php /* removed duplicate legacy header */ ?>
 
 <div class="container">
     <div class="title">CHỌN NGÀY</div>

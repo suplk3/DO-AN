@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 include "../config/db.php";
 
@@ -42,13 +42,16 @@ function fmt_money($n){ return $n !== null ? number_format($n,0,',','.') . '₫'
 
 <header class="header">
     <div class="header-inner">
-        <a href="index.php" class="logo">CGV</a>
-
+        <a href="index.php" class="logo">TTVH</a>
         <nav class="header-nav">
             <div class="header-nav-left">
-                <a href="index.php" class="nav-link">
+                <a href="index.php" class="nav-link active">
                     <span class="icon">🎬</span>
                     <span class="text">PHIM</span>
+                </a>
+                <a href="sap_chieu.php" class="nav-link">
+                    <span class="icon">🗓️</span>
+                    <span class="text">SẮP CHIẾU</span>
                 </a>
                 <?php if (isset($_SESSION['vai_tro']) && $_SESSION['vai_tro'] === 'admin'): ?>
                     <a href="../admin/phim.php" class="nav-link admin">
@@ -56,32 +59,37 @@ function fmt_money($n){ return $n !== null ? number_format($n,0,',','.') . '₫'
                         <span class="text">QUẢN LÝ PHIM</span>
                     </a>
                     <a href="../admin/suat_chieu.php" class="nav-link admin">
-                        <span class="icon">📅</span>
+                        <span class="icon">🗓️</span>
                         <span class="text">QUẢN LÝ SUẤT CHIẾU</span>
                     </a>
                 <?php endif; ?>
             </div>
-
             <div class="header-nav-right">
                 <?php if (isset($_SESSION['user_id'])):
                     $is_admin = (isset($_SESSION['vai_tro']) && $_SESSION['vai_tro'] === 'admin');
                     $ticket_label = $is_admin ? 'QUẢN LÝ USER' : 'VÉ CỦA TÔI';
+                    $my_ticket_label = 'VÉ CỦA TÔI';
                 ?>
                     <span class="hello">
                         <span class="icon">👋</span>
-                        <span class="text">Xin chào, <?= htmlspecialchars($_SESSION['ten'] ?? 'Khách') ?></span>
+                        <span class="text">Xin chào, <?= htmlspecialchars($_SESSION['ten_nguoi_dung'] ?? ($_SESSION['ten'] ?? 'bạn')) ?></span>
                     </span>
-                    <a href="ve_cua_toi.php" class="btn">
+                    <a href="../user/ve_cua_toi.php" class="btn btn-sm">
                         <span class="icon">🎟️</span>
+                        <span class="text"><?= $my_ticket_label ?></span>
+                    </a>
+                    <?php if ($is_admin): ?>
+                    <a href="../user/quan_ly_user.php" class="btn btn-sm">
+                        <span class="icon">🎫</span>
                         <span class="text"><?= $ticket_label ?></span>
                     </a>
-                    <a href="../auth/logout.php" class="btn btn-outline"
-                       onclick="return confirm('Bạn có chắc chắn muốn đăng xuất không?');">
+                    <?php endif; ?>
+                    <a href="../auth/logout.php" class="btn btn-sm btn-outline" onclick="return confirm('Bạn có chắc chắn muốn đăng xuất không?');">
                         <span class="icon">🚪</span>
                         <span class="text">ĐĂNG XUẤT</span>
                     </a>
                 <?php else: ?>
-                    <a href="../auth/login.php" class="btn open-login-modal">
+                    <a href="../auth/login.php" class="btn btn-sm open-login-modal">
                         <span class="icon">🔐</span>
                         <span class="text">ĐĂNG NHẬP</span>
                     </a>
@@ -114,11 +122,11 @@ function fmt_money($n){ return $n !== null ? number_format($n,0,',','.') . '₫'
 
             <div class="md-actions">
                 <?php if (isset($_SESSION['user_id'])): ?>
-                    <a href="chon_suat.php?phim_id=<?= (int)$phim['id'] ?>" class="btn-primary">🎟 Đặt vé</a>
+                    <a href="chon_suat.php?phim_id=<?= (int)$phim['id'] ?>" class="btn-primary">🎟️ Đặt vé</a>
                 <?php else: ?>
                     <a href="../auth/login.php" class="btn-outline open-login-modal">🔐 Đăng nhập để đặt vé</a>
                 <?php endif; ?>
-                <a href="#showtimes" class="btn-sm">📅 Xem suất chiếu</a>
+                <a href="#showtimes" class="btn-sm">🗓️ Xem suất chiếu</a>
                 <a href="index.php" class="btn-outline">🏠 Về trang chính</a>
             </div>
         </div>

@@ -1,6 +1,7 @@
-<?php
+﻿<?php
 session_start();
 include "../config/db.php";
+$force_show_login = (isset($_GET['show_login']) && !isset($_SESSION['user_id']));
 ?>
 
 <!DOCTYPE html>
@@ -19,7 +20,6 @@ include "../config/db.php";
 <header class="header">
     <div class="header-inner">
         <a href="index.php" class="logo">TTVH</a>
-
         <nav class="header-nav">
             <div class="header-nav-left">
                 <a href="index.php" class="nav-link active">
@@ -27,7 +27,7 @@ include "../config/db.php";
                     <span class="text">PHIM</span>
                 </a>
                 <a href="sap_chieu.php" class="nav-link">
-                    <span class="icon">📅</span>
+                    <span class="icon">🗓️</span>
                     <span class="text">SẮP CHIẾU</span>
                 </a>
                 <?php if (isset($_SESSION['vai_tro']) && $_SESSION['vai_tro'] === 'admin'): ?>
@@ -36,27 +36,32 @@ include "../config/db.php";
                         <span class="text">QUẢN LÝ PHIM</span>
                     </a>
                     <a href="../admin/suat_chieu.php" class="nav-link admin">
-                        <span class="icon">📅</span>
+                        <span class="icon">🗓️</span>
                         <span class="text">QUẢN LÝ SUẤT CHIẾU</span>
                     </a>
                 <?php endif; ?>
             </div>
-
             <div class="header-nav-right">
                 <?php if (isset($_SESSION['user_id'])):
                     $is_admin = (isset($_SESSION['vai_tro']) && $_SESSION['vai_tro'] === 'admin');
                     $ticket_label = $is_admin ? 'QUẢN LÝ USER' : 'VÉ CỦA TÔI';
+                    $my_ticket_label = 'VÉ CỦA TÔI';
                 ?>
                     <span class="hello">
                         <span class="icon">👋</span>
-                        <span class="text">Xin chào, <?= htmlspecialchars($_SESSION['ten_nguoi_dung'] ?? 'bạn') ?></span>
+                        <span class="text">Xin chào, <?= htmlspecialchars($_SESSION['ten_nguoi_dung'] ?? ($_SESSION['ten'] ?? 'bạn')) ?></span>
                     </span>
                     <a href="../user/ve_cua_toi.php" class="btn btn-sm">
                         <span class="icon">🎟️</span>
+                        <span class="text"><?= $my_ticket_label ?></span>
+                    </a>
+                    <?php if ($is_admin): ?>
+                    <a href="../user/quan_ly_user.php" class="btn btn-sm">
+                        <span class="icon">🎫</span>
                         <span class="text"><?= $ticket_label ?></span>
                     </a>
-                    <a href="../auth/logout.php" class="btn btn-sm btn-outline"
-                       onclick="return confirm('Bạn có chắc chắn muốn đăng xuất không?');">
+                    <?php endif; ?>
+                    <a href="../auth/logout.php" class="btn btn-sm btn-outline" onclick="return confirm('Bạn có chắc chắn muốn đăng xuất không?');">
                         <span class="icon">🚪</span>
                         <span class="text">ĐĂNG XUẤT</span>
                     </a>
@@ -176,6 +181,14 @@ include "../config/db.php";
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 <script src="../assets/js/login-modal.js"></script>
+<?php if ($force_show_login): ?>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+    const trigger = document.querySelector('.open-login-modal');
+    if (trigger) trigger.click();
+});
+</script>
+<?php endif; ?>
 
 <!-- Banner Carousel Script -->
 <script>

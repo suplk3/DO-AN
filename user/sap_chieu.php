@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 include "../config/db.php";
 
@@ -30,7 +30,6 @@ function fmt_date($d) {
 <header class="header">
     <div class="header-inner">
         <a href="index.php" class="logo">TTVH</a>
-
         <nav class="header-nav">
             <div class="header-nav-left">
                 <a href="index.php" class="nav-link">
@@ -38,7 +37,7 @@ function fmt_date($d) {
                     <span class="text">PHIM</span>
                 </a>
                 <a href="sap_chieu.php" class="nav-link active">
-                    <span class="icon">📅</span>
+                    <span class="icon">🗓️</span>
                     <span class="text">SẮP CHIẾU</span>
                 </a>
                 <?php if (isset($_SESSION['vai_tro']) && $_SESSION['vai_tro'] === 'admin'): ?>
@@ -47,27 +46,32 @@ function fmt_date($d) {
                         <span class="text">QUẢN LÝ PHIM</span>
                     </a>
                     <a href="../admin/suat_chieu.php" class="nav-link admin">
-                        <span class="icon">📅</span>
+                        <span class="icon">🗓️</span>
                         <span class="text">QUẢN LÝ SUẤT CHIẾU</span>
                     </a>
                 <?php endif; ?>
             </div>
-
             <div class="header-nav-right">
                 <?php if (isset($_SESSION['user_id'])):
                     $is_admin = (isset($_SESSION['vai_tro']) && $_SESSION['vai_tro'] === 'admin');
                     $ticket_label = $is_admin ? 'QUẢN LÝ USER' : 'VÉ CỦA TÔI';
+                    $my_ticket_label = 'VÉ CỦA TÔI';
                 ?>
                     <span class="hello">
                         <span class="icon">👋</span>
-                        <span class="text">Xin chào, <?= htmlspecialchars($_SESSION['ten_nguoi_dung'] ?? 'bạn') ?></span>
+                        <span class="text">Xin chào, <?= htmlspecialchars($_SESSION['ten_nguoi_dung'] ?? ($_SESSION['ten'] ?? 'bạn')) ?></span>
                     </span>
-                    <a href="ve_cua_toi.php" class="btn btn-sm">
+                    <a href="../user/ve_cua_toi.php" class="btn btn-sm">
                         <span class="icon">🎟️</span>
+                        <span class="text"><?= $my_ticket_label ?></span>
+                    </a>
+                    <?php if ($is_admin): ?>
+                    <a href="../user/quan_ly_user.php" class="btn btn-sm">
+                        <span class="icon">🎫</span>
                         <span class="text"><?= $ticket_label ?></span>
                     </a>
-                    <a href="../auth/logout.php" class="btn btn-sm btn-outline"
-                       onclick="return confirm('Bạn có chắc chắn muốn đăng xuất không?');">
+                    <?php endif; ?>
+                    <a href="../auth/logout.php" class="btn btn-sm btn-outline" onclick="return confirm('Bạn có chắc chắn muốn đăng xuất không?');">
                         <span class="icon">🚪</span>
                         <span class="text">ĐĂNG XUẤT</span>
                     </a>
@@ -152,4 +156,3 @@ function fmt_date($d) {
 
 </body>
 </html>
-
