@@ -15,25 +15,27 @@ if (isset($_POST['login'])) {
     $result = $stmt->get_result();
     $user = $result->fetch_assoc();
 
-    if ($user) {
-        if (password_verify($mat_khau, $user['mat_khau'])) {
-             session_start();
+    if ($user && password_verify($mat_khau, $user['mat_khau'])) {
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['ten'] = $user['ten'];
+        $_SESSION['vai_tro'] = $user['vai_tro'];
 
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['ten'] = $user['ten'];
-            $_SESSION['vai_tro'] = $user['vai_tro'];
-     header("Location: ../user/index.php");
-           /* if ($user['vai_tro'] === 'admin') {
-                header("Location: ../user/index.php");
-            } else {
-                header("Location: ../user/index.php");
-            }*/
-         //   exit;
-        } else {
-            $error = "Sai mật khẩu";
+        if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => true, 'redirect_url' => '../user/index.php']);
+            exit;
         }
+
+        header("Location: ../user/index.php");
+        exit;
     } else {
-        $error = "Email không tồn tại";
+        $error = "Tài khoản hoặc mật khẩu không đúng.";
+
+        if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'error' => $error]);
+            exit;
+        }
     }
 }
 ?>
@@ -64,7 +66,7 @@ if (isset($_GET['modal']) && $_GET['modal'] == '1') {
                             </div>
                             <button type="submit" name="login" class="btn-primary">Đăng nhập</button>
                         </form>
-                        <p class="login-error message"><?php echo $error; ?></p>
+                        <p class="login-error message" style="color:#f87171;font-weight:600;"><?php echo $error; ?></p>
                     </div>
 
                     <div class="auth-view auth-view-register">
@@ -115,18 +117,33 @@ if (isset($_GET['modal']) && $_GET['modal'] == '1') {
     <title>Đăng nhập</title>
     <link rel="stylesheet" href="../assets/css/login-modal.css">
 </head>
-<body>
+<body class="login-standalone" style="margin:0; min-height:100vh; background:linear-gradient(135deg,#0b1026,#121835); display:flex; align-items:center; justify-content:center;">
+    <div class="login-modal is-inline" role="dialog" aria-modal="true" style="width:960px; max-width:95vw;">
+        <div class="auth-card">
+            <div class="auth-inner">
+                <div class="auth-panel auth-panel-form" style="width:100%; background:rgba(0,0,0,0.4);">
+                    <div class="auth-view auth-view-login is-active">
+                        <h2 class="auth-heading">Đăng nhập</h2>
+                        <p class="auth-subtitle">Hãy đăng nhập để tiếp tục đặt vé và xem lịch sử của bạn.</p>
+                        <form method="POST" action="login.php" class="login-form">
+                            <div class="input-group">
+                                <input type="email" name="email" placeholder="Email" required>
+                            </div>
+                            <div class="input-group">
+                                <input type="password" name="mat_khau" placeholder="Mật khẩu" required>
+                                <span class="icon pw-toggle" title="Hiện/Ẩn">👁</span>
+                            </div>
+                            <button type="submit" name="login" class="btn-primary">Đăng nhập</button>
+                            <?php if (!empty($error)): ?>
+                                <p class="login-error message" style="color:#f87171;font-weight:600;margin-top:10px;text-align:center;"><?= $error ?></p>
+                            <?php endif; ?>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<h2>ĐĂNG NHẬP</h2>
-
-<form method="POST">
-    <input type="email" name="email" placeholder="Email" required><br><br>
-    <input type="password" name="mat_khau" placeholder="Mật khẩu" required><br><br>
-    <button type="submit" name="login">Đăng nhập</button>
-</form>
-
-<p style="color:red"><?= $error ?></p>
-
-<script src="../assets/js/login-modal.js"></script>
+    <script src="../assets/js/login-modal.js"></script>
 </body>
 </html>

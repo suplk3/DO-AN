@@ -1,5 +1,41 @@
 // Attach a click handler to elements with class 'open-login-modal'
 (function(){
+  function bindLoginForms(scope){
+    const forms = (scope || document).querySelectorAll('.login-form');
+    forms.forEach(function(loginForm){
+      if (loginForm.dataset.loginBound) return;
+      loginForm.dataset.loginBound = '1';
+      const ensureToast = function(message){
+        let toast = loginForm.querySelector('.login-toast');
+        if (!toast){
+          toast = document.createElement('div');
+          toast.className = 'login-toast';
+          toast.innerHTML = '<span class="toast-icon">!</span><span class="toast-text"></span>';
+          loginForm.appendChild(toast);
+        }
+        const text = toast.querySelector('.toast-text');
+        if (text) text.textContent = message;
+        toast.style.display = 'flex';
+      };
+      loginForm.addEventListener('submit', function(ev){
+        ev.preventDefault();
+        const url = loginForm.getAttribute('action') || 'login.php';
+        const fm = new FormData(loginForm);
+        fm.append('login', '1');
+        fetch(url, { method:'POST', body: fm, headers:{ 'X-Requested-With':'XMLHttpRequest' } })
+          .then(r => r.json())
+          .then(function(json){
+            if (json.success){
+              window.location.href = json.redirect_url || '../user/index.php';
+              return;
+            }
+            ensureToast(json.error || 'Tài khoản hoặc mật khẩu không đúng.');
+          })
+          .catch(function(err){ console.error(err); });
+      });
+    });
+  }
+
   function openLoginModal(url){
     fetch(url)
       .then(function(res){ return res.text(); })
@@ -144,6 +180,8 @@
               }).catch(function(err){ console.error(err); });
           });
         }
+        // Handle login form via AJAX to keep modal in place
+        bindLoginForms(overlay);
       })
       .catch(function(err){ console.error('Lỗi tải modal đăng nhập:', err); });
   }
@@ -158,4 +196,11 @@
     else if (url.indexOf('modal=') === -1) url += '&modal=1';
     openLoginModal(url);
   });
+
+  // Bind any login form already present on page (standalone login page)
+  if (document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', function(){ bindLoginForms(document); });
+  } else {
+    bindLoginForms(document);
+  }
 })();
