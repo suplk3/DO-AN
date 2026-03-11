@@ -131,7 +131,7 @@ mysqli_close($conn);
     max-width: 480px;
     margin: 40px auto;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    text-align: left;
+    text-align: center; /* Center content */
   }
 
   .invoice-card h2 {
@@ -140,11 +140,23 @@ mysqli_close($conn);
   }
 
   .invoice-card p {
-    margin: 8px 0;
+    background-color: #333; /* Dark background */
+    color: #fff;
+    padding: 12px;
+    border-radius: 6px;
+    margin: 10px 0;
+  }
+
+  .invoice-card p strong {
+      color: #ffc107; /* Gold color for labels */
+  }
+
+  .invoice-actions {
+      margin-top: 25px;
   }
 
   .invoice-card .btn {
-    margin-right: 8px;
+    margin: 0 5px;
   }
 
   /* Confetti particles */
@@ -173,7 +185,7 @@ mysqli_close($conn);
 <body class="user-index">
 <header class="header">
     <div class="header-inner">
-        <div class="logo">CGV</div>
+        <div class="logo">TTVH</div>
         <nav class="menu">
             <a href="index.php" class="nav-link">🎬 PHIM</a>
             <?php if (isset($_SESSION['vai_tro']) && $_SESSION['vai_tro'] === 'admin'): ?>
@@ -208,13 +220,15 @@ mysqli_close($conn);
         <?php endif; ?>
         <p><strong>Giá vé:</strong> <?= number_format($price_per_seat,0,',','.') ?>₫ / ghế</p>
         <p><strong>Tổng thanh toán:</strong> <?= number_format($total_amount,0,',','.') ?>₫</p>
-        <button onclick="window.print()" class="btn btn-secondary">🖨️ In hóa đơn</button>
-        <a href="index.php" class="btn btn-primary">🏠 VỀ TRANG CHÍNH</a>
+        <div class="invoice-actions">
+            <button onclick="window.print()" class="btn btn-secondary">🖨️ In hóa đơn</button>
+            <a href="index.php" class="btn btn-primary">🏠 VỀ TRANG CHÍNH</a>
+        </div>
     </div>
 </main>
 
 <footer class="footer">
-    <div>© <?= date('Y') ?> CGV Cinemas — Thiết kế gọn, responsive.</div>
+    <div>© <?= date('Y') ?> TTVH Cinemas — Thiết kế gọn, responsive.</div>
 </footer>
 
 <script src="../assets/js/login-modal.js"></script>

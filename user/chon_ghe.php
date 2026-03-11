@@ -74,7 +74,7 @@ function fmt_money($n){ return $n !== null ? number_format($n,0,',','.') . '₫'
 
 <header class="header">
     <div class="header-inner">
-        <div class="logo">CGV</div>
+        <div class="logo">TTVH</div>
         <nav class="menu">
             <a href="index.php" class="nav-link">🎬 PHIM</a>
         </nav>
@@ -158,7 +158,7 @@ if ($currentRow != '') echo '</div>';
 </main>
 
 <footer class="footer">
-    <div>© <?= date('Y') ?> CGV Cinemas — Thiết kế gọn, responsive.</div>
+    <div>© <?= date('Y') ?> TTVH Cinemas — Thiết kế gọn, responsive.</div>
 </footer>
 
 <script>
@@ -203,6 +203,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         updateCheckoutUI(); // Cập nhật lại UI
+    });
+
+    // Ngăn chặn việc thanh toán nếu chưa chọn ghế
+    document.querySelector('.checkout form').addEventListener('submit', function(e) {
+        if (selectedSeats.length === 0) {
+            e.preventDefault();
+            alert('Vui lòng chọn ít nhất một ghế.');
+        }
     });
 
     // Hàm kiểm tra và cập nhật trạng thái ghế từ server (polling)
