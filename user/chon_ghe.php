@@ -79,16 +79,27 @@ function fmt_money($n){ return $n !== null ? number_format($n,0,',','.') . '₫'
         cursor: default;
     }
 
+    /* seat rows should not wrap – each letter row stays on one line
+       overflow is handled by the wrapper so users can scroll horizontally */
+    .seat-row {
+        flex-wrap: nowrap;
+        justify-content: flex-start; /* align all rows to the left */
+        gap: 8px;
+    }
+
+    .seat-wrapper {
+        overflow-x: auto; /* allow horizontal scrolling if a row is too wide */
+        padding-bottom: 10px;
+    }
+
     /* responsive adjustments for mobile/narrow screens */
     @media (max-width: 768px) {
-        /* shrink seat buttons and allow wrapping */
-        .seat-row {
-            flex-wrap: wrap;
-            gap: 4px;
-        }
-        .seat-wrapper {
-            overflow-x: auto; /* allow horizontal scrolling if needed */
-            padding-bottom: 10px;
+        /* shrink seat buttons for small viewports */
+        .seat {
+            width: 32px;
+            height: 32px;
+            margin: 2px;
+            font-size: 10px;
         }
         .seat {
             width: 32px;
