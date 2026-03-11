@@ -507,7 +507,7 @@ $notShowingCount = max(0, $count - $showingCount);
         <div class="stat-card filter-showing clickable" title="Nhấn để lọc phim đã chiếu" onclick="showOnlyShowingMovies()">
             <span class="stat-icon">✓</span>
             <div>
-                <div class="label">Đã chiếu</div>
+                <div class="label">Đã có suất chiếu</div>
                 <div class="number"><?= $showingCount ?></div>
             </div>
         </div>
@@ -545,7 +545,7 @@ $notShowingCount = max(0, $count - $showingCount);
         <div class="filter-select">
             <select id="statusFilter" onchange="filterMovies()">
                 <option value="">Tất cả trạng thái</option>
-                <option value="showing">Đã chiếu</option>
+                <option value="showing">Đã có suất chiếu</option>
                 <option value="not_showing">Chưa có suất chiếu</option>
             </select>
         </div>
@@ -615,7 +615,7 @@ $notShowingCount = max(0, $count - $showingCount);
                     </td>
                     <td>
                         <?php if ($isShowing): ?>
-                            <span class="status-badge showing">Đã chiếu</span>
+                            <span class="status-badge showing">Đã có suất chiếu</span>
                         <?php else: ?>
                             <span class="status-badge not-showing">Chưa có suất</span>
                         <?php endif; ?>
