@@ -11,6 +11,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['dangky'])) {
 
     if ($ten === '' || $email === '' || $mat_khau === '') {
         $response['message'] = 'Vui lòng điền đầy đủ thông tin.';
+    } elseif (strlen($mat_khau) < 3) {
+        $response['message'] = 'Mật khẩu phải từ 3 ký tự trở lên.';
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $response['message'] = 'Email không hợp lệ.';
     } else {
