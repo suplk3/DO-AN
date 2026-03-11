@@ -128,7 +128,7 @@ if ($currentRow != '') echo '</div>';
             <p>Ghế đã chọn: <strong id="selected-seats"></strong></p>
             <p>Tổng tiền: <strong id="total">0 đ</strong></p>
 
-            <form action="dat_ve.php" method="POST">
+            <form action="payment.php" method="POST">
                 <input type="hidden" name="ghe" id="seat-input">
                 <input type="hidden" name="suat_chieu_id" value="<?= $suat_chieu_id ?>">
 
