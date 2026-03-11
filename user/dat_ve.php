@@ -7,6 +7,19 @@ if (!isset($_POST['suat_chieu_id'], $_POST['ghe']) || empty($_POST['ghe'])) {
     die("Lỗi: Dữ liệu không hợp lệ. Vui lòng thử lại.");
 }
 
+// extra fields from payment page
+if (empty($_POST['agree']) || !isset($_POST['payment_method'])) {
+    die("Vui lòng đồng ý điều khoản và chọn hình thức thanh toán.");
+}
+$payment_method = $_POST['payment_method'];
+
+// ensure terms agreed and payment method chosen
+if (empty($_POST['agree']) || !isset($_POST['payment_method'])) {
+    die("Vui lòng đồng ý điều khoản và chọn hình thức thanh toán.");
+}
+
+$payment_method = $_POST['payment_method'];
+
 $user_id = $_SESSION['user_id'] ?? 1; // Fallback for testing, ensure user is logged in for production
 $suat_chieu_id = (int)$_POST['suat_chieu_id'];
 $ghe_array = array_filter(explode(",", $_POST['ghe'])); // array_filter to remove empty values
@@ -74,7 +87,7 @@ try {
 
 // --- Fetch show information for confirmation message (already safe) ---
 $info = null;
-$sql = "SELECT p.ten_phim, sc.ngay, sc.gio
+$sql = "SELECT p.ten_phim, sc.ngay, sc.gio, sc.gia
         FROM suat_chieu sc
         JOIN phim p ON sc.phim_id = p.id
         WHERE sc.id = $suat_chieu_id";
@@ -85,6 +98,11 @@ if ($r) {
 
 // Formatted values for template
 $seat_list = htmlspecialchars(implode(", ", $ghe_array));
+$seat_count = count($ghe_array);
+// price per seat comes from the show info; default to 0 if missing
+$price_per_seat = (isset($info['gia']) && $info['gia'] !== null) ? (int)$info['gia'] : 0;
+$total_amount = $seat_count * $price_per_seat;
+
 $movie_name = $info['ten_phim'] ?? '';
 $show_datetime = '';
 if ($info) {
@@ -104,10 +122,34 @@ mysqli_close($conn);
 <link rel="stylesheet" href="../assets/css/user-index.css">
 <link rel="stylesheet" href="../assets/css/login-modal.css">
 <style>
+  /* invoice style */
+  .invoice-card {
+    background: #fff;
+    color: #333;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 480px;
+    margin: 40px auto;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    text-align: left;
+  }
+
+  .invoice-card h2 {
+    margin-top: 0;
+    color: #e71a0f;
+  }
+
+  .invoice-card p {
+    margin: 8px 0;
+  }
+
+  .invoice-card .btn {
+    margin-right: 8px;
+  }
+
   /* Confetti particles */
   .confetti {
     position: fixed;
-    width: 10px;
     height: 10px;
     background: #ff6b6b;
     pointer-events: none;
@@ -152,14 +194,21 @@ mysqli_close($conn);
 </header>
 
 <main class="container">
-    <div class="message-card">
-        <h2>🎉 Đặt vé thành công!</h2>
+    <div class="invoice-card">
+        <h2>🧾 Hóa đơn đặt vé</h2>
         <p><strong>Phim:</strong> <?= htmlspecialchars($movie_name) ?></p>
         <?php if ($show_datetime): ?>
             <p><strong>Thời gian:</strong> <?= htmlspecialchars($show_datetime) ?></p>
         <?php endif; ?>
-        <p><strong>Ghế:</strong> <?= $seat_list ?></p>
-        <p>Cảm ơn bạn đã mua vé. Hẹn gặp lại tại rạp!</p>
+        <p><strong>Ghế:</strong> <?= $seat_list ?> (<?= $seat_count ?> ghế)</p>
+        <?php if (!empty(
+            $payment_method
+        )): ?>
+            <p><strong>Phương thức:</strong> <?= htmlspecialchars($payment_method) ?></p>
+        <?php endif; ?>
+        <p><strong>Giá vé:</strong> <?= number_format($price_per_seat,0,',','.') ?>₫ / ghế</p>
+        <p><strong>Tổng thanh toán:</strong> <?= number_format($total_amount,0,',','.') ?>₫</p>
+        <button onclick="window.print()" class="btn btn-secondary">🖨️ In hóa đơn</button>
         <a href="index.php" class="btn btn-primary">🏠 VỀ TRANG CHÍNH</a>
     </div>
 </main>
