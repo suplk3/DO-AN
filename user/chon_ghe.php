@@ -19,7 +19,10 @@ SELECT
     ) AS da_dat
 FROM ghe
 WHERE ghe.phong_id = (SELECT phong_id FROM suat_chieu WHERE id = $suat_chieu_id LIMIT 1)
-ORDER BY ghe.ten_ghe
+-- order by row letter then seat number for natural ordering
+ORDER BY
+    LEFT(ghe.ten_ghe, 1),
+    CAST(SUBSTRING(ghe.ten_ghe, 2) AS UNSIGNED)
 ";
 $result = mysqli_query($conn, $sql);
 if (!$result) {
@@ -68,6 +71,73 @@ function fmt_money($n){ return $n !== null ? number_format($n,0,',','.') . '₫'
     .seat-selection .seat:hover {
         color: #fff !important;
     }
+
+    /* placeholder for equal‑width rows */
+    .seat.empty {
+        visibility: hidden;
+        background: transparent;
+        cursor: default;
+    }
+
+    /* seat rows should not wrap – each letter row stays on one line
+       overflow is handled by the wrapper so users can scroll horizontally */
+    .seat-row {
+        flex-wrap: nowrap;
+        justify-content: flex-start; /* align all rows to the left */
+        gap: 8px;
+    }
+
+    .seat-wrapper {
+        overflow-x: auto; /* allow horizontal scrolling if a row is too wide */
+        padding-bottom: 10px;
+    }
+
+    /* responsive adjustments for mobile/narrow screens */
+    @media (max-width: 768px) {
+        /* shrink seat buttons for small viewports */
+        .seat {
+            width: 32px;
+            height: 32px;
+            margin: 2px;
+            font-size: 10px;
+        }
+        .seat {
+            width: 32px;
+            height: 32px;
+            margin: 2px;
+            font-size: 10px;
+        }
+        .screen {
+            font-size: 14px;
+            padding: 6px;
+            margin-bottom: 12px;
+        }
+        .showtime-info h2 {
+            font-size: 18px;
+        }
+        .showtime-info p {
+            font-size: 12px;
+            line-height: 1.3;
+        }
+        .checkout {
+            font-size: 14px;
+            padding: 0 10px;
+        }
+        .checkout button {
+            width: 100%;
+            padding: 10px 0;
+            font-size: 16px;
+        }
+        .movie-info-card {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .movie-poster img {
+            max-width: 180px;
+            margin-bottom: 10px;
+        }
+    }
     </style>
 </head>
 <body class="movie-detail-page">
@@ -103,28 +173,37 @@ function fmt_money($n){ return $n !== null ? number_format($n,0,',','.') . '₫'
 
         <div class="seat-wrapper">
 <?php
-$currentRow = '';
+// build nested array of seats grouped by row letter
+$rows = [];
 while ($row = mysqli_fetch_assoc($result)) {
     $rowChar = substr($row['ten_ghe'], 0, 1);
-
-    if ($currentRow != $rowChar) {
-        if ($currentRow != '') echo '</div>';
-        echo "<div class='seat-row'>";
-        $currentRow = $rowChar;
-    }
-
-    $class = $row['da_dat'] ? 'seat booked' : 'seat';
-
-    echo "<button 
-            class='$class' 
-            data-seat='{$row['ten_ghe']}'
-            ".($row['da_dat'] ? 'disabled' : '').">
-            {$row['ten_ghe']}
-          </button>";
+    $rows[$rowChar][] = $row;
 }
 
+// determine maximum count so every row can be padded
+$maxCount = 0;
+foreach ($rows as $r) {
+    $maxCount = max($maxCount, count($r));
+}
 
-if ($currentRow != '') echo '</div>';
+foreach ($rows as $rowChar => $rowSeats) {
+    echo "<div class='seat-row'>";
+    foreach ($rowSeats as $r) {
+        $class = $r['da_dat'] ? 'seat booked' : 'seat';
+        echo "<button 
+                class='$class' 
+                data-seat='{$r['ten_ghe']}'
+                ".($r['da_dat'] ? 'disabled' : '').">
+                {$r['ten_ghe']}
+              </button>";
+    }
+    // pad with empty placeholders to reach maxCount
+    $pad = $maxCount - count($rowSeats);
+    for ($i = 0; $i < $pad; $i++) {
+        echo "<div class='seat empty'></div>";
+    }
+    echo "</div>";
+}
 ?>
         </div>
 
