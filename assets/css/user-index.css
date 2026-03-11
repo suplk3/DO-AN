@@ -4,7 +4,7 @@ body.user-index{
     --header-shrink-h:48px;
     background:linear-gradient(180deg,#0a0e27,#121829);
     font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;
-    color:#fff;
+    color: #121829;
     -webkit-font-smoothing:antialiased;
     padding-top:var(--header-default-h); /* space for fixed header */
     transition:padding-top .18s ease;
