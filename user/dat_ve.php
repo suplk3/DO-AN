@@ -309,53 +309,6 @@ mysqli_close($conn);
             font-size: 18px;
             font-weight: 500;
         }
-
-        /* --- PRINT STYLES --- */
-        @media print {
-            body {
-                background-color: #fff !important;
-                -webkit-print-color-adjust: exact;
-            }
-            body > *:not(.ticket-container) {
-                display: none;
-            }
-            html, body, .ticket-container {
-                width: 100%;
-                height: auto;
-                margin: 0 !important;
-                padding: 0 !important;
-                float: none !important;
-            }
-            .ticket {
-                max-width: 100%;
-                border-radius: 0;
-                border: 1px solid #888;
-                box-shadow: none;
-                background: #fff !important;
-                page-break-inside: avoid;
-            }
-            .ticket-header {
-                 -webkit-print-color-adjust: exact;
-            }
-             .ticket-header::before {
-                background: linear-gradient(to top, rgba(255,255,255,1) 0%, rgba(255,255,255,0.8) 30%, rgba(255,255,255,0) 100%) !important;
-             }
-            .ticket-header h2, .info-section .details span {
-                color: #000 !important;
-            }
-             .info-section .details strong { color: #555 !important; }
-             .info-section .details span.seat-list { color: #000 !important; font-weight: bold; }
-            .ticket-cutout, .ticket-bottom-part {
-                 background: #f0f0f0 !important;
-                 -webkit-print-color-adjust: exact;
-            }
-            .ticket-cutout::before, .ticket-cutout::after { background: #fff !important; }
-            .ticket-qr-section img.qr-code { border-color: #000 !important; }
-            .ticket-id { color: #000 !important; }
-            .total-amount span { color: #555 !important; }
-            .total-amount div { color: #000 !important; }
-            .barcode { filter: none !important; }
-        }
     </style>
 </head>
 <body class="user-index">
@@ -430,7 +383,6 @@ mysqli_close($conn);
         </div>
 
         <div class="ticket-actions">
-            <button onclick="window.print()" class="btn btn-secondary">🖨️ In vé</button>
             <a href="index.php" class="btn">🏠 Về trang chủ</a>
         </div>
     </div>
