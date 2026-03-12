@@ -139,6 +139,10 @@ nav a {
     gap: 8px;
 }
 
+.seat-row {
+    margin: auto;
+}
+
 .seat {
     width: 45px;
     height: 45px;
