@@ -45,6 +45,79 @@ $ves = mysqli_fetch_all($result, MYSQLI_ASSOC);
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Vé của tôi</title>
     <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        /* Modal styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            width: 840px;
+            position: relative;
+            color: #000;
+        }
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #eee;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        .modal-body {
+             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .ticket-printable {
+            width: 800px;
+            height: 400px;
+            display: flex;
+            overflow: hidden;
+        }
+        .ticket-stub { padding: 20px; width: 280px; text-align: left; display: flex; flex-direction: column; justify-content: space-between; border-right: 2px dashed #ccc;}
+        .ticket-main { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        .ticket-main .poster { width: 100%; max-width: 250px; height: auto; border-radius: 8px; }
+        .ticket-details h1 { font-size: 26px; margin: 15px 0 10px; font-weight: 700; color: #000; }
+        .ticket-qr img { width: 200px; height: 200px; }
+        .ticket-info { font-size: 14px; }
+        .ticket-info strong { font-weight: 600; }
+        .ticket-info p { margin: 4px 0; }
+        .modal-actions { text-align: right; margin-top: 20px; }
+
+        /* Print styles */
+        @media print {
+            body > *:not(.modal-printable-area) {
+                display: none;
+            }
+            html, body, .modal-printable-area {
+                width: 100%;
+                height: auto;
+                margin: 0 !important;
+                padding: 0 !important;
+                float: none !important;
+                background: #fff !important;
+            }
+            .modal-content {
+                box-shadow: none;
+                border: none;
+                padding: 0;
+            }
+        }
+    </style>
 </head>
 <body class="ve-page">
 <div class="wrap">
@@ -80,7 +153,7 @@ $ves = mysqli_fetch_all($result, MYSQLI_ASSOC);
                         </div>
                         <div class="price">Giá: <?= number_format($ve['gia']) ?> đ</div>
                         <div class="actions">
-                            <button class="btn btn-print" onclick="window.print()">🖨️ In vé</button>
+                            <button class="btn btn-print" onclick="showPrintModal(<?= (int)$ve['ve_id']; ?>)">🖨️ In vé</button>
                             <a class="btn btn-save" href="save_ticket.php?ve_id=<?= (int)$ve['ve_id']; ?>">💾 Lưu vé</a>
                             <form method="POST">
                                 <input type="hidden" name="ve_id" value="<?= (int)$ve['ve_id']; ?>">
@@ -93,7 +166,17 @@ $ves = mysqli_fetch_all($result, MYSQLI_ASSOC);
         </div>
     <?php endif; ?>
 </div>
+
 <div id="star-overlay"></div>
+
+<!-- Modal for printing tickets -->
+<div id="print-modal-overlay" class="modal-overlay" style="display: none;">
+    <div id="print-modal-content" class="modal-content">
+        <!-- Content will be injected by JavaScript -->
+    </div>
+</div>
+
+
 <script>
 function createStar() {
     const overlay = document.getElementById('star-overlay');
@@ -107,6 +190,63 @@ function createStar() {
     setTimeout(() => { star.remove(); }, 5000);
 }
 setInterval(createStar, 200);
+
+async function showPrintModal(ve_id) {
+    const overlay = document.getElementById('print-modal-overlay');
+    const modalContent = document.getElementById('print-modal-content');
+    
+    // Show loading state
+    modalContent.innerHTML = '<p>Đang tải dữ liệu vé...</p>';
+    overlay.style.display = 'flex';
+
+    try {
+        const response = await fetch(`get_ticket_details.php?ve_id=${ve_id}`);
+        if (!response.ok) {
+            throw new Error('Không thể tải thông tin vé. Vui lòng thử lại.');
+        }
+        const ticket = await response.json();
+
+        // Populate the modal with the ticket layout
+        modalContent.innerHTML = `
+            <div class="modal-body modal-printable-area">
+                <div class="ticket-printable">
+                    <div class="ticket-stub">
+                        <div class="ticket-info">
+                            <p><strong>RẠP:</strong> ${ticket.ten_rap}</p>
+                            <p><strong>PHÒNG:</strong> ${ticket.ten_phong}</p>
+                            <p><strong>NGÀY:</strong> ${ticket.ngay_f}</p>
+                            <p><strong>GIỜ:</strong> ${ticket.gio_f}</p>
+                            <p><strong>GHẾ:</strong></p>
+                            <h2 style="font-size: 48px; margin: 5px 0;">${ticket.ten_ghe}</h2>
+                        </div>
+                        <div class="ticket-qr">
+                            <img src="${ticket.qr_code_url}" alt="QR Code">
+                        </div>
+                    </div>
+                    <div class="ticket-main">
+                        <img src="${ticket.poster_url}" alt="Poster Phim" class="poster">
+                        <div class="ticket-details">
+                            <h1>${ticket.ten_phim}</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                 <button onclick="window.print()" class="btn">🖨️ In</button>
+                 <button onclick="closePrintModal()" class="btn btn-outline">Đóng</button>
+            </div>
+             <button onclick="closePrintModal()" class="modal-close">×</button>
+        `;
+
+    } catch (error) {
+        modalContent.innerHTML = `<p style="color: red;">${error.message}</p> <button onclick="closePrintModal()" class="btn btn-outline">Đóng</button>`;
+    }
+}
+
+function closePrintModal() {
+    const overlay = document.getElementById('print-modal-overlay');
+    overlay.style.display = 'none';
+}
 </script>
 </body>
 </html>

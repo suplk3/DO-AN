@@ -66,22 +66,20 @@ function fmt_money($n){ return $n !== null ? number_format($n,0,',','.') . '₫'
             </div>
             <div class="header-nav-right">
                 <?php if (isset($_SESSION['user_id'])):
-                    $is_admin = (isset($_SESSION['vai_tro']) && $_SESSION['vai_tro'] === 'admin');
-                    $ticket_label = $is_admin ? 'QUẢN LÝ USER' : 'VÉ CỦA TÔI';
-                    $my_ticket_label = 'VÉ CỦA TÔI';
-                ?>
+                    $is_admin = ($_SESSION['vai_tro'] ?? '') === 'admin';
+                    ?>
                     <span class="hello">
                         <span class="icon">👋</span>
-                        <span class="text">Xin chào, <?= htmlspecialchars($_SESSION['ten_nguoi_dung'] ?? ($_SESSION['ten'] ?? 'bạn')) ?></span>
+                        <span class="text">Xin chào, <?= htmlspecialchars($_SESSION['ten_nguoi_dung'] ?? $_SESSION['ten'] ?? 'bạn') ?></span>
                     </span>
                     <a href="../user/ve_cua_toi.php" class="btn btn-sm">
                         <span class="icon">🎟️</span>
-                        <span class="text"><?= $my_ticket_label ?></span>
+                        <span class="text">VÉ CỦA TÔI</span>
                     </a>
                     <?php if ($is_admin): ?>
                     <a href="../user/quan_ly_user.php" class="btn btn-sm">
                         <span class="icon">🎫</span>
-                        <span class="text"><?= $ticket_label ?></span>
+                        <span class="text">QUẢN LÝ USER</span>
                     </a>
                     <?php endif; ?>
                     <a href="../auth/logout.php" class="btn btn-sm btn-outline" onclick="return confirm('Bạn có chắc chắn muốn đăng xuất không?');">
@@ -212,7 +210,7 @@ function fmt_money($n){ return $n !== null ? number_format($n,0,',','.') . '₫'
 })();
 </script>
 
-<script src="/assets/js/login-modal.js"></script>
+<script src="/do-an-main/assets/js/login-modal.js"></script>
 
 </body>
 </html>
