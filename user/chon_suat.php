@@ -173,7 +173,7 @@ body {
 
 <header class="header">
     <div class="header-inner">
-        <a href="index.php" class="logo">CGV</a>
+        <a href="index.php" class="logo">TTVH</a>
         <nav class="header-nav">
             <div class="header-nav-left">
                 <a href="index.php" class="nav-link">
