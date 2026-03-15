@@ -539,3 +539,19 @@
 .reply-compose {
   margin-top: 6px;
 }
+
+/* ── Nút xoá comment ── */
+.delete-comment-btn {
+  background: none;
+  border: none;
+  color: #ef4444;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0 4px;
+  font-family: 'Be Vietnam Pro', sans-serif;
+  opacity: 0;
+  transition: opacity .15s, color .15s;
+}
+.comment-item:hover .delete-comment-btn { opacity: 1; }
+.delete-comment-btn:hover { color: #fca5a5; }

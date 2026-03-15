@@ -1,7 +1,6 @@
 <?php
 session_start();
 include "../config/db.php";
-mysqli_query($conn, "SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED");
 header('Content-Type: application/json; charset=utf-8');
 if (!isset($_SESSION['user_id'])) { echo json_encode(['error'=>'Chưa đăng nhập']); exit; }
 $me = (int)$_SESSION['user_id'];
@@ -58,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 }
 
 // ── POST: thêm comment hoặc reply ──
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_GET['action']??'') !== 'delete') {
     $d         = json_decode(file_get_contents('php://input'), true);
     $type      = in_array($d['target_type']??'', ['post','phim']) ? $d['target_type'] : null;
     $tid       = (int)($d['target_id']  ?? 0);
@@ -106,5 +105,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     echo json_encode(['ok'=>$ok, 'id'=>$newid, 'comment'=>$new]);
+    exit;
+}
+
+// ── DELETE: xoá comment ──
+if ($_SERVER['REQUEST_METHOD'] === 'DELETE' || 
+    ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_GET['action']??'') === 'delete')) {
+    $d      = json_decode(file_get_contents('php://input'), true);
+    $cmt_id = (int)($d['comment_id'] ?? $_GET['comment_id'] ?? 0);
+    if (!$cmt_id) { echo json_encode(['ok'=>false,'msg'=>'Thiếu comment_id']); exit; }
+
+    if (session_status() === PHP_SESSION_NONE) session_start();
+    $is_admin = (isset($_SESSION['vai_tro']) && $_SESSION['vai_tro'] === 'admin');
+
+    // Lấy comment để kiểm tra quyền
+    $row = mysqli_fetch_assoc(mysqli_query($conn,
+        "SELECT user_id, parent_id, target_type, target_id FROM comments WHERE id=$cmt_id"
+    ));
+    if (!$row) { echo json_encode(['ok'=>false,'msg'=>'Không tìm thấy']); exit; }
+
+    // Chỉ chủ comment hoặc admin mới được xoá
+    if ((int)$row['user_id'] !== $me && !$is_admin) {
+        echo json_encode(['ok'=>false,'msg'=>'Không có quyền']); exit;
+    }
+
+    // Nếu là comment gốc → xoá luôn các replies
+    if (!$row['parent_id']) {
+        mysqli_query($conn, "DELETE FROM comments WHERE parent_id=$cmt_id");
+    }
+    mysqli_query($conn, "DELETE FROM comments WHERE id=$cmt_id");
+
+    echo json_encode(['ok'=>true]);
     exit;
 }
