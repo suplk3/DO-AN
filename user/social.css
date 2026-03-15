@@ -402,3 +402,156 @@
 .source-badge.trending {
   background: rgba(232,25,44,.12); border-color: rgba(232,25,44,.25); color: #fca5a5;
 }
+
+/* ══════════════════════════════════════
+   Facebook-style reaction bar
+   ══════════════════════════════════════ */
+.react-bar {
+  margin-bottom: 12px;
+}
+.react-summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  cursor: default;
+}
+.react-emoji-stack {
+  display: flex;
+  align-items: center;
+}
+.react-emoji-bubble {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: #1e293b;
+  border: 2px solid #0d1322;
+  font-size: 14px;
+  margin-right: -6px;
+  transition: transform .15s;
+  cursor: default;
+}
+.react-emoji-bubble:hover { transform: scale(1.3); z-index: 2; }
+.react-emoji-stack .react-emoji-bubble:last-child { margin-right: 0; }
+
+.react-total-text {
+  font-size: 13px;
+  color: #64748b;
+  padding-left: 4px;
+  transition: color .15s;
+}
+.react-summary:hover .react-total-text { color: #94a3b8; }
+
+/* Tooltip chi tiết khi hover */
+.react-detail-tooltip {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 0;
+  background: #1e293b;
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 12px;
+  padding: 10px 14px;
+  min-width: 180px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.6);
+  z-index: 50;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(6px);
+  transition: opacity .2s, transform .2s;
+}
+.react-summary:hover .react-detail-tooltip {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+.react-detail-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 0;
+  font-size: 13px;
+  color: #f1f5f9;
+  border-bottom: 1px solid rgba(255,255,255,.04);
+}
+.react-detail-row:last-child { border-bottom: none; }
+.react-detail-row span:first-child { font-size: 18px; }
+.react-detail-row span:nth-child(2) { flex: 1; color: #94a3b8; }
+.react-detail-count {
+  font-weight: 800;
+  color: #f1f5f9;
+}
+
+/* ══════════════════════════════════════
+   Reply (nested comments)
+   ══════════════════════════════════════ */
+
+/* Bọc avatar + nội dung theo chiều dọc */
+.comment-item {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+.comment-body {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Reply thụt vào trong, có đường kẻ dọc */
+.reply-item {
+  margin-top: 8px;
+  padding-left: 20px;
+  position: relative;
+}
+.reply-item::before {
+  content: '';
+  position: absolute;
+  left: 6px; top: 0; bottom: 0;
+  width: 2px;
+  background: rgba(255,255,255,0.07);
+  border-radius: 2px;
+}
+
+/* Nút Trả lời */
+.reply-btn {
+  background: none;
+  border: none;
+  color: #7c3aed;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0 4px;
+  font-family: 'Be Vietnam Pro', sans-serif;
+  transition: color .15s;
+}
+.reply-btn:hover { color: #a78bfa; }
+
+/* Danh sách replies */
+.reply-list {
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Ô nhập reply */
+.reply-compose {
+  margin-top: 6px;
+}
+
+/* ── Nút xoá comment ── */
+.delete-comment-btn {
+  background: none;
+  border: none;
+  color: #ef4444;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0 4px;
+  font-family: 'Be Vietnam Pro', sans-serif;
+  opacity: 0;
+  transition: opacity .15s, color .15s;
+}
+.comment-item:hover .delete-comment-btn { opacity: 1; }
+.delete-comment-btn:hover { color: #fca5a5; }

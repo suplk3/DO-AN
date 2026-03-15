@@ -368,6 +368,8 @@ if ($tc) $tong_cmt = (int)$tc['c'];
 <!-- ── Script cần thêm vào cuối trang (trước </body>) ── -->
 <script>
 const FILM_REACTIONS = <?= json_encode($REACTIONS) ?>;
+const CURRENT_USER_ID = <?= json_encode($me_id) ?>;
+const IS_ADMIN        = <?= json_encode((bool)(isset($_SESSION['vai_tro']) && $_SESSION['vai_tro'] === 'admin')) ?>;
 let filmReactionTimer = {};
 let filmCommentsLoaded = false;
 let spoilerOpen = false;
@@ -474,11 +476,47 @@ function renderComment(c, isReply=false) {
                 <div class="comment-meta">
                     ${c.time_ago}
                     ${replyBtn}
+                    ${(CURRENT_USER_ID && (parseInt(c.user_id) === parseInt(CURRENT_USER_ID) || IS_ADMIN))
+                        ? `<button class="delete-comment-btn" onclick="deleteComment(${c.id}, ${c.parent_id || 0})">Xoá</button>`
+                        : ''}
                 </div>
                 ${replies}
                 ${replyBox}
             </div>
         </div>`;
+}
+
+async function deleteComment(cmtId, parentId) {
+    if (!confirm('Xoá bình luận này?')) return;
+    const res = await fetch('comment_api.php?action=delete', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({comment_id: cmtId})
+    });
+    const data = await res.json();
+    if (data.ok) {
+        const el = document.getElementById('cmt-' + cmtId);
+        if (el) {
+            // Animation fade out rồi xoá
+            el.style.transition = 'opacity .25s, transform .25s';
+            el.style.opacity = '0';
+            el.style.transform = 'translateX(-10px)';
+            setTimeout(() => el.remove(), 250);
+        }
+        // Cập nhật số comment trên spoiler button
+        const btn = document.getElementById('spoilerBtnText');
+        if (btn) {
+            const match = btn.textContent.match(/\d+/);
+            if (match) {
+                const cur = parseInt(match[0]);
+                if (cur > 0) {
+                    btn.textContent = btn.textContent.replace(/\d+/, cur - 1);
+                }
+            }
+        }
+    } else {
+        alert(data.msg || 'Không thể xoá');
+    }
 }
 
 function showReplyBox(parentId) {
@@ -805,6 +843,21 @@ function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(
   }
 
   connectFilmSSE();
+})();
+</script>
+<script>
+// User dropdown
+(function(){
+  var btn = document.getElementById('userMenuBtn');
+  var dd  = document.getElementById('userDropdown');
+  if (!btn || !dd) return;
+  btn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    dd.classList.toggle('open');
+  });
+  document.addEventListener('click', function() {
+    dd.classList.remove('open');
+  });
 })();
 </script>
 </body>
