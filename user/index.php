@@ -68,7 +68,7 @@ $force_show_login = (isset($_GET['show_login']) && !isset($_SESSION['user_id']))
                         <span class="text"><?= $my_ticket_label ?></span>
                     </a>
                     <?php if ($is_admin): ?>
-                    <a href="../user/quan_ly_user.php" class="btn btn-sm">
+                    <a href="../admin/quan_ly_user.php" class="btn btn-sm">
                         <span class="icon">🎫</span>
                         <span class="text"><?= $ticket_label ?></span>
                     </a>
