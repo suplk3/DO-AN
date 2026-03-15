@@ -308,15 +308,12 @@ $pct_trong = $tong_ghe > 0 ? round($ghe_trong / $tong_ghe * 100) : 0;
       <div class="header-nav-left">
         <a href="index.php" class="nav-link"><span class="icon">🎬</span><span class="text">PHIM</span></a>
       </div>
-      <div class="search-wrap" id="searchWrap">
-        <input type="text" id="searchInput" class="search-bar" placeholder="Tìm phim..." autocomplete="off">
-        <span class="search-icon">🔍</span>
-        <span class="search-spinner"></span>
-        <div class="search-dropdown" id="searchDropdown"></div>
-      </div>
+      <!-- Không cần search ở trang chọn ghế -->
       <div class="header-nav-right">
         <?php if (isset($_SESSION['user_id'])): ?>
-          <a href="../user/ve_cua_toi.php" class="btn btn-sm"><span class="icon">🎟️</span><span class="text">VÉ CỦA TÔI</span></a>
+          <a href="../user/ve_cua_toi.php" class="btn btn-sm">
+            <span class="icon">🎟️</span><span class="text">VÉ CỦA TÔI</span>
+          </a>
         <?php endif; ?>
       </div>
     </nav>
@@ -705,7 +702,6 @@ const sse = new EventSource(`seat_events.php?suat_id=${suatChieuId}`);
     connectSSE();   // Thay setInterval bằng SSE
 });
 </script>
-<script src="../assets/js/search.js"></script>
 <script>
 (function(){
   const h=document.querySelector('.header');
