@@ -1,6 +1,12 @@
 <?php
 include '../config/db.php';
 
+// Giải phóng session lock sớm nhất có thể
+// Nếu không, EventSource (SSE) cùng trình duyệt sẽ bị block
+if (session_status() === PHP_SESSION_ACTIVE) {
+    session_write_close();
+}
+
 $suat_chieu_id = $_GET['suat_id'] ?? 0;
 
 if ($suat_chieu_id == 0) {
@@ -55,123 +61,194 @@ function fmt_money($n){ return $n !== null ? number_format($n,0,',','.') . '₫'
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Chọn ghế - <?= htmlspecialchars($info['ten_phim']) ?></title>
-    <link rel="stylesheet" href="../assets/css/style.css">
-    <link rel="stylesheet" href="../assets/css/movie-detail.css">
-    <style>
-    /* ensure seat labels are always white for visibility */
-    .seat-selection .seat {
-        color: #fff !important;
-    }
-    .seat-selection .seat.booked {
-        color: #fff !important;
-    }
-    .seat-selection .seat:hover {
-        color: #fff !important;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chọn ghế — <?= htmlspecialchars($info['ten_phim']) ?></title>
+<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="stylesheet" href="../assets/css/movie-detail.css">
+<link rel="stylesheet" href="../assets/css/search.css">
+<style>
+/* ── Seat map ── */
+.seat-section { margin-top: 28px; }
+.screen-bar {
+  text-align: center;
+  padding: 10px;
+  margin-bottom: 24px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: rgba(255,255,255,0.5);
+  text-transform: uppercase;
+  position: relative;
+}
+.screen-bar::after {
+  content: '';
+  display: block;
+  height: 3px;
+  margin: 8px auto 0;
+  width: 60%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  border-radius: 2px;
+}
+.seat-wrapper { overflow-x: auto; padding-bottom: 10px; }
+.seat-row {
+  display: flex;
+  justify-content: center;
+  gap: 7px;
+  margin-bottom: 7px;
+  flex-wrap: nowrap;
+}
+.seat {
+  width: 38px; height: 38px;
+  border-radius: 8px 8px 4px 4px;
+  border: none;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .15s;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: #f1f5f9;
+  font-family: 'Be Vietnam Pro', sans-serif;
+  position: relative;
+}
+.seat::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 2px; right: 2px;
+  height: 3px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 0 0 2px 2px;
+}
+.seat:hover:not(.booked):not(.empty) {
+  background: rgba(34,197,94,0.25);
+  border-color: rgba(34,197,94,0.5);
+  color: #86efac;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(34,197,94,0.2);
+}
+.seat.selected {
+  background: linear-gradient(135deg, #e8192c, #c01020);
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(232,25,44,0.4);
+  transform: translateY(-2px);
+}
+.seat.booked {
+  background: rgba(255,255,255,0.04);
+  border-color: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.2);
+  cursor: not-allowed;
+}
+.seat.empty { visibility: hidden; background: transparent; cursor: default; border: none; }
 
-    /* placeholder for equal‑width rows */
-    .seat.empty {
-        visibility: hidden;
-        background: transparent;
-        cursor: default;
-    }
+/* Legend */
+.seat-legend {
+  display: flex; gap: 20px; justify-content: center;
+  margin: 20px 0; flex-wrap: wrap;
+}
+.legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #94a3b8; }
+.legend-dot {
+  width: 20px; height: 20px; border-radius: 5px;
+}
+.legend-dot.available { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); }
+.legend-dot.selected-l { background: linear-gradient(135deg,#e8192c,#c01020); }
+.legend-dot.booked-l { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); }
 
-    /* seat rows should not wrap – each letter row stays on one line
-       overflow is handled by the wrapper so users can scroll horizontally */
-    .seat-row {
-        flex-wrap: nowrap;
-        justify-content: flex-start; /* align all rows to the left */
-        gap: 8px;
-    }
+/* Checkout */
+.checkout-bar {
+  position: sticky;
+  bottom: 0;
+  background: rgba(13,19,34,0.95);
+  backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(255,255,255,0.08);
+  padding: 16px 20px;
+  margin: 0 -20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  z-index: 100;
+}
+.checkout-info { flex: 1; min-width: 200px; }
+.checkout-seats { font-size: 13px; color: #94a3b8; margin-bottom: 4px; }
+.checkout-seats strong { color: #f1f5f9; }
+.checkout-total { font-size: 20px; font-weight: 900; color: #f5c518; }
+.btn-checkout {
+  padding: 13px 28px;
+  background: linear-gradient(135deg,#e8192c,#c01020);
+  color: #fff; border: none; border-radius: 12px;
+  font-family: 'Be Vietnam Pro', sans-serif;
+  font-size: 14px; font-weight: 800;
+  cursor: pointer; transition: all .22s;
+  box-shadow: 0 6px 20px rgba(232,25,44,.35);
+  white-space: nowrap;
+}
+.btn-checkout:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(232,25,44,.5); }
 
-    .seat-wrapper {
-        overflow-x: auto; /* allow horizontal scrolling if a row is too wide */
-        padding-bottom: 10px;
-    }
-
-    /* responsive adjustments for mobile/narrow screens */
-    @media (max-width: 768px) {
-        /* shrink seat buttons for small viewports */
-        .seat {
-            width: 32px;
-            height: 32px;
-            margin: 2px;
-            font-size: 10px;
-        }
-        .seat {
-            width: 32px;
-            height: 32px;
-            margin: 2px;
-            font-size: 10px;
-        }
-        .screen {
-            font-size: 14px;
-            padding: 6px;
-            margin-bottom: 12px;
-        }
-        .showtime-info h2 {
-            font-size: 18px;
-        }
-        .showtime-info p {
-            font-size: 12px;
-            line-height: 1.3;
-        }
-        .checkout {
-            font-size: 14px;
-            padding: 0 10px;
-        }
-        .checkout button {
-            width: 100%;
-            padding: 10px 0;
-            font-size: 16px;
-        }
-        .movie-info-card {
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-        }
-        .movie-poster img {
-            max-width: 180px;
-            margin-bottom: 10px;
-        }
-    }
-    </style>
+@media (max-width: 480px) {
+  .seat { width: 30px; height: 30px; font-size: 9px; }
+  .checkout-bar { flex-direction: column; align-items: stretch; }
+  .btn-checkout { width: 100%; text-align: center; }
+}
+</style>
 </head>
 <body class="movie-detail-page">
 
 <header class="header">
-    <div class="header-inner">
-        <div class="logo">TTVH</div>
-        <nav class="menu">
-            <a href="index.php" class="nav-link">🎬 PHIM</a>
-        </nav>
-        <?php
-        $is_admin = (isset($_SESSION['vai_tro']) && $_SESSION['vai_tro'] === 'admin');
-        $ticket_label = $is_admin ? 'QUẢN LÝ USER' : 'VÉ CỦA TÔI';
-        ?>
-        <div class="actions">
-            <a href="ve_cua_toi.php" class="link">🎟️ <?= $ticket_label ?></a>
-        </div>
-    </div>
+  <div class="header-inner">
+    <a href="index.php" class="logo">TTVH</a>
+    <nav class="header-nav">
+      <div class="header-nav-left">
+        <a href="index.php" class="nav-link"><span class="icon">🎬</span><span class="text">PHIM</span></a>
+      </div>
+      <div class="search-wrap" id="searchWrap">
+        <input type="text" id="searchInput" class="search-bar" placeholder="Tìm phim..." autocomplete="off">
+        <span class="search-icon">🔍</span>
+        <span class="search-spinner"></span>
+        <div class="search-dropdown" id="searchDropdown"></div>
+      </div>
+      <div class="header-nav-right">
+        <?php if (isset($_SESSION['user_id'])): ?>
+          <a href="../user/ve_cua_toi.php" class="btn btn-sm"><span class="icon">🎟️</span><span class="text">VÉ CỦA TÔI</span></a>
+        <?php endif; ?>
+      </div>
+    </nav>
+  </div>
 </header>
 
 <main class="md-container">
-    <a class="back" href="chi_tiet_phim.php?id=<?= $info['phim_id'] ?? 0 ?>">← Quay lại chi tiết phim</a>
+  <a class="back" href="chi_tiet_phim.php?id=<?= $info['phim_id'] ?? 0 ?>">← Quay lại chi tiết phim</a>
 
-    <section class="seat-selection">
-        <h1 class="section-title">Chọn ghế</h1>
-        <div class="showtime-info">
-            <h2><?= htmlspecialchars($info['ten_phim']) ?></h2>
-            <p><strong>Ngày:</strong> <?= fmt_date($info['ngay']) ?> | <strong>Giờ:</strong> <?= fmt_time($info['gio']) ?> | <strong>Giá:</strong> <?= fmt_money($info['gia']) ?></p>
-            <p><strong>Rạp:</strong> <?= htmlspecialchars($info['ten_rap']) ?> | <strong>Phòng:</strong> <?= htmlspecialchars($info['ten_phong']) ?></p>
-        </div>
+  <!-- Showtime info card -->
+  <div style="background:linear-gradient(135deg,#111827,#0d1322);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:18px 20px;margin-bottom:28px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+    <div style="flex:1;min-width:200px;">
+      <div style="font-size:18px;font-weight:800;color:#f1f5f9;margin-bottom:8px;"><?= htmlspecialchars($info['ten_phim']) ?></div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;">
+        <span style="font-size:13px;color:#64748b;">📅 <strong style="color:#f1f5f9;"><?= date('d/m/Y', strtotime($info['ngay'])) ?></strong></span>
+        <span style="font-size:13px;color:#64748b;">⏰ <strong style="color:#f1f5f9;"><?= substr($info['gio'],0,5) ?></strong></span>
+        <span style="font-size:13px;color:#64748b;">🏢 <strong style="color:#f1f5f9;"><?= htmlspecialchars($info['ten_rap'] ?? '') ?></strong></span>
+        <?php if (!empty($info['ten_phong'])): ?>
+        <span style="font-size:13px;color:#64748b;">🚪 <strong style="color:#f1f5f9;"><?= htmlspecialchars($info['ten_phong']) ?></strong></span>
+        <?php endif; ?>
+      </div>
+    </div>
+    <div style="font-size:22px;font-weight:900;color:#f5c518;background:rgba(245,197,24,.1);border:1px solid rgba(245,197,24,.2);padding:8px 16px;border-radius:10px;white-space:nowrap;">
+      <?= fmt_money($info['gia']) ?> / ghế
+    </div>
+  </div>
 
-        <div class="screen">MÀN HÌNH</div>
+  <h2 style="font-size:16px;font-weight:800;color:#f1f5f9;margin-bottom:20px;display:flex;align-items:center;gap:10px;">
+    🪑 Chọn ghế ngồi
+    <span style="flex:1;height:1px;background:linear-gradient(90deg,rgba(232,25,44,.4),transparent);"></span>
+  </h2>
 
-        <div class="seat-wrapper">
+  <section class="seat-section">
+    <div class="screen-bar">Màn hình</div>
+
+    <div class="seat-wrapper">
 <?php
 // build nested array of seats grouped by row letter
 $rows = [];
@@ -206,43 +283,39 @@ foreach ($rows as $rowChar => $rowSeats) {
 }
 ?>
         </div>
+    </div><!-- end seat-wrapper -->
 
-        <div class="checkout">
-            <p>Ghế đã chọn: <strong id="selected-seats"></strong></p>
-            <p>Tổng tiền: <strong id="total">0 đ</strong></p>
+    <!-- Legend -->
+    <div class="seat-legend">
+      <div class="legend-item"><div class="legend-dot available"></div>Còn trống</div>
+      <div class="legend-item"><div class="legend-dot selected-l"></div>Đang chọn</div>
+      <div class="legend-item"><div class="legend-dot booked-l"></div>Đã đặt</div>
+    </div>
+  </section>
 
-            <form action="payment.php" method="POST">
-                <input type="hidden" name="ghe" id="seat-input">
-                <input type="hidden" name="suat_chieu_id" value="<?= $suat_chieu_id ?>">
+  <!-- Movie info mini -->
+  <div style="display:flex;align-items:flex-start;gap:16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:16px;margin-top:20px;margin-bottom:80px;">
+    <img src="../assets/images/<?= htmlspecialchars($info['poster']) ?>" style="width:60px;height:84px;object-fit:cover;border-radius:8px;flex-shrink:0;" alt="">
+    <p style="font-size:13px;line-height:1.7;color:rgba(241,245,249,.6);margin:0;">
+      <?= nl2br(htmlspecialchars(mb_strimwidth($info['mo_ta'] ?? '', 0, 200, '...'))) ?>
+    </p>
+  </div>
 
-                <button type="submit" class="btn-primary">TIẾP TỤC THANH TOÁN</button>
-            </form>
-        </div>
-    </section>
-
-    <section class="movie-info-section">
-        <h2 class="section-title">Thông tin phim</h2>
-        <div class="movie-info-card">
-            <div class="movie-poster">
-                <img src="../assets/images/<?= htmlspecialchars($info['poster']) ?>" alt="<?= htmlspecialchars($info['ten_phim']) ?>" loading="lazy">
-            </div>
-            <div class="movie-details">
-                <h3><?= htmlspecialchars($info['ten_phim']) ?></h3>
-                <div class="movie-meta">
-                    <span class="chip"><?= htmlspecialchars($info['the_loai'] ?: 'Khác') ?></span>
-                    <span class="chip"><?= htmlspecialchars($info['thoi_luong'] ? ($info['thoi_luong'] . ' phút') : '') ?></span>
-                </div>
-                <p class="movie-description">
-                    <?= nl2br(htmlspecialchars(mb_strimwidth($info['mo_ta'] ?? '', 0, 300, '...'))) ?>
-                </p>
-            </div>
-        </div>
-    </section>
+  <!-- Sticky checkout bar -->
+  <div class="checkout-bar">
+    <div class="checkout-info">
+      <div class="checkout-seats">Ghế đã chọn: <strong id="selected-seats">Chưa chọn ghế</strong></div>
+      <div class="checkout-total" id="total">0₫</div>
+    </div>
+    <form action="payment.php" method="POST" style="margin:0;">
+      <input type="hidden" name="ghe" id="seat-input">
+      <input type="hidden" name="suat_chieu_id" value="<?= $suat_chieu_id ?>">
+      <button type="submit" class="btn-checkout">Thanh toán →</button>
+    </form>
+  </div>
 </main>
 
-<footer class="footer">
-    <div>© <?= date('Y') ?> TTVH Cinemas — Thiết kế gọn, responsive.</div>
-</footer>
+<footer class="footer"><div>© <?= date('Y') ?> TTVH Cinemas</div></footer>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -288,63 +361,131 @@ document.addEventListener('DOMContentLoaded', function() {
         updateCheckoutUI(); // Cập nhật lại UI
     });
 
-    // Ngăn chặn việc thanh toán nếu chưa chọn ghế
-    document.querySelector('.checkout form').addEventListener('submit', function(e) {
-        if (selectedSeats.length === 0) {
-            e.preventDefault();
-            alert('Vui lòng chọn ít nhất một ghế.');
-        }
-    });
-
-    // Hàm kiểm tra và cập nhật trạng thái ghế từ server (polling)
-    async function updateBookedSeats() {
-        try {
-            const response = await fetch(`../get_seats.php?suat_id=${suatChieuId}&_=${new Date().getTime()}`);
-            if (!response.ok) {
-                console.error("Lỗi khi lấy trạng thái ghế. Status:", response.status);
-                return;
+// Ngăn chặn việc thanh toán nếu chưa chọn ghế
+    const checkoutForm = document.querySelector('.checkout form');
+    if (checkoutForm) {
+        checkoutForm.addEventListener('submit', function(e) {
+            if (selectedSeats.length === 0) {
+                e.preventDefault();
+                alert('Vui lòng chọn ít nhất một ghế.');
             }
-            const serverSeats = await response.json();
+        });
+    } else {
+        console.error('Checkout form not found');
+    }
 
-            let selectionChanged = false; // Cờ để kiểm tra xem lựa chọn có bị thay đổi không
+    // ── Hàm xử lý chung khi nhận danh sách ghế thay đổi ──
+    function applySeatsUpdate(seats, isInit) {
+        let selectionChanged = false;
 
-            serverSeats.forEach(serverSeat => {
-                const seatElement = seatWrapper.querySelector(`[data-seat='${serverSeat.ten_ghe}']`);
-                if (!seatElement) return;
+        seats.forEach(seat => {
+            const el = seatWrapper.querySelector(`[data-seat='${seat.ten_ghe}']`);
+            if (!el) return;
 
-                const isBookedOnServer = serverSeat.da_dat === 1;
-                const isBookedOnClient = seatElement.classList.contains('booked');
+            if (seat.da_dat === 1 && !el.classList.contains('booked')) {
+                // Ghế vừa bị người khác đặt → khóa ngay
+                el.classList.add('booked');
+                el.classList.remove('selected');
+                el.disabled = true;
 
-                // Chỉ cập nhật nếu trạng thái trên server là 'booked' và client chưa cập nhật
-                if (isBookedOnServer && !isBookedOnClient) {
-                    seatElement.classList.add('booked');
-                    seatElement.classList.remove('selected'); // Bỏ chọn nếu người khác đã đặt
-                    seatElement.disabled = true;
-
-                    if (selectedSeats.includes(serverSeat.ten_ghe)) {
-                        selectedSeats = selectedSeats.filter(s => s !== serverSeat.ten_ghe);
-                        selectionChanged = true;
-                    }
+                if (selectedSeats.includes(seat.ten_ghe)) {
+                    selectedSeats = selectedSeats.filter(s => s !== seat.ten_ghe);
+                    selectionChanged = true;
                 }
-            });
 
-            if (selectionChanged) {
-                updateCheckoutUI();
-                alert("Một hoặc nhiều ghế bạn đang chọn đã có người khác đặt. Vui lòng kiểm tra lại lựa chọn của bạn.");
+                // Hiệu ứng flash đỏ nhẹ để người dùng nhận ra
+                if (!isInit) {
+                    el.style.transition = 'background .15s';
+                    el.style.background = 'rgba(232,25,44,.5)';
+                    setTimeout(() => { el.style.background = ''; }, 400);
+                }
             }
+        });
 
-        } catch (error) {
-            console.error("Lỗi khi cập nhật trạng thái ghế:", error);
+        if (selectionChanged) {
+            updateCheckoutUI();
+            showSeatTakenToast();
         }
+    }
+
+    // ── Toast thông báo thay vì alert() cứng ──
+    function showSeatTakenToast() {
+        let toast = document.getElementById('seatToast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'seatToast';
+            toast.style.cssText = `
+                position:fixed; bottom:90px; left:50%; transform:translateX(-50%);
+                background:#111827; border:1px solid rgba(232,25,44,.4); color:#fca5a5;
+                padding:12px 20px; border-radius:12px; font-size:13px; font-weight:600;
+                box-shadow:0 8px 24px rgba(0,0,0,.5); z-index:9999;
+                animation:toastIn .3s ease;
+            `;
+            document.head.insertAdjacentHTML('beforeend',
+                '<style>@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}</style>');
+            document.body.appendChild(toast);
+        }
+        toast.textContent = '⚠️ Ghế bạn chọn vừa bị người khác đặt!';
+        toast.style.display = 'block';
+        clearTimeout(toast._timer);
+        toast._timer = setTimeout(() => { toast.style.display = 'none'; }, 4000);
+    }
+
+// ── Kết nối SSE — server đẩy ngay khi có thay đổi ──
+    function connectSSE() {
+      console.log('Connecting SSE to seat_events.php?suat_id=', suatChieuId);
+        if (!window.EventSource) {
+            // Fallback: trình duyệt cũ dùng polling 2s
+            setInterval(async () => {
+                try {
+                    const r = await fetch(`../get_seats.php?suat_id=${suatChieuId}&_=${Date.now()}`);
+                    const seats = await r.json();
+                    applySeatsUpdate(seats, false);
+                } catch(e) {}
+            }, 2000);
+            return;
+        }
+
+const sse = new EventSource(`seat_events.php?suat_id=${suatChieuId}`);
+
+        // Nhận snapshot đầy đủ khi mới kết nối
+        sse.addEventListener('init', e => {
+            console.log('SSE init:', e.data);
+            applySeatsUpdate(JSON.parse(e.data), true);
+        });
+
+        // Nhận chỉ những ghế thay đổi — gần như tức thì
+        sse.addEventListener('seats_update', e => {
+            console.log('SSE update:', e.data);
+            applySeatsUpdate(JSON.parse(e.data), false);
+        });
+
+        // Server đóng → EventSource tự reconnect sau ~3s
+        sse.addEventListener('reconnect', () => sse.close());
+
+        sse.onerror = () => {
+            // Nếu SSE lỗi liên tục (server không hỗ trợ), fallback polling
+            if (sse.readyState === EventSource.CLOSED) {
+                setTimeout(connectSSE, 3000);
+            }
+        };
     }
 
     // --- END OF COMBINED SCRIPT LOGIC ---
 
     // Khởi chạy
-    updateCheckoutUI(); // Cập nhật UI lần đầu
-    setInterval(updateBookedSeats, 3000); // Cập nhật trạng thái mỗi 3 giây
+    updateCheckoutUI();
+    console.log('DOM loaded, starting SSE for suat_id', suatChieuId);
+    connectSSE();   // Thay setInterval bằng SSE
 });
 </script>
-
+<script src="../assets/js/search.js"></script>
+<script>
+(function(){
+  const h=document.querySelector('.header');
+  if(!h) return;
+  window.addEventListener('scroll',()=>h.classList.toggle('shrink',scrollY>50),{passive:true});
+})();
+</script>
 </body>
 </html>

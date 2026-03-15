@@ -2,6 +2,9 @@
 include "../config/db.php";
 session_start();
 
+$user_id = $_SESSION['user_id'] ?? 1; // Fallback for testing
+session_write_close(); // GIẢI PHÓNG SESSION LOCK NGAY LẬP TỨC
+
 // --- Basic Input Validation ---
 if (!isset($_POST['suat_chieu_id'], $_POST['ghe']) || empty($_POST['ghe'])) {
     die("Lỗi: Dữ liệu không hợp lệ. Vui lòng thử lại.");

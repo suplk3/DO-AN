@@ -1,0 +1,37 @@
+<html>
+<head>
+<title>Kiểm tra SSE</title>
+</head>
+<body>
+<h1>✅ SSE hoạt động tốt!</h1>
+<div id="sse-data" style="min-height:200px;border:1px solid #4f46e5;background:#1e1b4b;padding:20px;border-radius:12px;color:#e0e0e0;"></div>
+<p style="color:#94a3b8;font-size:14px;margin-top:10px;">Test SSE ghế với suất chiếu ID từ URL (?suat_id=1). Mở 2 tab chon_ghe.php cùng suat_id để test real-time.</p>
+<script>
+const sseDataElement = document.getElementById('sse-data');
+// Kết nối đến file sse test.php
+const urlParams = new URLSearchParams(window.location.search);
+const suatId = urlParams.get('suat_id') || 1;
+const eventSource = new EventSource(`seat_events.php?suat_id=${suatId}`);
+// Hàm này sẽ chạy mỗi khi nhận được dữ liệu từ server
+eventSource.onmessage = function (event) {
+// Hiển thị dữ Liệu nhận được vào thẻ div
+try {
+  const data = JSON.parse(event.data);
+  if (event.lastEventId === 'init' || data.length === undefined) {
+    sseDataElement.innerHTML = `<div style="color:#10b981">✅ Init: ${data.length || Object.keys(data).length} ghế loaded</div>`;
+  } else {
+    sseDataElement.innerHTML += `<div style="color:#f59e0b">[${new Date().toLocaleTimeString()}] Update ghế: ${data.map(s=>s.ten_ghe+'='+(s.da_dat?'BOOKED':'free')).join(', ')}</div>`;
+  }
+} catch(e) {
+  sseDataElement.innerHTML += `<div style="color:#ef4444">[${new Date().toLocaleTimeString()}] Raw: ${event.data}</div>`;
+}
+};
+// Bột Lỗi nếu không kết nối được
+eventSource.onerror = function(err) {
+console.error("Event Source thất bại:", err);
+sseDataElement.innerHTML = "Lỗi kết nối đến luồng SSE. Vui lòng kiểm tra console của trình duyệt.";
+eventSource.close();
+};
+</script>
+</body>
+</html>
