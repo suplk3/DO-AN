@@ -1,6 +1,7 @@
 <?php
 session_start();
 include "../config/db.php";
+mysqli_query($conn, "SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED");
 header('Content-Type: application/json; charset=utf-8');
 if (!isset($_SESSION['user_id'])) { echo json_encode(['error'=>'Chưa đăng nhập']); exit; }
 $me = (int)$_SESSION['user_id'];

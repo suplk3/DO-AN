@@ -258,16 +258,15 @@ if ($tc) $tong_cmt = (int)$tc['c'];
               <?php if (!empty($s['ten_phong'])): ?> — <?= htmlspecialchars($s['ten_phong']) ?><?php endif; ?>
             </div>
             <div class="st-seats">
-              <?php if (is_null($total) || $total == 0): ?>
-                <span class="badge">Không xác định</span>
-              <?php elseif ($avail === 0): ?>
-                <span class="badge full">🔴 Hết ghế</span>
-              <?php else: ?>
-                <span class="badge <?= $badge_class ?>">
-                  <?= $badge_class === 'few' ? '🟡' : '🟢' ?>
-                  <?= $avail ?> / <?= $total ?> ghế trống
-                </span>
-              <?php endif; ?>
+              <span class="badge <?= $badge_class ?>" data-suat-id="<?= $suat_id ?>" id="badge-<?= $suat_id ?>">
+                <?php if (is_null($total) || $total == 0): ?>
+                  Không xác định
+                <?php elseif ($avail === 0): ?>
+                  🔴 Hết ghế
+                <?php else: ?>
+                  <?= $badge_class === 'few' ? '🟡' : '🟢' ?> <?= $avail ?> / <?= $total ?> ghế trống
+                <?php endif; ?>
+              </span>
             </div>
           </div>
 
@@ -603,6 +602,33 @@ function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(
     onScroll();
   }
 
+  // ── SSE Real-time suất ghế ──
+  const phimId = <?= json_encode($id) ?>;
+  const sseSuat = new EventSource(`suat_updates.php?phim_id=${phimId}`);
+  sseSuat.addEventListener('suats_update', e => {
+    const suats = JSON.parse(e.data);
+    suats.forEach(s => {
+      const badge = document.getElementById(`badge-${s.id}`);
+      if (!badge) return;
+      const total = s.total_ghe || 0;
+      const avail = s.avail;
+      if (total === 0) {
+        badge.innerHTML = 'Không xác định';
+        badge.className = 'badge';
+      } else if (avail === 0) {
+        badge.innerHTML = '🔴 Hết ghế';
+        badge.className = 'badge full';
+      } else {
+        const perc = avail / total;
+        const cls = perc < 0.25 ? 'few' : 'available';
+        badge.innerHTML = (cls === 'few' ? '🟡' : '🟢') + ` ${avail} / ${total} ghế trống`;
+        badge.className = `badge ${cls}`;
+      }
+    });
+    console.log('Suất ghế updated:', suats);
+  });
+  sseSuat.onerror = () => console.log('Suất SSE error, fallback polling');
+
   /* Desc expand/collapse */
   const toggle = document.getElementById('descToggle');
   if (toggle) {
@@ -653,5 +679,133 @@ function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(
 <script src="../assets/js/search.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 <script src="../assets/js/login-modal.js"></script>
+
+<script>
+(function() {
+  // ── SSE Realtime: reactions + comments cho phim ──
+  var phimId  = <?= json_encode($id) ?>;
+  var sseFilm = null;
+
+  function connectFilmSSE() {
+    if (sseFilm) sseFilm.close();
+    sseFilm = new EventSource('film_events.php?phim_id=' + phimId);
+
+    // Snapshot ban đầu
+    sseFilm.addEventListener('init', function(e) {
+      var data = JSON.parse(e.data);
+      if (data.reactions) updateReactSummary(phimId, data.reactions.breakdown, data.reactions.total);
+      if (data.comments !== undefined) updateSpoilerCount(data.comments);
+    });
+
+    // Ai thả/hủy reaction
+    sseFilm.addEventListener('reactions_update', function(e) {
+      var data = JSON.parse(e.data);
+      updateReactSummary(phimId, data.breakdown, data.total);
+    });
+
+    // Ai comment mới
+    sseFilm.addEventListener('comments_update', function(e) {
+      var data = JSON.parse(e.data);
+      updateSpoilerCount(data.total);
+
+      // Nếu spoiler đang mở → reload danh sách comment để thấy comment mới
+      if (spoilerOpen) {
+        var filmId = phimId;
+        // Delay 300ms để DB chắc chắn đã commit trước khi fetch
+        setTimeout(function() {
+          fetch('comment_api.php?target_type=phim&target_id=' + filmId + '&_=' + Date.now())
+            .then(function(r){ return r.json(); })
+            .then(function(d){
+              filmCommentsLoaded = true;
+              var list = document.getElementById('fclist-' + filmId);
+              if (!list) return;
+              if (!d.comments || !d.comments.length) {
+                list.innerHTML = '<div style="text-align:center;padding:8px;color:#64748b;font-size:12px;">Chưa có bình luận nào</div>';
+                return;
+              }
+              list.innerHTML = d.comments.map(function(cm){ return renderComment(cm); }).join('');
+            })
+            .catch(function(){});
+        }, 300);
+      }
+    });
+
+    // Server đóng sau 55s → reconnect
+    sseFilm.addEventListener('reconnect', function() {
+      sseFilm.close();
+      setTimeout(connectFilmSSE, 500);
+    });
+
+    sseFilm.onerror = function() {
+      if (sseFilm.readyState === EventSource.CLOSED) {
+        setTimeout(connectFilmSSE, 3000);
+      }
+    };
+  }
+
+  function updateSpoilerCount(total) {
+    var btn = document.getElementById('spoilerBtnText');
+    if (btn && btn.textContent.indexOf('Ẩn') === -1) {
+      btn.textContent = 'Xem bình luận (' + total + ') — Có thể chứa spoiler!';
+    }
+  }
+
+  function updateReactSummary(id, breakdown, total) {
+    var stack   = document.getElementById('reactStack-'   + id);
+    var totalEl = document.getElementById('reactTotal-'   + id);
+    var tooltip = document.getElementById('reactTooltip-' + id);
+
+    // Tạo elements nếu chưa có
+    if (!stack || !totalEl) {
+      var bar = document.getElementById('reactBar-' + id);
+      if (!bar) {
+        // Tìm film-reactions div cũ và tạo bar mới
+        var oldReact = document.querySelector('.film-reactions');
+        if (!oldReact) return;
+        bar = document.createElement('div');
+        bar.id = 'reactBar-' + id;
+        bar.className = 'react-bar';
+        var summary = document.createElement('div');
+        summary.className = 'react-summary';
+        summary.id = 'reactSummary-' + id;
+        stack = document.createElement('div');
+        stack.className = 'react-emoji-stack';
+        stack.id = 'reactStack-' + id;
+        totalEl = document.createElement('span');
+        totalEl.className = 'react-total-text';
+        totalEl.id = 'reactTotal-' + id;
+        tooltip = document.createElement('div');
+        tooltip.className = 'react-detail-tooltip';
+        tooltip.id = 'reactTooltip-' + id;
+        summary.appendChild(stack);
+        summary.appendChild(totalEl);
+        summary.appendChild(tooltip);
+        bar.appendChild(summary);
+        oldReact.parentNode.replaceChild(bar, oldReact);
+      }
+    }
+
+    var EMOJI = {like:'👍',love:'❤️',haha:'😂',wow:'😮',sad:'😢',angry:'😡'};
+    var sorted = Object.entries(breakdown).sort(function(a,b){return b[1]-a[1];});
+
+    if (stack) {
+      stack.innerHTML = sorted.slice(0,3).map(function(e){
+        return '<span class="react-emoji-bubble">' + (EMOJI[e[0]]||'👍') + '</span>';
+      }).join('');
+    }
+    if (totalEl) {
+      totalEl.textContent = total > 0 ? total + ' lượt cảm xúc' : 'Chưa có cảm xúc nào';
+    }
+    if (tooltip) {
+      tooltip.innerHTML = total === 0 ? '' : sorted.map(function(e){
+        var name = e[0].charAt(0).toUpperCase() + e[0].slice(1);
+        return '<div class="react-detail-row"><span>'+(EMOJI[e[0]]||'?')+'</span><span>'+name+'</span><span class="react-detail-count">'+e[1]+'</span></div>';
+      }).join('');
+    }
+  }
+
+  connectFilmSSE();
+})();
+</script>
 </body>
 </html>
