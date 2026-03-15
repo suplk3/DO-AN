@@ -307,15 +307,20 @@ if ($tc) $tong_cmt = (int)$tc['c'];
   <!-- Reaction buttons -->
   <?php if ($me_id): ?>
   <div class="post-actions" style="margin-bottom:14px;padding:0;">
-    <div class="reaction-wrap" id="rw-film-<?= $id ?>">
+    <div class="reaction-wrap" id="rw-film-<?= $id ?>"
+         onmouseenter="scheduleShowReactions(<?= $id ?>)"
+         onmouseleave="cancelAndHideReactions(<?= $id ?>)">
       <button class="action-btn <?= $my_react ? 'reacted' : '' ?>"
               id="rbtn-film-<?= $id ?>"
-              onclick="quickReactFilm(<?= $id ?>, 'like')"
-              onmouseenter="showReactionsFilm(<?= $id ?>)">
-        <?= $my_react ? ($REACTIONS[$my_react] . ' ' . ucfirst($my_react)) : '👍 Thả cảm xúc' ?>
+              data-current="<?= $my_react ?? '' ?>"
+              onclick="toggleReactFilm(<?= $id ?>)">
+        <?php if ($my_react): ?>
+          <?= $REACTIONS[$my_react] ?> <span id="rbtn-label-<?= $id ?>"><?= ucfirst($my_react) ?></span>
+        <?php else: ?>
+          👍 <span id="rbtn-label-<?= $id ?>">Thả cảm xúc</span>
+        <?php endif; ?>
       </button>
-      <div class="reaction-picker" id="rpicker-film-<?= $id ?>" style="display:none"
-           onmouseleave="hideReactionsFilm(<?= $id ?>)">
+      <div class="reaction-picker" id="rpicker-film-<?= $id ?>" style="display:none">
         <?php foreach ($REACTIONS as $key => $emoji): ?>
         <button class="reaction-emoji"
                 onclick="doReactFilm(<?= $id ?>, '<?= $key ?>')"
@@ -367,44 +372,212 @@ let filmReactionTimer = {};
 let filmCommentsLoaded = false;
 let spoilerOpen = false;
  
-function showReactionsFilm(id){clearTimeout(filmReactionTimer[id]);document.getElementById('rpicker-film-'+id).style.display='flex';}
-function hideReactionsFilm(id){filmReactionTimer[id]=setTimeout(()=>{const el=document.getElementById('rpicker-film-'+id);if(el)el.style.display='none';},300);}
-function quickReactFilm(id,loai){hideReactionsFilm(id);doReactFilm(id,loai);}
-async function doReactFilm(id,loai){
-    hideReactionsFilm(id);
-    const res=await fetch('reaction_api.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({target_type:'phim',target_id:id,loai})});
-    const data=await res.json();
-    const btn=document.getElementById('rbtn-film-'+id);
-    if(btn){if(data.action==='removed'){btn.textContent='👍 Thả cảm xúc';btn.classList.remove('reacted');}else{btn.textContent=(FILM_REACTIONS[loai]||'👍')+' '+(loai.charAt(0).toUpperCase()+loai.slice(1));btn.classList.add('reacted');}}
+// Hover vào wrapper → delay 600ms rồi hiện picker
+function scheduleShowReactions(id) {
+    clearTimeout(filmReactionTimer[id]);
+    filmReactionTimer[id] = setTimeout(() => {
+        const el = document.getElementById('rpicker-film-' + id);
+        if (el) el.style.display = 'flex';
+    }, 600);
 }
-async function toggleSpoilerComments(){
-    spoilerOpen=!spoilerOpen;
-    const sec=document.getElementById('filmComments');
-    const btn=document.getElementById('spoilerBtnText');
-    sec.style.display=spoilerOpen?'block':'none';
-    if(spoilerOpen){
-        btn.textContent='Ẩn bình luận ▴';
-        if(!filmCommentsLoaded){
-            const list=document.getElementById('fclist-<?= $id ?>');
-            list.innerHTML='<div style="text-align:center;padding:12px;color:#64748b;font-size:12px;">Đang tải...</div>';
-            const r=await fetch(`comment_api.php?target_type=phim&target_id=<?= $id ?>`);
-            const d=await r.json();
-            filmCommentsLoaded=true;
-            if(!d.comments.length){list.innerHTML='<div style="text-align:center;padding:8px;color:#64748b;font-size:12px;">Chưa có bình luận nào</div>';return;}
-            list.innerHTML=d.comments.map(c=>`<div class="comment-item"><div class="comment-avatar">${c.avatar?`<img src="../assets/images/avatars/${c.avatar}" class="avatar-xs" alt="">`:`<div class="avatar-placeholder-xs">${c.ten.charAt(0)}</div>`}</div><div class="comment-bubble"><a href="profile.php?id=${c.user_id}" class="comment-name">${escHtml(c.ten)}</a><span class="comment-text">${escHtml(c.noi_dung)}</span><div class="comment-meta">${c.time_ago}</div></div></div>`).join('');
-        }
+function cancelAndHideReactions(id) {
+    clearTimeout(filmReactionTimer[id]);
+    filmReactionTimer[id] = setTimeout(() => {
+        const el = document.getElementById('rpicker-film-' + id);
+        if (el) el.style.display = 'none';
+    }, 200);
+}
+function showReactionsFilm(id){clearTimeout(filmReactionTimer[id]);document.getElementById('rpicker-film-'+id).style.display='flex';}
+function hideReactionsFilm(id){clearTimeout(filmReactionTimer[id]);const el=document.getElementById('rpicker-film-'+id);if(el)el.style.display='none';}
+
+// Click nút = toggle (hủy nếu đã react, like nếu chưa)
+function toggleReactFilm(id) {
+    cancelAndHideReactions(id);
+    const btn = document.getElementById('rbtn-film-' + id);
+    const currentLoai = btn ? btn.dataset.current : '';
+    if (currentLoai) {
+        doReactFilm(id, currentLoai); // gửi cùng loại → server xoá
     } else {
-        btn.textContent=`Xem bình luận — Có thể chứa spoiler!`;
+        doReactFilm(id, 'like');
     }
 }
-async function submitFilmComment(id){
-    const inp=document.getElementById('fci-'+id);
-    const text=inp.value.trim();
-    if(!text)return;
-    inp.value='';
-    const res=await fetch('comment_api.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({target_type:'phim',target_id:id,noi_dung:text})});
-    const data=await res.json();
-    if(data.ok){filmCommentsLoaded=false;if(spoilerOpen){const r=await fetch(`comment_api.php?target_type=phim&target_id=${id}`);const d=await r.json();filmCommentsLoaded=true;const list=document.getElementById('fclist-'+id);list.innerHTML=d.comments.map(c=>`<div class="comment-item"><div class="comment-avatar">${c.avatar?`<img src="../assets/images/avatars/${c.avatar}" class="avatar-xs" alt="">`:`<div class="avatar-placeholder-xs">${c.ten.charAt(0)}</div>`}</div><div class="comment-bubble"><a href="profile.php?id=${c.user_id}" class="comment-name">${escHtml(c.ten)}</a><span class="comment-text">${escHtml(c.noi_dung)}</span><div class="comment-meta">${c.time_ago}</div></div></div>`).join('');}}
+function quickReactFilm(id,loai){cancelAndHideReactions(id);doReactFilm(id,loai);}
+async function doReactFilm(id, loai) {
+    cancelAndHideReactions(id);
+    const res = await fetch('reaction_api.php', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({target_type: 'phim', target_id: id, loai})
+    });
+    const data = await res.json();
+    const btn  = document.getElementById('rbtn-film-' + id);
+    if (btn) {
+        if (data.action === 'removed') {
+            btn.innerHTML = '👍 <span id="rbtn-label-'+id+'">Thả cảm xúc</span>';
+            btn.classList.remove('reacted');
+            btn.dataset.current = '';
+        } else {
+            const emoji = FILM_REACTIONS[data.current_loai] || '👍';
+            const name  = data.current_loai ? data.current_loai.charAt(0).toUpperCase()+data.current_loai.slice(1) : 'Thả cảm xúc';
+            btn.innerHTML = emoji + ' <span id="rbtn-label-'+id+'">' + name + '</span>';
+            btn.classList.add('reacted');
+            btn.dataset.current = data.current_loai || '';
+        }
+    }
+    // Cập nhật summary emoji + tổng
+    if (data.breakdown !== undefined) updateReactSummary(id, data.breakdown, data.total);
+}
+function updateReactSummary(id, breakdown, total) {
+    const stack   = document.getElementById('reactStack-'   + id);
+    const totalEl = document.getElementById('reactTotal-'   + id);
+    const tooltip = document.getElementById('reactTooltip-' + id);
+    const sorted  = Object.entries(breakdown).sort((a,b) => b[1]-a[1]);
+    if (stack)   stack.innerHTML   = sorted.slice(0,3).map(([k])=>`<span class="react-emoji-bubble">${FILM_REACTIONS[k]||'👍'}</span>`).join('');
+    if (totalEl) totalEl.textContent = total > 0 ? total+' lượt cảm xúc' : 'Chưa có cảm xúc nào';
+    if (tooltip) tooltip.innerHTML = total === 0 ? '' : sorted.map(([k,cnt])=>`<div class="react-detail-row"><span>${FILM_REACTIONS[k]||'?'}</span><span>${k.charAt(0).toUpperCase()+k.slice(1)}</span><span class="react-detail-count">${cnt}</span></div>`).join('');
+}
+// ── Helper: render 1 comment (có replies) ──
+function renderComment(c, isReply=false) {
+    const avatar = c.avatar
+        ? `<img src="../assets/images/avatars/${c.avatar}" class="avatar-xs" alt="">`
+        : `<div class="avatar-placeholder-xs">${escHtml(c.ten.charAt(0))}</div>`;
+
+    const replyBtn = !isReply
+        ? `<button class="reply-btn" onclick="showReplyBox(${c.id})">Trả lời</button>`
+        : '';
+
+    const replies = (!isReply && c.replies && c.replies.length)
+        ? `<div class="reply-list" id="replies-${c.id}">
+               ${c.replies.map(r => renderComment(r, true)).join('')}
+           </div>`
+        : `<div class="reply-list" id="replies-${c.id}"></div>`;
+
+    const replyBox = !isReply ? `
+        <div class="reply-compose" id="rbox-${c.id}" style="display:none">
+            <div class="comment-input-wrap" style="margin-left:8px;">
+                <input type="text" class="comment-input" id="ri-${c.id}"
+                       placeholder="Trả lời ${escHtml(c.ten)}..."
+                       onkeydown="if(event.key==='Enter')submitReply(${c.id})">
+                <button class="comment-send" onclick="submitReply(${c.id})">➤</button>
+            </div>
+        </div>` : '';
+
+    const wrapClass = isReply ? 'comment-item reply-item' : 'comment-item';
+    return `
+        <div class="${wrapClass}" id="cmt-${c.id}">
+            <div class="comment-avatar">${avatar}</div>
+            <div class="comment-body">
+                <div class="comment-bubble">
+                    <a href="profile.php?id=${c.user_id}" class="comment-name">${escHtml(c.ten)}</a>
+                    <span class="comment-text">${escHtml(c.noi_dung)}</span>
+                </div>
+                <div class="comment-meta">
+                    ${c.time_ago}
+                    ${replyBtn}
+                </div>
+                ${replies}
+                ${replyBox}
+            </div>
+        </div>`;
+}
+
+function showReplyBox(parentId) {
+    // Ẩn tất cả reply box khác trước
+    document.querySelectorAll('.reply-compose').forEach(el => el.style.display='none');
+    const box = document.getElementById('rbox-' + parentId);
+    if (box) {
+        box.style.display = 'block';
+        const inp = document.getElementById('ri-' + parentId);
+        if (inp) inp.focus();
+    }
+}
+
+async function submitReply(parentId) {
+    const inp  = document.getElementById('ri-' + parentId);
+    const text = inp ? inp.value.trim() : '';
+    if (!text) return;
+    inp.value = '';
+
+    const filmId = <?= $id ?>;
+    const res  = await fetch('comment_api.php', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({
+            target_type: 'phim',
+            target_id:   filmId,
+            parent_id:   parentId,
+            noi_dung:    text
+        })
+    });
+    const data = await res.json();
+    if (data.ok && data.comment) {
+        const replyList = document.getElementById('replies-' + parentId);
+        if (replyList) {
+            replyList.insertAdjacentHTML('beforeend', renderComment(data.comment, true));
+        }
+        // Ẩn reply box
+        const box = document.getElementById('rbox-' + parentId);
+        if (box) box.style.display = 'none';
+        // Cập nhật đếm spoiler button
+        const spoilerBtn = document.getElementById('spoilerBtnText');
+        if (spoilerBtn) {
+            const cur = parseInt(spoilerBtn.textContent.match(/\d+/)?.[0] || 0);
+            spoilerBtn.textContent = `Xem bình luận (${cur+1}) — Có thể chứa spoiler!`;
+        }
+    }
+}
+
+async function toggleSpoilerComments() {
+    spoilerOpen = !spoilerOpen;
+    const sec = document.getElementById('filmComments');
+    const btn = document.getElementById('spoilerBtnText');
+    sec.style.display = spoilerOpen ? 'block' : 'none';
+    if (spoilerOpen) {
+        btn.textContent = 'Ẩn bình luận ▴';
+        if (!filmCommentsLoaded) {
+            const list = document.getElementById('fclist-<?= $id ?>');
+            list.innerHTML = '<div style="text-align:center;padding:12px;color:#64748b;font-size:12px;">Đang tải...</div>';
+            const r = await fetch(`comment_api.php?target_type=phim&target_id=<?= $id ?>`);
+            const d = await r.json();
+            filmCommentsLoaded = true;
+            if (!d.comments.length) {
+                list.innerHTML = '<div style="text-align:center;padding:8px;color:#64748b;font-size:12px;">Chưa có bình luận nào</div>';
+                return;
+            }
+            list.innerHTML = d.comments.map(c => renderComment(c)).join('');
+        }
+    } else {
+        btn.textContent = `Xem bình luận — Có thể chứa spoiler!`;
+    }
+}
+
+async function submitFilmComment(id) {
+    const inp  = document.getElementById('fci-' + id);
+    const text = inp ? inp.value.trim() : '';
+    if (!text) return;
+    inp.value = '';
+    const res  = await fetch('comment_api.php', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({target_type:'phim', target_id:id, noi_dung:text})
+    });
+    const data = await res.json();
+    if (data.ok && data.comment) {
+        const list = document.getElementById('fclist-' + id);
+        if (!filmCommentsLoaded || list.innerHTML.includes('Chưa có')) {
+            list.innerHTML = '';
+            filmCommentsLoaded = true;
+        }
+        list.insertAdjacentHTML('beforeend', renderComment(data.comment));
+        // Cập nhật spoiler button count
+        const spoilerBtn = document.getElementById('spoilerBtnText');
+        if (spoilerBtn && spoilerBtn.textContent.includes('Ẩn')) {
+            // đang mở — count sẽ tự cập nhật
+        } else if (spoilerBtn) {
+            const cur = parseInt(spoilerBtn.textContent.match(/\d+/)?.[0] || 0);
+            spoilerBtn.textContent = `Xem bình luận (${cur+1}) — Có thể chứa spoiler!`;
+        }
+    }
 }
 function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 </script>

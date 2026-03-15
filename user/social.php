@@ -7,22 +7,10 @@ if (!isset($_SESSION['user_id'])) {
 }
 $me = (int)$_SESSION['user_id'];
 
-// Lấy feed: bài của mình + bài của người mình follow
-$feed_sql = "
-    SELECT p.*, u.ten AS ten_user, u.avatar,
-           (SELECT COUNT(*) FROM reactions WHERE target_type='post' AND target_id=p.id) AS tong_reaction,
-           (SELECT loai FROM reactions WHERE target_type='post' AND target_id=p.id AND user_id=$me LIMIT 1) AS my_reaction,
-           (SELECT COUNT(*) FROM comments WHERE target_type='post' AND target_id=p.id) AS tong_comment,
-           ph.ten_phim, ph.poster AS phim_poster
-    FROM posts p
-    JOIN users u ON p.user_id = u.id
-    LEFT JOIN phim ph ON p.phim_id = ph.id
-    WHERE p.user_id = $me
-       OR p.user_id IN (SELECT following_id FROM follows WHERE follower_id = $me)
-    ORDER BY p.created_at DESC
-    LIMIT 30
-";
-$feed = mysqli_query($conn, $feed_sql);
+// ── Ranked feed dùng FeedRanker (4-step algorithm) ──
+require_once __DIR__ . '/feed_ranker.php';
+$ranker    = new FeedRanker($conn, $me);
+$feed_rows = $ranker->getFeed(limit: 30);
 
 // Đếm người đang follow / follower
 $fl = mysqli_fetch_assoc(mysqli_query($conn, "SELECT
@@ -160,14 +148,14 @@ $REACTIONS = ['like'=>'👍','love'=>'❤️','haha'=>'😂','wow'=>'😮','sad'
       </div>
 
       <!-- Feed posts -->
-      <?php if (mysqli_num_rows($feed) === 0): ?>
+      <?php if (empty($feed_rows)): ?>
       <div class="feed-empty">
         <div style="font-size:48px;margin-bottom:12px;">🎬</div>
         <div style="font-size:16px;font-weight:700;color:#e2e8f0;margin-bottom:6px;">Bảng tin trống</div>
         <div style="font-size:13px;color:#64748b;">Hãy theo dõi bạn bè để xem bài đăng của họ</div>
       </div>
       <?php else: ?>
-      <?php while ($post = mysqli_fetch_assoc($feed)): ?>
+      <?php foreach ($feed_rows as $post): ?>
       <article class="post-card" id="post-<?= $post['id'] ?>">
         <!-- Post header -->
         <div class="post-header">
@@ -179,7 +167,15 @@ $REACTIONS = ['like'=>'👍','love'=>'❤️','haha'=>'😂','wow'=>'😮','sad'
             <?php endif; ?>
             <div>
               <div class="post-username"><?= htmlspecialchars($post['ten_user']) ?></div>
-              <div class="post-time"><?= time_ago($post['created_at']) ?></div>
+              <div class="post-time">
+                <?= time_ago($post['created_at']) ?>
+                <?php
+                  $badge = ['following'=>'','interest'=>'✨ Đề xuất','trending'=>'🔥 Trending','self'=>''];
+                  $src   = $post['source'] ?? '';
+                  if (!empty($badge[$src])): ?>
+                  <span class="source-badge"><?= $badge[$src] ?></span>
+                <?php endif; ?>
+              </div>
             </div>
           </a>
           <?php if ($post['user_id'] == $me): ?>
@@ -268,7 +264,7 @@ $REACTIONS = ['like'=>'👍','love'=>'❤️','haha'=>'😂','wow'=>'😮','sad'
           </div>
         </div>
       </article>
-      <?php endwhile; ?>
+      <?php endforeach; ?>
       <?php endif; ?>
     </div>
 
@@ -333,6 +329,31 @@ $REACTIONS = ['like'=>'👍','love'=>'❤️','haha'=>'😂','wow'=>'😮','sad'
 </main>
 
 <footer class="footer"><div>© <?= date('Y') ?> TTVH Cinemas</div></footer>
+
+<script>
+// ── Impression tracking (dwell time) ──────────────────
+// Ghi nhận thời gian đọc từng bài → feedback loop cho ranker
+const postTimers = {};
+const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+        const id = e.target.dataset.postId;
+        if (!id) return;
+        if (e.isIntersecting) {
+            postTimers[id] = Date.now();
+        } else if (postTimers[id]) {
+            const dwell = Date.now() - postTimers[id];
+            if (dwell > 500) {  // chỉ log nếu xem > 500ms
+                navigator.sendBeacon('impression_api.php',
+                    JSON.stringify({ post_id: parseInt(id), action: 'view', dwell_ms: dwell })
+                );
+            }
+            delete postTimers[id];
+        }
+    });
+}, { threshold: 0.5 });
+
+document.querySelectorAll('.post-card[data-post-id]').forEach(el => io.observe(el));
+</script>
 
 <script>
 <?php
