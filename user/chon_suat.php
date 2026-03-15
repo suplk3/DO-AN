@@ -39,7 +39,7 @@ if (isset($_GET['ngay']) && in_array($_GET['ngay'], $ngay_list, true)) {
 // nếu danh sách ngày rỗng thì $ngay_chon đã được đặt thành ngày hiện tại ở phía trên
 $ngay_esc = mysqli_real_escape_string($conn, $ngay_chon);
 $sql_suat = "
-SELECT sc.*, pc.rap_id, r.ten_rap, r.dia_chi, r.thanh_pho
+SELECT sc.*, pc.rap_id, pc.ten_phong, r.ten_rap, r.dia_chi, r.thanh_pho
 FROM suat_chieu sc
 LEFT JOIN phong_chieu pc ON sc.phong_id = pc.id
 LEFT JOIN rap r ON pc.rap_id = r.id
@@ -53,219 +53,132 @@ $q_suat = mysqli_query($conn, $sql_suat);
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chọn suất chiếu</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chọn suất chiếu — TTVH Cinemas</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="../assets/css/style.css">
-<style>
-/* layout */
-body {
-    background: #12131a;
-    color: #e0e0e0;
-}
-.header-inner{
-    display:flex;
-    align-items:center;
-    gap:16px;
-}
-.header-nav{
-    margin-left:auto;
-    display:flex;
-    align-items:center;
-    gap:16px;
-    flex-wrap:wrap;
-}
-.header-nav-left,
-.header-nav-right{
-    display:flex;
-    align-items:center;
-    gap:12px;
-}
-.container {
-    max-width: 900px;
-    margin: 30px auto;
-    padding: 0 20px;
-}
-.section {
-    background: #1f2028;
-    border-radius: 8px;
-    padding: 20px 25px;
-    margin-bottom: 25px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-}
-.section-title {
-    font-size: 20px;
-    font-weight: 600;
-    margin-bottom: 15px;
-    color: #fff;
-}
-
-/* date list */
-.date-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-.date-list a{
-    padding:8px 15px;
-    background:#2c2e38;
-    text-decoration:none;
-    color:#e0e0e0;
-    border-radius:6px;
-    transition:background 0.2s, color 0.2s;
-}
-.date-list a.active{
-    background:#e71a0f;
-    color:white;
-}
-.date-list a:hover{
-    background:#3a3c48;
-}
-
-/* time buttons */
-.time-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-}
-.time-btn{
-    display:inline-block;
-    margin:5px;
-    padding:12px 16px;
-    background:#e71a0f;
-    color:#fff;
-    text-decoration:none;
-    font-weight:bold;
-    border-radius:6px;
-    transition:background 0.2s;
-    min-width: 140px;
-    text-align: center;
-    box-shadow: 0 2px 8px rgba(231, 26, 15, 0.3);
-}
-.time-btn:hover{
-    background:#c4160e;
-    box-shadow: 0 4px 12px rgba(231, 26, 15, 0.5);
-}
-
-/* empty message card */
-.empty-message{
-    text-align:center;
-    padding:30px 10px;
-    color:#bbb;
-}
-.empty-message .icon{
-    font-size:40px;
-    margin-bottom:10px;
-}
-
-/* responsive tweaks */
-@media (max-width:600px) {
-    .date-list, .time-list {
-        justify-content: center;
-    }
-    .time-btn, .date-list a {
-        flex: 1 0 120px;
-        text-align: center;
-    }
-}
-</style>
+<link rel="stylesheet" href="../assets/css/user-index.css">
+<link rel="stylesheet" href="../assets/css/login-modal.css">
+<link rel="stylesheet" href="../assets/css/search.css">
 </head>
-<body>
+<body class="user-index">
 
 <header class="header">
-    <div class="header-inner">
-        <a href="index.php" class="logo">TTVH</a>
-        <nav class="header-nav">
-            <div class="header-nav-left">
-                <a href="index.php" class="nav-link">
-                    <span class="icon">🎬</span>
-                    <span class="text">PHIM</span>
-                </a>
-                <a href="sap_chieu.php" class="nav-link">
-                    <span class="icon">🗓️</span>
-                    <span class="text">SẮP CHIẾU</span>
-                </a>
-            </div>
-            <div class="header-nav-right">
-                <?php if (isset($_SESSION['user_id'])):
-                    $is_admin = (isset($_SESSION['vai_tro']) && $_SESSION['vai_tro'] === 'admin');
-                    $ticket_label = $is_admin ? 'QUẢN LÝ USER' : 'VÉ CỦA TÔI';
-                    $my_ticket_label = 'VÉ CỦA TÔI';
-                ?>
-                    <a href="../user/ve_cua_toi.php" class="btn btn-sm">
-                        <span class="icon">🎟️</span>
-                        <span class="text"><?= $my_ticket_label ?></span>
-                    </a>
-                    <?php if ($is_admin): ?>
-                    <a href="../user/quan_ly_user.php" class="btn btn-sm">
-                        <span class="icon">🎫</span>
-                        <span class="text"><?= $ticket_label ?></span>
-                    </a>
-                    <?php endif; ?>
-                    <a href="../auth/logout.php" class="btn btn-sm btn-outline" onclick="return confirm('Bạn có chắc chắn muốn đăng xuất không?');">
-                        <span class="icon">🚪</span>
-                        <span class="text">ĐĂNG XUẤT</span>
-                    </a>
-                <?php else: ?>
-                    <a href="../auth/login.php" class="btn btn-sm open-login-modal">
-                        <span class="icon">🔐</span>
-                        <span class="text">ĐĂNG NHẬP</span>
-                    </a>
-                <?php endif; ?>
-            </div>
-        </nav>
-    </div>
+  <div class="header-inner">
+    <a href="index.php" class="logo">TTVH</a>
+    <nav class="header-nav">
+      <div class="header-nav-left">
+        <a href="index.php" class="nav-link"><span class="icon">🎬</span><span class="text">PHIM</span></a>
+        <a href="sap_chieu.php" class="nav-link"><span class="icon">🗓️</span><span class="text">SẮP CHIẾU</span></a>
+      </div>
+      <div class="search-wrap" id="searchWrap">
+        <input type="text" id="searchInput" class="search-bar" placeholder="Tìm phim..." autocomplete="off">
+        <span class="search-icon">🔍</span>
+        <span class="search-spinner"></span>
+        <div class="search-dropdown" id="searchDropdown"></div>
+      </div>
+      <div class="header-nav-right">
+        <?php if (isset($_SESSION['user_id'])):
+          $is_admin = ($_SESSION['vai_tro'] ?? '') === 'admin'; ?>
+          <span class="hello"><span class="icon">👋</span><span class="text">Xin chào, <?= htmlspecialchars($_SESSION['ten_nguoi_dung'] ?? $_SESSION['ten'] ?? 'bạn') ?></span></span>
+          <a href="../user/ve_cua_toi.php" class="btn btn-sm"><span class="icon">🎟️</span><span class="text">VÉ CỦA TÔI</span></a>
+          <a href="../auth/logout.php" class="btn btn-sm btn-outline" onclick="return confirm('Đăng xuất?')"><span class="icon">🚪</span><span class="text">ĐĂNG XUẤT</span></a>
+        <?php else: ?>
+          <a href="../auth/login.php" class="btn btn-sm open-login-modal"><span class="icon">🔐</span><span class="text">ĐĂNG NHẬP</span></a>
+        <?php endif; ?>
+      </div>
+    </nav>
+  </div>
 </header>
 
-<div class="container">
-    <div class="title">CHỌN NGÀY</div>
+<main class="container">
+  <a href="chi_tiet_phim.php?id=<?= $phim_id ?>" style="display:inline-flex;align-items:center;gap:6px;color:#64748b;text-decoration:none;font-size:13px;font-weight:600;margin-bottom:20px;">← Quay lại chi tiết phim</a>
 
-    <div class="section">
-        <div class="section-title">Chọn ngày</div>
-        <div class="date-list">
-            <?php 
-            if (!empty($ngay_list)) {
-                foreach ($ngay_list as $d): ?>
-                    <a href="?phim_id=<?= $phim_id ?>&ngay=<?= $d ?>"
-                       class="<?= ($d == $ngay_chon) ? 'active' : '' ?>">
-                       <?= date('d/m/Y', strtotime($d)) ?>
-                    </a>
-                <?php endforeach;
-            } else {
-                echo '<div class="empty-message">Không có ngày chiếu nào</div>';
-            }
-            ?>
-        </div>
+  <?php
+  $pi = mysqli_fetch_assoc(mysqli_query($conn, "SELECT ten_phim,poster,the_loai,thoi_luong FROM phim WHERE id=$phim_id"));
+  if ($pi): ?>
+  <div style="display:flex;align-items:center;gap:16px;background:linear-gradient(135deg,#111827,#0d1322);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:16px 20px;margin-bottom:28px;">
+    <img src="../assets/images/<?= htmlspecialchars($pi['poster']) ?>" style="width:52px;height:74px;object-fit:cover;border-radius:8px;flex-shrink:0;" alt="">
+    <div>
+      <div style="font-size:17px;font-weight:800;color:#f1f5f9;margin-bottom:6px;"><?= htmlspecialchars($pi['ten_phim']) ?></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <?php if ($pi['the_loai']): ?><span style="font-size:11px;font-weight:600;color:#a78bfa;background:rgba(124,58,237,0.12);border:1px solid rgba(124,58,237,0.2);padding:2px 9px;border-radius:999px;"><?= htmlspecialchars($pi['the_loai']) ?></span><?php endif; ?>
+        <?php if ($pi['thoi_luong']): ?><span style="font-size:11px;color:#64748b;">⏱ <?= htmlspecialchars($pi['thoi_luong']) ?> phút</span><?php endif; ?>
+      </div>
     </div>
+  </div>
+  <?php endif; ?>
 
-    <div class="section">
-        <div class="section-title">Chọn giờ chiếu</div>
-        <div class="time-list">
-            <?php 
-            if (mysqli_num_rows($q_suat) > 0) {
-                while($s = mysqli_fetch_assoc($q_suat)): 
-                    $rap_name = !empty($s['ten_rap']) ? $s['ten_rap'] : 'Rạp không xác định';
-                    $dia_chi = $s['dia_chi'] ?? '';
-                    $display_title = htmlspecialchars($rap_name);
-                    if (!empty($dia_chi)) {
-                        $display_title .= ' - ' . htmlspecialchars($dia_chi);
-                    }
-                    ?>
-                    <a class="time-btn" href="chon_ghe.php?suat_id=<?= $s['id'] ?>" title="<?= $display_title ?>">
-                        <div style="font-weight: bold; font-size: 13px; margin-bottom: 5px;"><?= htmlspecialchars($rap_name) ?></div>
-                        <span class="time"><?= $s['gio'] ?></span>
-                        <span class="price" style="display: block; font-size: 12px; margin-top: 5px;"><?= number_format($s['gia']) ?>đ</span>
-                    </a>
-                <?php endwhile;
-            } else {
-                echo '<div class="empty-message" style="grid-column: 1 / -1; margin-top: -12px;">
-                    <div class="icon">🎬</div>
-                    <div>Không có suất chiếu nào trong ngày này</div>
-                </div>';
-            }
-            ?>
-        </div>
+  <h1 class="page-title" style="text-align:left;font-size:20px;margin-bottom:20px;">🗓️ Chọn ngày chiếu</h1>
+
+  <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:32px;">
+    <?php if (empty($ngay_list)): ?>
+      <p style="color:#64748b;">Không có ngày chiếu nào.</p>
+    <?php else: foreach ($ngay_list as $d):
+      $active = ($d == $ngay_chon);
+      $ts = strtotime($d);
+      $thu = ['CN','T2','T3','T4','T5','T6','T7'][date('w',$ts)];
+    ?>
+      <a href="?phim_id=<?= $phim_id ?>&ngay=<?= $d ?>"
+         style="display:flex;flex-direction:column;align-items:center;padding:10px 18px;border-radius:12px;text-decoration:none;transition:all .2s;
+         <?= $active ? 'background:linear-gradient(135deg,#e8192c,#c01020);color:#fff;box-shadow:0 6px 18px rgba(232,25,44,.35);border:1px solid transparent;'
+                     : 'background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#94a3b8;' ?>">
+        <span style="font-size:10px;font-weight:600;letter-spacing:.5px;"><?= $thu ?></span>
+        <span style="font-size:20px;font-weight:800;"><?= date('d',$ts) ?></span>
+        <span style="font-size:11px;"><?= date('m/Y',$ts) ?></span>
+      </a>
+    <?php endforeach; endif; ?>
+  </div>
+
+  <h2 style="font-size:16px;font-weight:800;color:#f1f5f9;margin-bottom:16px;display:flex;align-items:center;gap:10px;">
+    ⏰ Suất chiếu
+    <span style="flex:1;height:1px;background:linear-gradient(90deg,rgba(232,25,44,.4),transparent);"></span>
+  </h2>
+
+  <?php if (mysqli_num_rows($q_suat) === 0): ?>
+    <div style="text-align:center;padding:60px 20px;color:#64748b;">
+      <div style="font-size:42px;margin-bottom:12px;opacity:.5;">🎬</div>
+      <div style="font-size:16px;font-weight:700;color:#94a3b8;margin-bottom:6px;">Không có suất chiếu trong ngày này</div>
+      <div style="font-size:13px;">Hãy chọn ngày khác</div>
     </div>
-</div>
+  <?php else: ?>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-bottom:40px;">
+    <?php while ($s = mysqli_fetch_assoc($q_suat)):
+      $gio   = substr($s['gio'], 0, 5);
+      $gia   = number_format($s['gia'], 0, ',', '.');
+      $rap   = $s['ten_rap'] ?: 'Rạp';
+      $phong = $s['ten_phong'] ?: '';
+    ?>
+    <a href="chon_ghe.php?suat_id=<?= $s['id'] ?>"
+       style="display:flex;flex-direction:column;gap:12px;padding:18px;background:linear-gradient(135deg,#111827,#0d1322);border:1px solid rgba(255,255,255,0.07);border-radius:14px;text-decoration:none;transition:all .22s;position:relative;overflow:hidden;"
+       onmouseover="this.style.transform='translateY(-4px)';this.style.borderColor='rgba(232,25,44,.4)';this.style.boxShadow='0 14px 32px rgba(0,0,0,.5)'"
+       onmouseout="this.style.transform='';this.style.borderColor='rgba(255,255,255,0.07)';this.style.boxShadow=''">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div style="font-size:30px;font-weight:900;color:#f1f5f9;letter-spacing:-1px;line-height:1;"><?= $gio ?></div>
+        <div style="font-size:12px;font-weight:800;color:#f5c518;background:rgba(245,197,24,.1);border:1px solid rgba(245,197,24,.2);padding:3px 10px;border-radius:8px;white-space:nowrap;"><?= $gia ?>₫</div>
+      </div>
+      <div style="font-size:12px;font-weight:600;color:#64748b;"><?= htmlspecialchars($rap) ?><?= $phong ? ' — '.htmlspecialchars($phong) : '' ?></div>
+      <div style="text-align:center;padding:8px;background:rgba(232,25,44,.15);border-radius:8px;border:1px solid rgba(232,25,44,.2);">
+        <span style="font-size:12px;font-weight:700;color:#ff6b6b;">Chọn ghế →</span>
+      </div>
+    </a>
+    <?php endwhile; ?>
+  </div>
+  <?php endif; ?>
+</main>
 
+<footer class="footer"><div>© <?= date('Y') ?> TTVH Cinemas</div></footer>
+
+<script>
+(function(){
+  const h=document.querySelector('.header'),b=document.querySelector('body.user-index');
+  if(!h||!b) return;
+  const fn=()=>{h.classList.toggle('shrink',scrollY>50);b.classList.toggle('header-shrink',scrollY>50);};
+  window.addEventListener('scroll',fn,{passive:true});fn();
+})();
+</script>
+<script src="../assets/js/search.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../assets/js/login-modal.js"></script>
 </body>
 </html>

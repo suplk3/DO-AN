@@ -36,35 +36,68 @@ if (!$phong_id) {
     die("Lỗi: Suất chiếu không tồn tại.");
 }
 
-// --- Begin Transaction ---
+// --- Begin Transaction với SERIALIZABLE để chống double booking ---
+mysqli_query($conn, "SET SESSION TRANSACTION ISOLATION LEVEL SERIALIZABLE");
 mysqli_begin_transaction($conn);
 $last_ve_id = null;
 try {
-    $get_ghe_id_stmt = mysqli_prepare($conn, "SELECT id FROM ghe WHERE ten_ghe = ? AND phong_id = ?");
-    $insert_ve_stmt = mysqli_prepare($conn, "INSERT INTO ve (user_id, ghe_id, suat_chieu_id) VALUES (?, ?, ?)");
+    // Chuẩn bị statements
+    // SELECT FOR UPDATE: lock hàng ghế lại trong transaction
+    // Nếu 2 request cùng lúc, request sau sẽ chờ request trước commit/rollback
+    $lock_stmt = mysqli_prepare($conn,
+        "SELECT g.id FROM ghe g
+         WHERE g.ten_ghe = ? AND g.phong_id = ?
+         AND NOT EXISTS (
+             SELECT 1 FROM ve
+             WHERE ve.ghe_id = g.id AND ve.suat_chieu_id = ?
+         )
+         FOR UPDATE"
+    );
+    $insert_ve_stmt = mysqli_prepare($conn,
+        "INSERT INTO ve (user_id, ghe_id, suat_chieu_id) VALUES (?, ?, ?)"
+    );
 
     foreach ($ghe_array as $ten_ghe) {
-        mysqli_stmt_bind_param($get_ghe_id_stmt, "si", $ten_ghe, $phong_id);
-        mysqli_stmt_execute($get_ghe_id_stmt);
-        $result_ghe = mysqli_stmt_get_result($get_ghe_id_stmt);
-        $ghe_row = mysqli_fetch_assoc($result_ghe);
+        $ten_ghe = trim($ten_ghe);
+        if ($ten_ghe === '') continue;
 
-        if (!$ghe_row) throw new Exception("Ghế '{$ten_ghe}' không tồn tại.");
+        // Lock + kiểm tra ghế còn trống trong 1 query atomic
+        mysqli_stmt_bind_param($lock_stmt, "sii", $ten_ghe, $phong_id, $suat_chieu_id);
+        mysqli_stmt_execute($lock_stmt);
+        $result_ghe = mysqli_stmt_get_result($lock_stmt);
+        $ghe_row    = mysqli_fetch_assoc($result_ghe);
+
+        if (!$ghe_row) {
+            // Ghế không tồn tại HOẶC đã bị người khác đặt mất (race condition bị chặn!)
+            throw new Exception("GHE_TAKEN::{$ten_ghe}");
+        }
         $ghe_id = (int)$ghe_row['id'];
 
+        // Insert vé
         mysqli_stmt_bind_param($insert_ve_stmt, "iii", $user_id, $ghe_id, $suat_chieu_id);
         if (!mysqli_stmt_execute($insert_ve_stmt)) {
-             throw new Exception("Không thể đặt ghế '{$ten_ghe}'. Ghế có thể đã được đặt.");
+            throw new Exception("Lỗi hệ thống khi đặt ghế '{$ten_ghe}'.");
         }
-        $current_ve_id = mysqli_insert_id($conn);
-        if($current_ve_id) $last_ve_id = $current_ve_id;
+        $ve_id = (int)mysqli_insert_id($conn);
+        if ($ve_id) $last_ve_id = $ve_id;
     }
+
     mysqli_commit($conn);
-    mysqli_stmt_close($get_ghe_id_stmt);
+    mysqli_stmt_close($lock_stmt);
     mysqli_stmt_close($insert_ve_stmt);
+
 } catch (Exception $e) {
     mysqli_rollback($conn);
-    die("Đã xảy ra lỗi: " . $e->getMessage());
+    $msg = $e->getMessage();
+
+    // Lỗi ghế đã bị đặt → redirect về chọn ghế với thông báo rõ ràng
+    if (str_starts_with($msg, 'GHE_TAKEN::')) {
+        $taken = str_replace('GHE_TAKEN::', '', $msg);
+        $back  = "chon_ghe.php?suat_id={$suat_chieu_id}&taken=" . urlencode($taken);
+        header("Location: $back");
+        exit;
+    }
+    die("Đã xảy ra lỗi: " . htmlspecialchars($msg));
 }
 
 // --- Fetch enriched show information for the e-ticket ---

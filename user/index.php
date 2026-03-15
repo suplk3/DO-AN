@@ -17,6 +17,8 @@ $force_show_login = (isset($_GET['show_login']) && !isset($_SESSION['user_id']))
 <link rel="stylesheet" href="../assets/css/style.css">
 <link rel="stylesheet" href="../assets/css/user-index.css">
     <link rel="stylesheet" href="../assets/css/login-modal.css">
+    <link rel="stylesheet" href="../assets/css/search.css">
+    
 </head>
 <body class="user-index">
 
@@ -33,6 +35,12 @@ $force_show_login = (isset($_GET['show_login']) && !isset($_SESSION['user_id']))
                     <span class="icon">🗓️</span>
                     <span class="text">SẮP CHIẾU</span>
                 </a>
+                <?php if (isset($_SESSION['user_id'])): ?>
+                <a href="social.php" class="nav-link">
+                    <span class="icon">👥</span>
+                    <span class="text">CỘNG ĐỒNG</span>
+                </a>
+                <?php endif; ?>
                 <?php if (isset($_SESSION['vai_tro']) && $_SESSION['vai_tro'] === 'admin'): ?>
                     <a href="../admin/phim.php" class="nav-link admin">
                         <span class="icon">🎬</span>
@@ -44,6 +52,13 @@ $force_show_login = (isset($_GET['show_login']) && !isset($_SESSION['user_id']))
                     </a>
                 <?php endif; ?>
             </div>
+            <div class="search-wrap" id="searchWrap">
+    <input type="text" id="searchInput" class="search-bar"
+           placeholder="Tìm phim, thể loại..." autocomplete="off">
+    <span class="search-icon">🔍</span>
+    <span class="search-spinner"></span>
+    <div class="search-dropdown" id="searchDropdown"></div>
+</div>
             <div class="header-nav-right">
                 <?php if (isset($_SESSION['user_id'])):
                     $is_admin = (isset($_SESSION['vai_tro']) && $_SESSION['vai_tro'] === 'admin');
@@ -232,6 +247,7 @@ $force_show_login = (isset($_GET['show_login']) && !isset($_SESSION['user_id']))
 
 })();
 </script>
+<script src="../assets/js/search.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 <script src="../assets/js/login-modal.js"></script>
 <?php if ($force_show_login): ?>
