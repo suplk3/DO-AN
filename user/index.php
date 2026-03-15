@@ -8,6 +8,9 @@ $force_show_login = (isset($_GET['show_login']) && !isset($_SESSION['user_id']))
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TTVH Cinemas</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
@@ -160,23 +163,73 @@ $force_show_login = (isset($_GET['show_login']) && !isset($_SESSION['user_id']))
     <div>© <?= date('Y') ?> TTVH Cinemas — Thiết kế gọn, responsive.</div>
 </footer>
 
-<!-- Header shrink script -->
+<!-- Main scripts: header shrink + movie card stagger animation -->
 <script>
-(function(){
+(function () {
+
+    /* ── 1. Header shrink khi scroll ── */
     const header = document.querySelector('.header');
-    const body = document.querySelector('body.user-index');
-    if(!header || !body) return;
-    const onScroll = () => {
-        if (window.scrollY > 50) {
-            header.classList.add('shrink');
-            body.classList.add('header-shrink');
-        } else {
-            header.classList.remove('shrink');
-            body.classList.remove('header-shrink');
+    const body   = document.querySelector('body.user-index');
+    if (header && body) {
+        const onScroll = () => {
+            const past = window.scrollY > 50;
+            header.classList.toggle('shrink', past);
+            body.classList.toggle('header-shrink', past);
+        };
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+    }
+
+    /* ── 2. Movie card stagger fade-up ── */
+    const cards = Array.from(document.querySelectorAll('.movie-card'));
+    if (!cards.length) return;
+
+    // Thời gian delay giữa mỗi card (ms)
+    const STAGGER = 90;
+    // Card nào nằm trong viewport ngay khi load → kích hoạt ngay
+    // Card nào ngoài viewport → chờ IntersectionObserver khi scroll tới
+
+    // Theo dõi batch index cho scroll reveal (reset mỗi lần scroll)
+    let batchCounter = 0;
+    let batchTimer   = null;
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+
+            const card = entry.target;
+
+            // Với cards trong viewport lúc load: dùng index toàn cục để stagger đẹp
+            // Với cards scroll reveal: dùng batch counter (reset sau 300ms không có card mới)
+            const isInitial = card.dataset.initial === '1';
+            const delay = isInitial
+                ? Math.min(parseInt(card.dataset.cardIndex, 10) * STAGGER, 400)
+                : batchCounter * 60; // scroll reveal: stagger nhẹ 60ms
+
+            if (!isInitial) {
+                batchCounter++;
+                clearTimeout(batchTimer);
+                batchTimer = setTimeout(() => { batchCounter = 0; }, 300);
+            }
+
+            setTimeout(() => card.classList.add('is-visible'), delay);
+            observer.unobserve(card);
+        });
+    }, {
+        threshold: 0,
+        rootMargin: '0px 0px 300px 0px'  // trigger trước 300px — load sớm trước khi nhìn thấy
+    });
+
+    // Phân biệt cards trong viewport lúc đầu vs cards ngoài viewport
+    cards.forEach((card, i) => {
+        card.dataset.cardIndex = i;
+        const rect = card.getBoundingClientRect();
+        if (rect.top < window.innerHeight + 300) {
+            card.dataset.initial = '1'; // trong viewport hoặc gần viewport lúc load
         }
-    };
-    window.addEventListener('scroll', onScroll, {passive:true});
-    onScroll();
+        observer.observe(card);
+    });
+
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
