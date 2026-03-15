@@ -23,6 +23,29 @@ while ($r = mysqli_fetch_assoc($suat_result)) $suats[] = $r;
 function fmt_date($d){ return $d ? date('d/m/Y', strtotime($d)) : ''; }
 function fmt_time($t){ return $t ? date('H:i', strtotime($t)) : ''; }
 function fmt_money($n){ return $n !== null ? number_format($n,0,',','.') . '₫' : '—'; }
+
+// ── Social: reactions + comments cho phim ──
+$me_id = (int)($_SESSION['user_id'] ?? 0);
+$REACTIONS = ['like'=>'👍','love'=>'❤️','haha'=>'😂','wow'=>'😮','sad'=>'😢','angry'=>'😡'];
+
+$react_counts = [];
+$rc = mysqli_query($conn, "SELECT loai, COUNT(*) AS c FROM reactions WHERE target_type='phim' AND target_id=$id GROUP BY loai");
+if ($rc) while ($r = mysqli_fetch_assoc($rc)) $react_counts[$r['loai']] = (int)$r['c'];
+$tong_react = array_sum($react_counts);
+
+$my_react = null;
+if ($me_id) {
+    $mr = mysqli_fetch_assoc(mysqli_query($conn,
+        "SELECT loai FROM reactions WHERE target_type='phim' AND target_id=$id AND user_id=$me_id LIMIT 1"
+    ));
+    $my_react = $mr['loai'] ?? null;
+}
+
+$tong_cmt = 0;
+$tc = mysqli_fetch_assoc(mysqli_query($conn,
+    "SELECT COUNT(*) AS c FROM comments WHERE target_type='phim' AND target_id=$id"
+));
+if ($tc) $tong_cmt = (int)$tc['c'];
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -35,6 +58,7 @@ function fmt_money($n){ return $n !== null ? number_format($n,0,',','.') . '₫'
 <link rel="stylesheet" href="../assets/css/movie-detail.css">
 <link rel="stylesheet" href="../assets/css/login-modal.css">
 <link rel="stylesheet" href="../assets/css/search.css">
+<link rel="stylesheet" href="../assets/css/social.css">
 
 </head>
 <body class="movie-detail-page">
@@ -51,6 +75,11 @@ function fmt_money($n){ return $n !== null ? number_format($n,0,',','.') . '₫'
         <a href="sap_chieu.php" class="nav-link">
           <span class="icon">🗓️</span><span class="text">SẮP CHIẾU</span>
         </a>
+        <?php if (isset($_SESSION['user_id'])): ?>
+        <a href="social.php" class="nav-link">
+          <span class="icon">👥</span><span class="text">CỘNG ĐỒNG</span>
+        </a>
+        <?php endif; ?>
         <?php if (isset($_SESSION['vai_tro']) && $_SESSION['vai_tro'] === 'admin'): ?>
         <a href="../admin/phim.php" class="nav-link admin">
           <span class="icon">🎬</span><span class="text">QUẢN LÝ PHIM</span>
@@ -257,6 +286,130 @@ function fmt_money($n){ return $n !== null ? number_format($n,0,',','.') . '₫'
       </div>
     <?php endif; ?>
   </section>
+  
+  
+  <section class="film-social-block">
+  <div class="film-social-title">🎭 Cảm xúc & Bình luận</div>
+ 
+  <!-- Tổng reaction summary -->
+  <div class="film-reactions">
+    <?php foreach ($REACTIONS as $key => $emoji):
+      $cnt = $react_counts[$key] ?? 0;
+      if ($cnt > 0):
+    ?>
+    <span style="font-size:14px;color:#94a3b8;"><?= $emoji ?> <strong style="color:#f1f5f9;"><?= $cnt ?></strong></span>
+    <?php endif; endforeach; ?>
+    <?php if ($tong_react > 0): ?>
+    <span class="film-react-summary">— <?= $tong_react ?> lượt cảm xúc</span>
+    <?php endif; ?>
+  </div>
+ 
+  <!-- Reaction buttons -->
+  <?php if ($me_id): ?>
+  <div class="post-actions" style="margin-bottom:14px;padding:0;">
+    <div class="reaction-wrap" id="rw-film-<?= $id ?>">
+      <button class="action-btn <?= $my_react ? 'reacted' : '' ?>"
+              id="rbtn-film-<?= $id ?>"
+              onclick="quickReactFilm(<?= $id ?>, 'like')"
+              onmouseenter="showReactionsFilm(<?= $id ?>)">
+        <?= $my_react ? ($REACTIONS[$my_react] . ' ' . ucfirst($my_react)) : '👍 Thả cảm xúc' ?>
+      </button>
+      <div class="reaction-picker" id="rpicker-film-<?= $id ?>" style="display:none"
+           onmouseleave="hideReactionsFilm(<?= $id ?>)">
+        <?php foreach ($REACTIONS as $key => $emoji): ?>
+        <button class="reaction-emoji"
+                onclick="doReactFilm(<?= $id ?>, '<?= $key ?>')"
+                title="<?= ucfirst($key) ?>"><?= $emoji ?></button>
+        <?php endforeach; ?>
+      </div>
+    </div>
+  </div>
+  <?php else: ?>
+  <p style="font-size:13px;color:#64748b;margin-bottom:14px;">
+    <a href="../auth/login.php" style="color:#a78bfa;font-weight:700;">Đăng nhập</a> để thả cảm xúc và bình luận
+  </p>
+  <?php endif; ?>
+ 
+  <!-- ⚠️ Spoiler warning — user phải bấm để xem comment -->
+  <button class="spoiler-toggle-btn" id="spoilerBtn" onclick="toggleSpoilerComments()">
+    <span>⚠️</span>
+    <span id="spoilerBtnText">Xem bình luận (<?= $tong_cmt ?>) — Có thể chứa spoiler!</span>
+    <span style="margin-left:auto;">▾</span>
+  </button>
+ 
+  <div id="filmComments" style="display:none">
+    <div class="comment-list" id="fclist-<?= $id ?>"></div>
+ 
+    <?php if ($me_id):
+      $me_info_c = mysqli_fetch_assoc(mysqli_query($conn,"SELECT ten,avatar FROM users WHERE id=$me_id"));
+    ?>
+    <div class="comment-compose" style="margin-top:10px;">
+      <?php if (!empty($me_info_c['avatar'])): ?>
+        <img src="../assets/images/avatars/<?= htmlspecialchars($me_info_c['avatar']) ?>" class="avatar-xs" alt="">
+      <?php else: ?>
+        <div class="avatar-placeholder-xs"><?= mb_substr($me_info_c['ten'],0,1) ?></div>
+      <?php endif; ?>
+      <div class="comment-input-wrap">
+        <input type="text" class="comment-input" id="fci-<?= $id ?>"
+               placeholder="Bình luận về phim (cẩn thận spoiler!)..."
+               onkeydown="if(event.key==='Enter')submitFilmComment(<?= $id ?>)">
+        <button class="comment-send" onclick="submitFilmComment(<?= $id ?>)">➤</button>
+      </div>
+    </div>
+    <?php endif; ?>
+  </div>
+</section>
+ 
+<!-- ── Script cần thêm vào cuối trang (trước </body>) ── -->
+<script>
+const FILM_REACTIONS = <?= json_encode($REACTIONS) ?>;
+let filmReactionTimer = {};
+let filmCommentsLoaded = false;
+let spoilerOpen = false;
+ 
+function showReactionsFilm(id){clearTimeout(filmReactionTimer[id]);document.getElementById('rpicker-film-'+id).style.display='flex';}
+function hideReactionsFilm(id){filmReactionTimer[id]=setTimeout(()=>{const el=document.getElementById('rpicker-film-'+id);if(el)el.style.display='none';},300);}
+function quickReactFilm(id,loai){hideReactionsFilm(id);doReactFilm(id,loai);}
+async function doReactFilm(id,loai){
+    hideReactionsFilm(id);
+    const res=await fetch('reaction_api.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({target_type:'phim',target_id:id,loai})});
+    const data=await res.json();
+    const btn=document.getElementById('rbtn-film-'+id);
+    if(btn){if(data.action==='removed'){btn.textContent='👍 Thả cảm xúc';btn.classList.remove('reacted');}else{btn.textContent=(FILM_REACTIONS[loai]||'👍')+' '+(loai.charAt(0).toUpperCase()+loai.slice(1));btn.classList.add('reacted');}}
+}
+async function toggleSpoilerComments(){
+    spoilerOpen=!spoilerOpen;
+    const sec=document.getElementById('filmComments');
+    const btn=document.getElementById('spoilerBtnText');
+    sec.style.display=spoilerOpen?'block':'none';
+    if(spoilerOpen){
+        btn.textContent='Ẩn bình luận ▴';
+        if(!filmCommentsLoaded){
+            const list=document.getElementById('fclist-<?= $id ?>');
+            list.innerHTML='<div style="text-align:center;padding:12px;color:#64748b;font-size:12px;">Đang tải...</div>';
+            const r=await fetch(`comment_api.php?target_type=phim&target_id=<?= $id ?>`);
+            const d=await r.json();
+            filmCommentsLoaded=true;
+            if(!d.comments.length){list.innerHTML='<div style="text-align:center;padding:8px;color:#64748b;font-size:12px;">Chưa có bình luận nào</div>';return;}
+            list.innerHTML=d.comments.map(c=>`<div class="comment-item"><div class="comment-avatar">${c.avatar?`<img src="../assets/images/avatars/${c.avatar}" class="avatar-xs" alt="">`:`<div class="avatar-placeholder-xs">${c.ten.charAt(0)}</div>`}</div><div class="comment-bubble"><a href="profile.php?id=${c.user_id}" class="comment-name">${escHtml(c.ten)}</a><span class="comment-text">${escHtml(c.noi_dung)}</span><div class="comment-meta">${c.time_ago}</div></div></div>`).join('');
+        }
+    } else {
+        btn.textContent=`Xem bình luận — Có thể chứa spoiler!`;
+    }
+}
+async function submitFilmComment(id){
+    const inp=document.getElementById('fci-'+id);
+    const text=inp.value.trim();
+    if(!text)return;
+    inp.value='';
+    const res=await fetch('comment_api.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({target_type:'phim',target_id:id,noi_dung:text})});
+    const data=await res.json();
+    if(data.ok){filmCommentsLoaded=false;if(spoilerOpen){const r=await fetch(`comment_api.php?target_type=phim&target_id=${id}`);const d=await r.json();filmCommentsLoaded=true;const list=document.getElementById('fclist-'+id);list.innerHTML=d.comments.map(c=>`<div class="comment-item"><div class="comment-avatar">${c.avatar?`<img src="../assets/images/avatars/${c.avatar}" class="avatar-xs" alt="">`:`<div class="avatar-placeholder-xs">${c.ten.charAt(0)}</div>`}</div><div class="comment-bubble"><a href="profile.php?id=${c.user_id}" class="comment-name">${escHtml(c.ten)}</a><span class="comment-text">${escHtml(c.noi_dung)}</span><div class="comment-meta">${c.time_ago}</div></div></div>`).join('');}}
+}
+function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+</script>
+ 
+
 </main>
 
 <footer class="footer">

@@ -35,6 +35,12 @@ $force_show_login = (isset($_GET['show_login']) && !isset($_SESSION['user_id']))
                     <span class="icon">🗓️</span>
                     <span class="text">SẮP CHIẾU</span>
                 </a>
+                <?php if (isset($_SESSION['user_id'])): ?>
+                <a href="social.php" class="nav-link">
+                    <span class="icon">👥</span>
+                    <span class="text">CỘNG ĐỒNG</span>
+                </a>
+                <?php endif; ?>
                 <?php if (isset($_SESSION['vai_tro']) && $_SESSION['vai_tro'] === 'admin'): ?>
                     <a href="../admin/phim.php" class="nav-link admin">
                         <span class="icon">🎬</span>
