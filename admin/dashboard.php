@@ -121,10 +121,11 @@ while($row = mysqli_fetch_assoc($top_5_result)) {
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1a2847 50%, #15294c 100%);
             min-height: 100vh;
-            padding: 20px;
+            padding: 30px;
+            color: #e0e7ff;
         }
 
         .container {
@@ -133,94 +134,122 @@ while($row = mysqli_fetch_assoc($top_5_result)) {
         }
 
         header {
-            background: white;
-            padding: 20px 30px;
-            border-radius: 10px;
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(26, 40, 71, 0.9) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            padding: 30px;
+            border-radius: 16px;
             margin-bottom: 30px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            backdrop-filter: blur(10px);
         }
 
         header h1 {
-            color: #333;
-            font-size: 28px;
-            font-weight: 700;
+            background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 32px;
+            font-weight: 900;
         }
 
         .month-info {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
             color: white;
-            padding: 10px 20px;
+            padding: 12px 25px;
             border-radius: 25px;
-            font-weight: 600;
+            font-weight: 700;
+            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3);
         }
 
         .dashboard-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
+            gap: 25px;
             margin-bottom: 30px;
         }
 
         .card {
-            background: white;
-            border-radius: 10px;
-            padding: 25px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(26, 40, 71, 0.95) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #8b5cf6, transparent);
         }
 
         .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            transform: translateY(-8px);
+            border-color: rgba(139, 92, 246, 0.5);
+            box-shadow: 0 25px 60px rgba(139, 92, 246, 0.25), inset 0 1px 0 rgba(255,255,255,0.1);
         }
 
         .card-title {
-            font-size: 14px;
-            color: #666;
+            font-size: 12px;
+            color: #a5b4fc;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 10px;
-            font-weight: 600;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+            font-weight: 700;
+            opacity: 0.8;
         }
 
         .card-value {
-            font-size: 32px;
-            font-weight: 700;
-            color: #333;
-            margin-bottom: 5px;
+            font-size: 42px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #8b5cf6 0%, #c084fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
         }
 
         .card-subtitle {
-            font-size: 12px;
-            color: #999;
+            font-size: 13px;
+            color: #a5b4fc;
+            font-weight: 500;
         }
 
         .card.revenue {
-            border-left: 5px solid #667eea;
+            border-left: none;
         }
 
         .card.tickets {
-            border-left: 5px solid #764ba2;
+            border-left: none;
         }
 
         .card.showtimes {
-            border-left: 5px solid #f093fb;
+            border-left: none;
         }
 
         .top-movie-card {
-            background: white;
-            border-radius: 10px;
-            padding: 25px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(26, 40, 71, 0.95) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
             grid-column: 1 / -1;
+            backdrop-filter: blur(10px);
         }
 
         .top-movie-container {
             display: flex;
-            gap: 30px;
+            gap: 40px;
             align-items: center;
         }
 
@@ -229,11 +258,18 @@ while($row = mysqli_fetch_assoc($top_5_result)) {
         }
 
         .movie-poster img {
-            width: 180px;
-            height: 250px;
-            border-radius: 8px;
+            width: 200px;
+            height: 280px;
+            border-radius: 12px;
             object-fit: cover;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            box-shadow: 0 15px 50px rgba(139, 92, 246, 0.3);
+            border: 2px solid rgba(139, 92, 246, 0.2);
+            transition: all 0.3s;
+        }
+
+        .movie-poster img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 20px 60px rgba(139, 92, 246, 0.4);
         }
 
         .movie-details {
@@ -241,48 +277,59 @@ while($row = mysqli_fetch_assoc($top_5_result)) {
         }
 
         .movie-details h2 {
-            font-size: 24px;
-            color: #333;
-            margin-bottom: 15px;
+            font-size: 32px;
+            color: #e0e7ff;
+            margin-bottom: 8px;
+            font-weight: 900;
         }
 
         .detail-row {
             display: flex;
             justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid #f0f0f0;
-            font-size: 14px;
+            padding: 18px 0;
+            border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+            font-size: 15px;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
         }
 
         .detail-label {
-            color: #666;
+            color: #a5b4fc;
             font-weight: 500;
         }
 
         .detail-value {
-            color: #333;
-            font-weight: 700;
+            color: #fbbf24;
+            font-weight: 800;
         }
 
         .charts-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
+            gap: 25px;
             margin-bottom: 30px;
         }
 
         .chart-card {
-            background: white;
-            border-radius: 10px;
-            padding: 25px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(26, 40, 71, 0.95) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
         }
 
         .chart-card h3 {
-            margin-bottom: 20px;
-            color: #333;
+            margin-bottom: 25px;
+            color: #e0e7ff;
             font-size: 16px;
-            font-weight: 600;
+            font-weight: 800;
+            background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .occupancy-table {
@@ -291,54 +338,87 @@ while($row = mysqli_fetch_assoc($top_5_result)) {
         }
 
         .occupancy-table thead {
-            background: #f8f9fa;
+            background: rgba(139, 92, 246, 0.1);
+            border-bottom: 1px solid rgba(139, 92, 246, 0.3);
         }
 
         .occupancy-table th {
-            padding: 12px;
+            padding: 18px;
             text-align: left;
-            color: #666;
+            color: #a5b4fc;
             font-weight: 600;
             font-size: 12px;
             text-transform: uppercase;
-            border-bottom: 2px solid #e9ecef;
+            letter-spacing: 1px;
         }
 
         .occupancy-table td {
-            padding: 12px;
-            border-bottom: 1px solid #e9ecef;
-            color: #333;
+            padding: 16px 18px;
+            border-bottom: 1px solid rgba(139, 92, 246, 0.1);
+            color: #e0e7ff;
             font-size: 14px;
         }
 
-        .occupancy-bar {
-            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-            height: 6px;
-            border-radius: 3px;
-            margin-top: 5px;
-        }
-
         .occupancy-table tr:hover {
-            background: #f8f9fa;
+            background: rgba(139, 92, 246, 0.1);
         }
 
         .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: #e9ecef;
-            border-radius: 4px;
+            flex: 1;
+            height: 6px;
+            background: rgba(139, 92, 246, 0.2);
+            border-radius: 3px;
             overflow: hidden;
         }
 
         .progress-fill {
             height: 100%;
-            border-radius: 4px;
-            transition: width 0.3s ease;
+            border-radius: 3px;
+            transition: width 0.3s;
         }
 
-        .occupancy-low { background: #dc3545; }
-        .occupancy-medium { background: #ffc107; }
-        .occupancy-high { background: #28a745; }
+        .progress-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .occupancy-low { 
+            background: linear-gradient(90deg, #f87171 0%, #ef4444 100%);
+            box-shadow: 0 0 10px rgba(248, 113, 113, 0.5);
+        }
+        .occupancy-medium { 
+            background: linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%);
+            box-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+        }
+        .occupancy-high { 
+            background: linear-gradient(90deg, #34d399 0%, #10b981 100%);
+            box-shadow: 0 0 10px rgba(52, 211, 153, 0.5);
+        }
+
+        .back-button {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background: rgba(139, 92, 246, 0.2);
+            color: #a5b4fc;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+
+        .back-button:hover {
+            background: rgba(139, 92, 246, 0.3);
+            color: #c084fc;
+            border-color: rgba(139, 92, 246, 0.5);
+        }
+
+        .format-vnd {
+            color: #fbbf24;
+            font-weight: 700;
+        }
 
         @media (max-width: 768px) {
             .charts-container {
@@ -380,21 +460,23 @@ while($row = mysqli_fetch_assoc($top_5_result)) {
             display: inline-block;
             margin-bottom: 20px;
             padding: 10px 20px;
-            background: white;
-            color: #667eea;
+            background: rgba(139, 92, 246, 0.2);
+            color: #a5b4fc;
             text-decoration: none;
-            border-radius: 5px;
+            border-radius: 8px;
             font-weight: 600;
-            transition: all 0.3s ease;
+            transition: all 0.3s;
+            border: 1px solid rgba(139, 92, 246, 0.3);
         }
 
         .back-button:hover {
-            background: #667eea;
-            color: white;
+            background: rgba(139, 92, 246, 0.3);
+            color: #c084fc;
+            border-color: rgba(139, 92, 246, 0.5);
         }
 
         .format-vnd {
-            color: #667eea;
+            color: #fbbf24;
             font-weight: 700;
         }
     </style>
@@ -421,13 +503,13 @@ while($row = mysqli_fetch_assoc($top_5_result)) {
             <div class="card tickets">
                 <div class="card-title">🎫 Vé Bán</div>
                 <div class="card-value"><?php echo number_format($revenue_data['total_tickets']); ?></div>
-                <div class="card-subtitle">Tổng số vé bán được</div>
+                <div class="card-subtitle">Giá TB: <?php echo $revenue_data['total_tickets'] > 0 ? number_format($revenue_data['total_revenue'] / $revenue_data['total_tickets']) : 0; ?> ₫</div>
             </div>
 
             <div class="card showtimes">
                 <div class="card-title">🎬 Suất Chiếu</div>
                 <div class="card-value"><?php echo $revenue_data['total_showtimes']; ?></div>
-                <div class="card-subtitle">Tổng số suất chiếu</div>
+                <div class="card-subtitle" style="color: #a5b4fc;"><?php echo date('d/m/Y', strtotime($start_date)); ?> - <?php echo date('d/m/Y', strtotime($end_date)); ?></div>
             </div>
         </div>
 
@@ -442,30 +524,30 @@ while($row = mysqli_fetch_assoc($top_5_result)) {
                     <?php if($top_movie['poster']): ?>
                         <img src="../assets/images/posts/<?php echo htmlspecialchars($top_movie['poster']); ?>" alt="<?php echo htmlspecialchars($top_movie['ten_phim']); ?>">
                     <?php else: ?>
-                        <div style="width:180px; height:250px; background: #e9ecef; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #999;">Không có hình</div>
+                        <div style="width:200px; height:280px; background: rgba(139, 92, 246, 0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #a5b4fc; border: 1px solid rgba(139, 92, 246, 0.3);">Không có hình</div>
                     <?php endif; ?>
                 </div>
                 <div class="movie-details">
-                    <h2>🏆 Phim Doanh Thu #1</h2>
-                    <h3 style="color: #667eea; margin-bottom: 20px; font-size: 20px;"><?php echo htmlspecialchars($top_movie['ten_phim']); ?></h3>
+                    <div style="display: inline-block; background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); color: #000; padding: 10px 20px; border-radius: 25px; font-weight: 800; margin-bottom: 25px; font-size: 13px; box-shadow: 0 8px 20px rgba(251, 191, 36, 0.3);">🏆 PHIM DOANH THU #1</div>
+                    <h2><?php echo htmlspecialchars($top_movie['ten_phim']); ?></h2>
                     
                     <div class="detail-row">
-                        <span class="detail-label">💵 Doanh Thu</span>
+                        <span class="detail-label">💵 Doanh Thu Tháng</span>
                         <span class="detail-value format-vnd"><?php echo number_format($top_movie['movie_revenue']); ?> ₫</span>
                     </div>
                     <div class="detail-row">
-                        <span class="detail-label">🎫 Vé Bán</span>
+                        <span class="detail-label">🎫 Vé Đã Bán</span>
                         <span class="detail-value"><?php echo number_format($top_movie['ticket_sold']); ?> vé</span>
                     </div>
                     <div class="detail-row">
-                        <span class="detail-label">💳 Giá Trung Bình</span>
+                        <span class="detail-label">💳 Giá Vé Trung Bình</span>
                         <span class="detail-value format-vnd"><?php echo number_format($top_movie['avg_price']); ?> ₫</span>
                     </div>
                 </div>
             </div>
         </div>
         <?php else: ?>
-        <div class="top-movie-card" style="text-align: center; color: #999; padding: 40px;">
+        <div class="top-movie-card" style="text-align: center; color: #a5b4fc; padding: 40px;">
             <p>Chưa có dữ liệu doanh thu cho tháng này</p>
         </div>
         <?php endif; ?>
@@ -485,7 +567,7 @@ while($row = mysqli_fetch_assoc($top_5_result)) {
 
         <!-- Occupancy Rate Table -->
         <div class="card">
-            <h3 style="margin-bottom: 20px; color: #333; font-size: 16px; font-weight: 600;">
+            <h3 style="margin-bottom: 20px; color: #e0e7ff; font-size: 16px; font-weight: 800; background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
                 📍 Tỷ Lệ Lấp Đầy Phòng Chiếu
             </h3>
             <table class="occupancy-table">
@@ -506,7 +588,7 @@ while($row = mysqli_fetch_assoc($top_5_result)) {
                         <td><?php echo $occupancy['total_seats_available']; ?></td>
                         <td><?php echo $occupancy['booked_seats']; ?></td>
                         <td>
-                            <div style="display: flex; align-items: center; gap: 10px;">
+                            <div class="progress-container">
                                 <div class="progress-bar">
                                     <?php 
                                     $rate = $occupancy['occupancy_rate'] ?? 0;
@@ -516,7 +598,7 @@ while($row = mysqli_fetch_assoc($top_5_result)) {
                                     ?>
                                     <div class="progress-fill <?php echo $rate_class; ?>" style="width: <?php echo min($rate, 100); ?>%;"></div>
                                 </div>
-                                <span><?php echo number_format($rate, 2); ?>%</span>
+                                <span style="min-width: 50px; text-align: right; font-weight: 700;"><?php echo number_format($rate, 1); ?>%</span>
                             </div>
                         </td>
                     </tr>
@@ -527,6 +609,10 @@ while($row = mysqli_fetch_assoc($top_5_result)) {
     </div>
 
     <script>
+        // Chart.js default settings cho dark theme
+        Chart.defaults.color = '#a5b4fc';
+        Chart.defaults.borderColor = 'rgba(139, 92, 246, 0.2)';
+
         // Revenue Chart
         const revenueCtx = document.getElementById('revenueChart').getContext('2d');
         new Chart(revenueCtx, {
@@ -536,15 +622,18 @@ while($row = mysqli_fetch_assoc($top_5_result)) {
                 datasets: [{
                     label: 'Doanh Thu (₫)',
                     data: <?php echo json_encode($daily_revenues); ?>,
-                    borderColor: '#667eea',
-                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                    borderColor: '#8b5cf6',
+                    backgroundColor: 'rgba(139, 92, 246, 0.15)',
                     borderWidth: 3,
                     fill: true,
                     tension: 0.4,
-                    pointRadius: 5,
-                    pointBackgroundColor: '#667eea',
-                    pointBorderColor: '#fff',
-                    pointBorderWidth: 2
+                    pointRadius: 6,
+                    pointBackgroundColor: '#8b5cf6',
+                    pointBorderColor: '#1e293b',
+                    pointBorderWidth: 2,
+                    pointHoverRadius: 8,
+                    pointHoverBackgroundColor: '#c084fc',
+                    pointHoverBorderWidth: 3
                 }]
             },
             options: {
@@ -552,18 +641,38 @@ while($row = mysqli_fetch_assoc($top_5_result)) {
                 maintainAspectRatio: true,
                 plugins: {
                     legend: {
-                        labels: {
-                            font: { size: 12, weight: 600 }
+                        labels: { 
+                            font: { size: 12, weight: 700 },
+                            color: '#a5b4fc'
                         }
+                    },
+                    filler: {
+                        propagate: true
                     }
                 },
                 scales: {
                     y: {
                         beginAtZero: true,
+                        grid: {
+                            color: 'rgba(139, 92, 246, 0.1)',
+                            drawBorder: false
+                        },
                         ticks: {
+                            color: '#a5b4fc',
+                            font: { weight: 600 },
                             callback: function(value) {
                                 return value.toLocaleString('vi-VN') + ' ₫';
                             }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false,
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: '#a5b4fc',
+                            font: { weight: 600 }
                         }
                     }
                 }
@@ -580,13 +689,21 @@ while($row = mysqli_fetch_assoc($top_5_result)) {
                     label: 'Doanh Thu (₫)',
                     data: <?php echo json_encode($top_5_revenues); ?>,
                     backgroundColor: [
-                        '#667eea',
-                        '#764ba2',
-                        '#f093fb',
-                        '#4facfe',
-                        '#00f2fe'
+                        'rgba(139, 92, 246, 0.8)',
+                        'rgba(168, 85, 247, 0.8)',
+                        'rgba(236, 72, 153, 0.8)',
+                        'rgba(59, 130, 246, 0.8)',
+                        'rgba(34, 197, 94, 0.8)'
                     ],
-                    borderRadius: 8,
+                    borderColor: [
+                        '#8b5cf6',
+                        '#a855f7',
+                        '#ec4899',
+                        '#3b82f6',
+                        '#22c55e'
+                    ],
+                    borderWidth: 2,
+                    borderRadius: 10,
                     borderSkipped: false
                 }]
             },
@@ -596,17 +713,34 @@ while($row = mysqli_fetch_assoc($top_5_result)) {
                 maintainAspectRatio: true,
                 plugins: {
                     legend: {
-                        labels: {
-                            font: { size: 12, weight: 600 }
+                        labels: { 
+                            font: { size: 12, weight: 700 },
+                            color: '#a5b4fc'
                         }
                     }
                 },
                 scales: {
                     x: {
+                        grid: {
+                            color: 'rgba(139, 92, 246, 0.1)',
+                            drawBorder: false
+                        },
                         ticks: {
+                            color: '#a5b4fc',
+                            font: { weight: 600 },
                             callback: function(value) {
                                 return value.toLocaleString('vi-VN') + ' ₫';
                             }
+                        }
+                    },
+                    y: {
+                        grid: {
+                            display: false,
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: '#a5b4fc',
+                            font: { weight: 600 }
                         }
                     }
                 }

@@ -159,9 +159,10 @@ while($row = mysqli_fetch_assoc($top_5_result)) {
 
         body {
             font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #0f172a 0%, #1a2847 50%, #15294c 100%);
             min-height: 100vh;
-            padding: 20px;
+            padding: 30px;
+            color: #e0e7ff;
         }
 
         .container {
@@ -170,22 +171,27 @@ while($row = mysqli_fetch_assoc($top_5_result)) {
         }
 
         header {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(26, 40, 71, 0.9) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            padding: 35px;
+            border-radius: 20px;
+            margin-bottom: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
             gap: 20px;
+            backdrop-filter: blur(10px);
         }
 
         header h1 {
-            font-size: 32px;
-            color: #333;
-            font-weight: 800;
+            font-size: 36px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 900;
             flex: 1;
         }
 
@@ -198,105 +204,137 @@ while($row = mysqli_fetch_assoc($top_5_result)) {
 
         .filter-section label {
             font-weight: 600;
-            color: #666;
+            color: #c7d2fe;
+            font-size: 14px;
         }
 
         .filter-section select {
-            padding: 10px 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
+            padding: 12px 16px;
+            background: rgba(30, 41, 59, 0.8);
+            border: 1.5px solid rgba(139, 92, 246, 0.5);
+            border-radius: 10px;
             font-size: 14px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.3s;
+            color: #e0e7ff;
+            min-width: 140px;
         }
 
         .filter-section select:hover {
-            border-color: #667eea;
+            border-color: #8b5cf6;
+            background: rgba(30, 41, 59, 0.95);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
         }
 
         .filter-section select:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-color: #8b5cf6;
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.5);
         }
 
         .filter-btn {
-            padding: 10px 25px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
             color: white;
             border: none;
-            border-radius: 8px;
-            font-weight: 600;
+            border-radius: 10px;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.3s;
+            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3);
         }
 
         .filter-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(139, 92, 246, 0.5);
+        }
+
+        .filter-btn:active {
+            transform: translateY(-1px);
         }
 
         .kpi-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
         }
 
         .kpi-card {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(26, 40, 71, 0.95) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
             transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #8b5cf6, transparent);
         }
 
         .kpi-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            transform: translateY(-8px);
+            border-color: rgba(139, 92, 246, 0.5);
+            box-shadow: 0 25px 60px rgba(139, 92, 246, 0.25), inset 0 1px 0 rgba(255,255,255,0.1);
         }
 
         .kpi-label {
             font-size: 12px;
-            color: #999;
+            color: #a5b4fc;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
+            letter-spacing: 2px;
             font-weight: 700;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
+            opacity: 0.8;
         }
 
         .kpi-value {
-            font-size: 36px;
-            font-weight: 800;
-            color: #333;
-            margin-bottom: 5px;
+            font-size: 42px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #8b5cf6 0%, #c084fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
         }
 
         .kpi-change {
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 600;
         }
 
         .kpi-change.positive {
-            color: #22c55e;
+            color: #34d399;
         }
 
         .kpi-change.negative {
-            color: #ef4444;
+            color: #f87171;
         }
 
         .top-movie {
-            background: white;
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(26, 40, 71, 0.95) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
+            margin-bottom: 40px;
+            backdrop-filter: blur(10px);
         }
 
         .top-movie-content {
             display: flex;
-            gap: 30px;
+            gap: 40px;
             align-items: center;
         }
 
@@ -304,33 +342,42 @@ while($row = mysqli_fetch_assoc($top_5_result)) {
             width: 200px;
             height: 280px;
             object-fit: cover;
-            border-radius: 10px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            border-radius: 12px;
+            box-shadow: 0 15px 50px rgba(139, 92, 246, 0.3);
+            border: 2px solid rgba(139, 92, 246, 0.2);
+            transition: all 0.3s;
+        }
+
+        .movie-poster img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 20px 60px rgba(139, 92, 246, 0.4);
         }
 
         .movie-info h2 {
-            font-size: 28px;
-            color: #333;
-            margin-bottom: 5px;
+            font-size: 32px;
+            color: #e0e7ff;
+            margin-bottom: 8px;
+            font-weight: 900;
         }
 
         .movie-badge {
             display: inline-block;
             background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-weight: 700;
-            margin-bottom: 20px;
+            color: #000;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 800;
+            margin-bottom: 25px;
             font-size: 13px;
+            box-shadow: 0 8px 20px rgba(251, 191, 36, 0.3);
         }
 
         .movie-stat {
             display: flex;
             justify-content: space-between;
-            padding: 15px 0;
-            border-bottom: 1px solid #f0f0f0;
-            font-size: 14px;
+            padding: 18px 0;
+            border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+            font-size: 15px;
         }
 
         .movie-stat:last-child {
@@ -338,49 +385,61 @@ while($row = mysqli_fetch_assoc($top_5_result)) {
         }
 
         .stat-label {
-            color: #666;
+            color: #a5b4fc;
             font-weight: 500;
         }
 
         .stat-value {
-            color: #333;
-            font-weight: 700;
+            color: #fbbf24;
+            font-weight: 800;
         }
 
         .charts-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 30px;
+            gap: 25px;
+            margin-bottom: 40px;
         }
 
         .chart-card {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(26, 40, 71, 0.95) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
         }
 
         .chart-card h3 {
             font-size: 16px;
-            color: #333;
-            font-weight: 700;
-            margin-bottom: 20px;
+            color: #e0e7ff;
+            font-weight: 800;
+            margin-bottom: 25px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .table-card {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(26, 40, 71, 0.95) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
             overflow-x: auto;
+            backdrop-filter: blur(10px);
         }
 
         .table-card h3 {
             font-size: 16px;
-            color: #333;
-            font-weight: 700;
-            margin-bottom: 20px;
+            color: #e0e7ff;
+            font-weight: 800;
+            margin-bottom: 25px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         table {
@@ -389,73 +448,78 @@ while($row = mysqli_fetch_assoc($top_5_result)) {
         }
 
         thead {
-            background: #f9fafb;
+            background: rgba(139, 92, 246, 0.1);
+            border-bottom: 1px solid rgba(139, 92, 246, 0.3);
         }
 
         th {
-            padding: 15px;
+            padding: 18px;
             text-align: left;
-            color: #666;
+            color: #a5b4fc;
             font-weight: 700;
             font-size: 12px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border-bottom: 2px solid #e9ecef;
+            letter-spacing: 1px;
         }
 
         td {
-            padding: 15px;
-            border-bottom: 1px solid #f0f0f0;
+            padding: 16px 18px;
+            border-bottom: 1px solid rgba(139, 92, 246, 0.1);
             font-size: 14px;
-            color: #333;
+            color: #e0e7ff;
         }
 
         tr:hover {
-            background: #f9fafb;
+            background: rgba(139, 92, 246, 0.1);
         }
 
         .progress-container {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
 
         .progress-bar {
             flex: 1;
-            height: 8px;
-            background: #e9ecef;
-            border-radius: 4px;
+            height: 6px;
+            background: rgba(139, 92, 246, 0.2);
+            border-radius: 3px;
             overflow: hidden;
         }
 
         .progress-fill {
             height: 100%;
-            border-radius: 4px;
+            border-radius: 3px;
             transition: width 0.3s;
         }
 
         .progress-high {
-            background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%);
+            background: linear-gradient(90deg, #34d399 0%, #10b981 100%);
+            box-shadow: 0 0 10px rgba(52, 211, 153, 0.5);
         }
 
         .progress-medium {
             background: linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%);
+            box-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
         }
 
         .progress-low {
-            background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);
+            background: linear-gradient(90deg, #f87171 0%, #ef4444 100%);
+            box-shadow: 0 0 10px rgba(248, 113, 113, 0.5);
         }
 
         .back-link {
             display: inline-block;
-            margin-bottom: 20px;
-            color: white;
+            margin-bottom: 25px;
+            color: #a5b4fc;
             text-decoration: none;
-            font-weight: 600;
+            font-weight: 700;
             transition: all 0.3s;
+            font-size: 15px;
         }
 
         .back-link:hover {
+            color: #8b5cf6;
             transform: translateX(-5px);
         }
 
@@ -488,6 +552,32 @@ while($row = mysqli_fetch_assoc($top_5_result)) {
             .filter-section select {
                 width: 100%;
             }
+
+            body {
+                padding: 15px;
+            }
+
+            header {
+                padding: 20px;
+            }
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(139, 92, 246, 0.1);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #8b5cf6 0%, #6366f1 100%);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #9d5eff 0%, #7c3aed 100%);
         }
     </style>
 </head>
@@ -501,7 +591,7 @@ while($row = mysqli_fetch_assoc($top_5_result)) {
                 <form method="GET" style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
                     <div>
                         <label>Tháng:</label>
-                        <select name="month" id="month" style="margin-left: 10px;">
+                        <select name="month" id="month">
                             <?php for($i = 1; $i <= 12; $i++): ?>
                                 <option value="<?php echo $i; ?>" <?php echo $i == $selected_month ? 'selected' : ''; ?>>
                                     Tháng <?php echo $i; ?>
@@ -512,7 +602,7 @@ while($row = mysqli_fetch_assoc($top_5_result)) {
 
                     <div>
                         <label>Năm:</label>
-                        <select name="year" id="year" style="margin-left: 10px;">
+                        <select name="year" id="year">
                             <?php 
                             $current_year = date('Y');
                             for($year = $current_year; $year >= 2020; $year--):
@@ -524,7 +614,7 @@ while($row = mysqli_fetch_assoc($top_5_result)) {
                         </select>
                     </div>
 
-                    <button type="submit" class="filter-btn">📅 Xem</button>
+                    <button type="submit" class="filter-btn">📅 Xem Thống Kê</button>
                 </form>
             </div>
         </header>
@@ -543,13 +633,13 @@ while($row = mysqli_fetch_assoc($top_5_result)) {
             <div class="kpi-card">
                 <div class="kpi-label">🎫 Vé Bán</div>
                 <div class="kpi-value"><?php echo number_format($revenue_data['total_tickets']); ?></div>
-                <div class="kpi-change">Trung bình: <?php echo $revenue_data['total_tickets'] > 0 ? number_format($revenue_data['total_revenue'] / $revenue_data['total_tickets']) : 0; ?> ₫/vé</div>
+                <div class="kpi-change">Giá TB: <?php echo $revenue_data['total_tickets'] > 0 ? number_format($revenue_data['total_revenue'] / $revenue_data['total_tickets']) : 0; ?> ₫</div>
             </div>
 
             <div class="kpi-card">
                 <div class="kpi-label">🎬 Suất Chiếu</div>
                 <div class="kpi-value"><?php echo $revenue_data['total_showtimes']; ?></div>
-                <div class="kpi-change"><?php echo date('d/m/Y', strtotime($start_date)); ?> - <?php echo date('d/m/Y', strtotime($end_date)); ?></div>
+                <div class="kpi-change" style="color: #a5b4fc;"><?php echo date('d/m/Y', strtotime($start_date)); ?> - <?php echo date('d/m/Y', strtotime($end_date)); ?></div>
             </div>
         </div>
 
@@ -640,6 +730,10 @@ while($row = mysqli_fetch_assoc($top_5_result)) {
     </div>
 
     <script>
+        // Chart.js default settings cho dark theme
+        Chart.defaults.color = '#a5b4fc';
+        Chart.defaults.borderColor = 'rgba(139, 92, 246, 0.2)';
+
         // Revenue Chart
         const revenueCtx = document.getElementById('revenueChart').getContext('2d');
         new Chart(revenueCtx, {
@@ -649,16 +743,18 @@ while($row = mysqli_fetch_assoc($top_5_result)) {
                 datasets: [{
                     label: 'Doanh Thu (₫)',
                     data: <?php echo json_encode($daily_revenues); ?>,
-                    borderColor: '#667eea',
-                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                    borderColor: '#8b5cf6',
+                    backgroundColor: 'rgba(139, 92, 246, 0.15)',
                     borderWidth: 3,
                     fill: true,
                     tension: 0.4,
-                    pointRadius: 5,
-                    pointBackgroundColor: '#667eea',
-                    pointBorderColor: '#fff',
+                    pointRadius: 6,
+                    pointBackgroundColor: '#8b5cf6',
+                    pointBorderColor: '#1e293b',
                     pointBorderWidth: 2,
-                    pointHoverRadius: 7
+                    pointHoverRadius: 8,
+                    pointHoverBackgroundColor: '#c084fc',
+                    pointHoverBorderWidth: 3
                 }]
             },
             options: {
@@ -666,16 +762,38 @@ while($row = mysqli_fetch_assoc($top_5_result)) {
                 maintainAspectRatio: true,
                 plugins: {
                     legend: {
-                        labels: { font: { size: 12, weight: 600 } }
+                        labels: { 
+                            font: { size: 12, weight: 700 },
+                            color: '#a5b4fc'
+                        }
+                    },
+                    filler: {
+                        propagate: true
                     }
                 },
                 scales: {
                     y: {
                         beginAtZero: true,
+                        grid: {
+                            color: 'rgba(139, 92, 246, 0.1)',
+                            drawBorder: false
+                        },
                         ticks: {
+                            color: '#a5b4fc',
+                            font: { weight: 600 },
                             callback: function(value) {
                                 return value.toLocaleString('vi-VN') + ' ₫';
                             }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false,
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: '#a5b4fc',
+                            font: { weight: 600 }
                         }
                     }
                 }
@@ -692,13 +810,21 @@ while($row = mysqli_fetch_assoc($top_5_result)) {
                     label: 'Doanh Thu (₫)',
                     data: <?php echo json_encode($top_5_revenues); ?>,
                     backgroundColor: [
-                        '#667eea',
-                        '#764ba2',
-                        '#f093fb',
-                        '#4facfe',
-                        '#00f2fe'
+                        'rgba(139, 92, 246, 0.8)',
+                        'rgba(168, 85, 247, 0.8)',
+                        'rgba(236, 72, 153, 0.8)',
+                        'rgba(59, 130, 246, 0.8)',
+                        'rgba(34, 197, 94, 0.8)'
                     ],
-                    borderRadius: 8,
+                    borderColor: [
+                        '#8b5cf6',
+                        '#a855f7',
+                        '#ec4899',
+                        '#3b82f6',
+                        '#22c55e'
+                    ],
+                    borderWidth: 2,
+                    borderRadius: 10,
                     borderSkipped: false
                 }]
             },
@@ -708,15 +834,34 @@ while($row = mysqli_fetch_assoc($top_5_result)) {
                 maintainAspectRatio: true,
                 plugins: {
                     legend: {
-                        labels: { font: { size: 12, weight: 600 } }
+                        labels: { 
+                            font: { size: 12, weight: 700 },
+                            color: '#a5b4fc'
+                        }
                     }
                 },
                 scales: {
                     x: {
+                        grid: {
+                            color: 'rgba(139, 92, 246, 0.1)',
+                            drawBorder: false
+                        },
                         ticks: {
+                            color: '#a5b4fc',
+                            font: { weight: 600 },
                             callback: function(value) {
                                 return value.toLocaleString('vi-VN') + ' ₫';
                             }
+                        }
+                    },
+                    y: {
+                        grid: {
+                            display: false,
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: '#a5b4fc',
+                            font: { weight: 600 }
                         }
                     }
                 }
