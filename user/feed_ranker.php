@@ -74,6 +74,25 @@ class FeedRanker {
     private function collectInventory(): array {
         $me    = $this->me;
         $posts = [];
+        $has_impressions = $this->tableExists('post_impressions');
+        $has_follows = $this->tableExists('follows');
+
+        $impression_filter = $has_impressions
+            ? "AND p.id NOT IN (
+                SELECT post_id FROM post_impressions
+                WHERE user_id=$me AND action IN ('hide','report')
+            )"
+            : "";
+        $follow_source = $has_follows
+            ? "WHERE p.user_id IN (
+                SELECT following_id FROM follows WHERE follower_id = $me
+            )"
+            : "WHERE 1=0";
+        $follow_exclude = $has_follows
+            ? "AND p.user_id NOT IN (
+                SELECT following_id FROM follows WHERE follower_id=$me
+            )"
+            : "";
 
         // ── Nguồn A: Social graph (người đang follow) ──────
         // Ưu tiên cao nhất — gắn label source để tính signal sau
@@ -92,14 +111,9 @@ class FeedRanker {
             FROM posts p
             JOIN users u ON p.user_id = u.id
             LEFT JOIN phim ph ON p.phim_id = ph.id
-            WHERE p.user_id IN (
-                SELECT following_id FROM follows WHERE follower_id = $me
-            )
+            $follow_source
             AND p.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
-            AND p.id NOT IN (
-                SELECT post_id FROM post_impressions
-                WHERE user_id=$me AND action IN ('hide','report')
-            )
+            $impression_filter
             ORDER BY p.created_at DESC
             LIMIT 200
         ";
@@ -130,14 +144,9 @@ class FeedRanker {
                 JOIN phim ph ON p.phim_id = ph.id
                 WHERE ph.the_loai IN ($topics_in)
                 AND p.user_id != $me
-                AND p.user_id NOT IN (
-                    SELECT following_id FROM follows WHERE follower_id=$me
-                )
+                $follow_exclude
                 AND p.created_at >= DATE_SUB(NOW(), INTERVAL 3 DAY)
-                AND p.id NOT IN (
-                    SELECT post_id FROM post_impressions
-                    WHERE user_id=$me AND action IN ('hide','report')
-                )
+                $impression_filter
                 ORDER BY p.engagement_score DESC
                 LIMIT 100
             ";
@@ -165,10 +174,7 @@ class FeedRanker {
             LEFT JOIN phim ph ON p.phim_id = ph.id
             WHERE p.user_id != $me
             AND p.created_at >= DATE_SUB(NOW(), INTERVAL 24 HOUR)
-            AND p.id NOT IN (
-                SELECT post_id FROM post_impressions
-                WHERE user_id=$me AND action IN ('hide','report')
-            )
+            $impression_filter
             ORDER BY p.engagement_score DESC
             LIMIT 50
         ";
@@ -215,18 +221,20 @@ class FeedRanker {
         } elseif ($post['source'] === 'following') {
             $rel = 2.0;
             // Mutual follow bonus
-            $mutual = mysqli_fetch_assoc(mysqli_query($this->conn,
-                "SELECT 1 FROM follows WHERE follower_id=$author AND following_id=$me LIMIT 1"
-            ));
-            if ($mutual) $rel += 0.5;
+            if ($this->tableExists('follows')) {
+                $mutual = mysqli_fetch_assoc(mysqli_query($this->conn,
+                    "SELECT 1 FROM follows WHERE follower_id=$author AND following_id=$me LIMIT 1"
+                ));
+                if ($mutual) $rel += 0.5;
 
-            // Bạn chung cũng tương tác bài này
-            $mutual_engaged = (int)mysqli_fetch_assoc(mysqli_query($this->conn,
-                "SELECT COUNT(*) AS c FROM reactions r
-                 JOIN follows f ON f.following_id = r.user_id
-                 WHERE f.follower_id=$me AND r.target_type='post' AND r.target_id={$post['id']}"
-            ))['c'];
-            $rel += min($mutual_engaged * 0.3, 1.0);
+                // Bạn chung cũng tương tác bài này
+                $mutual_engaged = (int)mysqli_fetch_assoc(mysqli_query($this->conn,
+                    "SELECT COUNT(*) AS c FROM reactions r
+                     JOIN follows f ON f.following_id = r.user_id
+                     WHERE f.follower_id=$me AND r.target_type='post' AND r.target_id={$post['id']}"
+                ))['c'];
+                $rel += min($mutual_engaged * 0.3, 1.0);
+            }
         } elseif ($post['source'] === 'interest') {
             $rel = 0.5;
         } else {
@@ -327,12 +335,16 @@ class FeedRanker {
         // ── P(negative) — hide/report ───────────────────────
         $p_neg = 0.01;
         // Nếu user đã hide bài từ author này trước đó
-        $hide_count = (int)mysqli_fetch_assoc(mysqli_query($this->conn,
-            "SELECT COUNT(*) AS c FROM post_impressions pi
-             JOIN posts pp ON pi.post_id = pp.id
-             WHERE pi.user_id=$me AND pp.user_id=$author
-             AND pi.action IN ('hide','report')"
-        ))['c'];
+        $hide_count = 0;
+        if ($this->tableExists('post_impressions')) {
+            $row = mysqli_fetch_assoc(mysqli_query($this->conn,
+                "SELECT COUNT(*) AS c FROM post_impressions pi
+                 JOIN posts pp ON pi.post_id = pp.id
+                 WHERE pi.user_id=$me AND pp.user_id=$author
+                 AND pi.action IN ('hide','report')"
+            ));
+            $hide_count = (int)($row['c'] ?? 0);
+        }
         $p_neg += $hide_count * 0.05;
         $post['p_negative'] = min($p_neg, 1.0);
     }
@@ -414,11 +426,13 @@ class FeedRanker {
     public function logImpression(int $post_id, string $action, int $dwell_ms = 0): void {
         $me = $this->me;
         $action = mysqli_real_escape_string($this->conn, $action);
-        mysqli_query($this->conn,
-            "INSERT INTO post_impressions (user_id, post_id, dwell_ms, action)
-             VALUES ($me, $post_id, $dwell_ms, '$action')
-             ON DUPLICATE KEY UPDATE dwell_ms = GREATEST(dwell_ms, $dwell_ms), action='$action'"
-        );
+        if ($this->tableExists('post_impressions')) {
+            mysqli_query($this->conn,
+                "INSERT INTO post_impressions (user_id, post_id, dwell_ms, action)
+                 VALUES ($me, $post_id, $dwell_ms, '$action')
+                 ON DUPLICATE KEY UPDATE dwell_ms = GREATEST(dwell_ms, $dwell_ms), action='$action'"
+            );
+        }
 
         // Cập nhật interest profile
         if (in_array($action, ['like','reply','share'])) {
@@ -438,26 +452,39 @@ class FeedRanker {
 
     private function refreshEngagementScore(int $post_id): void {
         // score = reactions*1 + comments*2 + views*0.1
-        mysqli_query($this->conn,
-            "UPDATE posts SET engagement_score = (
-                SELECT COALESCE(SUM(
-                    CASE action
-                        WHEN 'like'   THEN 3
-                        WHEN 'reply'  THEN 5
-                        WHEN 'share'  THEN 4
-                        ELSE 0.1
-                    END
-                ), 0)
-                FROM post_impressions WHERE post_id = $post_id
-            ) + (
-                SELECT COUNT(*)*1 FROM reactions
-                WHERE target_type='post' AND target_id=$post_id
-            ) + (
-                SELECT COUNT(*)*2 FROM comments
-                WHERE target_type='post' AND target_id=$post_id
-            )
-            WHERE id = $post_id"
-        );
+        if ($this->tableExists('post_impressions')) {
+            mysqli_query($this->conn,
+                "UPDATE posts SET engagement_score = (
+                    SELECT COALESCE(SUM(
+                        CASE action
+                            WHEN 'like'   THEN 3
+                            WHEN 'reply'  THEN 5
+                            WHEN 'share'  THEN 4
+                            ELSE 0.1
+                        END
+                    ), 0)
+                    FROM post_impressions WHERE post_id = $post_id
+                ) + (
+                    SELECT COUNT(*)*1 FROM reactions
+                    WHERE target_type='post' AND target_id=$post_id
+                ) + (
+                    SELECT COUNT(*)*2 FROM comments
+                    WHERE target_type='post' AND target_id=$post_id
+                )
+                WHERE id = $post_id"
+            );
+        } else {
+            mysqli_query($this->conn,
+                "UPDATE posts SET engagement_score = (
+                    SELECT COUNT(*)*1 FROM reactions
+                    WHERE target_type='post' AND target_id=$post_id
+                ) + (
+                    SELECT COUNT(*)*2 FROM comments
+                    WHERE target_type='post' AND target_id=$post_id
+                )
+                WHERE id = $post_id"
+            );
+        }
     }
 
     // ════════════════════════════════════════════════════════
@@ -466,6 +493,10 @@ class FeedRanker {
     private function loadUserProfile(): void {
         $me = $this->me;
         $interests = [];
+        if (!$this->tableExists('user_interests')) {
+            $this->userProfile['interests'] = [];
+            return;
+        }
         $r = mysqli_query($this->conn,
             "SELECT topic, score FROM user_interests WHERE user_id=$me ORDER BY score DESC"
         );
@@ -488,6 +519,9 @@ class FeedRanker {
     private function getAuthorInteractionRate(int $author_id, string $action): float {
         $me = $this->me;
         $action = mysqli_real_escape_string($this->conn, $action);
+        if (!$this->tableExists('post_impressions')) {
+            return 0.0;
+        }
         $row = mysqli_fetch_assoc(mysqli_query($this->conn,
             "SELECT
                 COUNT(*) AS interactions,
@@ -506,6 +540,9 @@ class FeedRanker {
         $has_image = !empty($post['hinh_anh']) ? 1 : 0;
         $has_movie = !empty($post['phim_id'])  ? 1 : 0;
 
+        if (!$this->tableExists('post_impressions')) {
+            return $has_movie ? 1.2 : 1.0;
+        }
         if ($has_image) {
             $row = mysqli_fetch_assoc(mysqli_query($this->conn,
                 "SELECT AVG(pi.dwell_ms) AS avg_dwell
@@ -522,6 +559,9 @@ class FeedRanker {
 
     private function updateInterest(string $topic, string $action): void {
         $me = $this->me;
+        if (!$this->tableExists('user_interests')) {
+            return;
+        }
         $delta = ['like'=>0.5, 'reply'=>1.0, 'share'=>0.8][$action] ?? 0.1;
         $topic = mysqli_real_escape_string($this->conn, $topic);
         mysqli_query($this->conn,
@@ -536,5 +576,23 @@ class FeedRanker {
              WHERE user_id=$me AND topic != '$topic'"
         );
         $this->loadUserProfile(); // refresh cache
+    }
+
+    private function tableExists(string $table): bool {
+        $sql = "SELECT COUNT(*) AS cnt
+                FROM information_schema.tables
+                WHERE table_schema = DATABASE()
+                  AND table_name = ?
+                LIMIT 1";
+        $stmt = mysqli_prepare($this->conn, $sql);
+        if (!$stmt) {
+            return false;
+        }
+        mysqli_stmt_bind_param($stmt, 's', $table);
+        mysqli_stmt_execute($stmt);
+        $res = mysqli_stmt_get_result($stmt);
+        $row = $res ? mysqli_fetch_assoc($res) : null;
+        mysqli_stmt_close($stmt);
+        return $row && (int)$row['cnt'] > 0;
     }
 }

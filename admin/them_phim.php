@@ -9,6 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $the_loai = trim($_POST['the_loai'] ?? '');
     $thoi_luong = trim($_POST['thoi_luong'] ?? '');
     $noi_dung = trim($_POST['mo_ta'] ?? '');
+    $trailer_url = trim($_POST['trailer_url'] ?? '');
     $ngay_khoi_chieu = !empty($_POST['ngay_khoi_chieu']) ? $_POST['ngay_khoi_chieu'] : null;
 
     if ($ten === '') {
@@ -63,9 +64,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (empty($errors)) {
-        $sql = "INSERT INTO phim (ten_phim, the_loai, thoi_luong, mo_ta, poster, banner, ngay_khoi_chieu) VALUES (?,?,?,?,?,?,?)";
-        $stmt = mysqli_prepare($conn, $sql);
-        mysqli_stmt_bind_param($stmt, 'sssssss', $ten, $the_loai, $thoi_luong, $noi_dung, $posterName, $bannerName, $ngay_khoi_chieu);
+        if (column_exists($conn, 'phim', 'trailer_url')) {
+            $sql = "INSERT INTO phim (ten_phim, the_loai, thoi_luong, mo_ta, poster, banner, trailer_url, ngay_khoi_chieu) VALUES (?,?,?,?,?,?,?,?)";
+            $stmt = mysqli_prepare($conn, $sql);
+            mysqli_stmt_bind_param($stmt, 'ssssssss', $ten, $the_loai, $thoi_luong, $noi_dung, $posterName, $bannerName, $trailer_url, $ngay_khoi_chieu);
+        } else {
+            $sql = "INSERT INTO phim (ten_phim, the_loai, thoi_luong, mo_ta, poster, banner, ngay_khoi_chieu) VALUES (?,?,?,?,?,?,?)";
+            $stmt = mysqli_prepare($conn, $sql);
+            mysqli_stmt_bind_param($stmt, 'sssssss', $ten, $the_loai, $thoi_luong, $noi_dung, $posterName, $bannerName, $ngay_khoi_chieu);
+        }
         $ok = mysqli_stmt_execute($stmt);
         mysqli_stmt_close($stmt);
         if ($ok) {
@@ -135,6 +142,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <label for="banner">Banner (cho trang chủ)</label>
             <input id="banner" type="file" name="banner" accept="image/*">
             <small style="color: #6b7280; margin-left: 10px;">Ảnh banner sẽ hiển thị ở trang chủ (không bắt buộc)</small>
+        </div>
+
+        <div class="form-row">
+            <label for="trailer_url">Trailer (YouTube URL)</label>
+            <input id="trailer_url" name="trailer_url" type="text" value="<?= isset($trailer_url) ? htmlspecialchars($trailer_url) : '' ?>" placeholder="https://youtu.be/xxxx">
+            <small style="color: #6b7280; margin-left: 10px;">Dùng link YouTube (watch hoặc youtu.be)</small>
         </div>
 
         <div class="form-row">
