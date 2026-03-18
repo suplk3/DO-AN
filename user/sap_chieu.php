@@ -1,6 +1,16 @@
 ﻿<?php
 session_start();
 include "../config/db.php";
+$notif_unread = 0;
+if (isset($_SESSION['user_id'])) {
+    if (table_exists($conn, 'notifications')) {
+        $uid = (int)$_SESSION['user_id'];
+        $nr = mysqli_fetch_assoc(mysqli_query($conn,
+            "SELECT COUNT(*) AS c FROM notifications WHERE user_id=$uid AND is_read=0"
+        ));
+        $notif_unread = (int)($nr['c'] ?? 0);
+    }
+}
 
 $today = date('Y-m-d');
 $sql = "SELECT * FROM phim WHERE ngay_khoi_chieu > '$today' ORDER BY ngay_khoi_chieu ASC";
@@ -29,6 +39,7 @@ function fmt_date($d) {
 <link rel="stylesheet" href="../assets/css/user-index.css">
 <link rel="stylesheet" href="../assets/css/login-modal.css">
 <link rel="stylesheet" href="../assets/css/search.css">
+<link rel="stylesheet" href="../assets/css/theme-toggle.css">
 
 <style>
 /* ── Countdown badge ── */
@@ -182,6 +193,7 @@ function fmt_date($d) {
     <div class="search-dropdown" id="searchDropdown"></div>
 </div>
             <div class="header-nav-right">
+                <button class="theme-toggle-btn" id="themeToggle">🌓 Giao diện</button>
                 <?php if (isset($_SESSION['user_id'])):
                     $is_admin = (isset($_SESSION['vai_tro']) && $_SESSION['vai_tro'] === 'admin');
                     $my_ticket_label = 'VÉ CỦA TÔI';
@@ -191,6 +203,9 @@ function fmt_date($d) {
                         <span class="icon">👋</span>
                         <span class="text">Xin chào, <?= htmlspecialchars($_SESSION['ten_nguoi_dung'] ?? ($_SESSION['ten'] ?? 'bạn')) ?></span>
                     </span>
+                    <a href="notifications.php" class="notif-link">🔔
+                        <?php if ($notif_unread > 0): ?><span class="notif-badge"><?= $notif_unread ?></span><?php endif; ?>
+                    </a>
                     <a href="../user/ve_cua_toi.php" class="btn btn-sm">
                         <span class="icon">🎟️</span>
                         <span class="text"><?= $my_ticket_label ?></span>
@@ -358,6 +373,21 @@ function fmt_date($d) {
 <script src="../assets/js/search.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 <script src="../assets/js/login-modal.js"></script>
+<script>
+// Theme toggle
+(function(){
+  var body = document.body;
+  var btn = document.getElementById('themeToggle');
+  var stored = localStorage.getItem('theme') || 'dark';
+  body.setAttribute('data-theme', stored);
+  if (!btn) return;
+  btn.addEventListener('click', function(){
+    var cur = body.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+    body.setAttribute('data-theme', cur);
+    localStorage.setItem('theme', cur);
+  });
+})();
+</script>
 
 </body>
 </html>

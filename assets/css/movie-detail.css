@@ -462,6 +462,96 @@ body.movie-detail-page > * { position: relative; z-index: 1; }
   .section-title { font-size: 17px; }
 }
 
+/* Notifications */
+.notif-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.05);
+  color: #e2e8f0;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 700;
+}
+.notif-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: #ef4444;
+  color: #fff;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 999px;
+}
+
+/* Rating */
+.rating-block {
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.rating-stars {
+  display: inline-flex;
+  gap: 6px;
+  font-size: 22px;
+}
+.rating-stars .star {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: rgba(255,255,255,0.35);
+  font-size: 24px;
+  transition: transform .15s ease, color .15s ease;
+}
+.rating-stars .star.active { color: #f5c518; }
+.rating-stars .star:hover { transform: translateY(-1px); }
+.rating-summary { font-size: 13px; color: var(--muted); }
+
+/* Trailer modal */
+.trailer-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.65);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 20px;
+}
+.trailer-modal.open { display: flex; }
+.trailer-box {
+  width: min(900px, 95vw);
+  background: #0b1220;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+}
+.trailer-close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  background: rgba(255,255,255,0.1);
+  border: none;
+  color: #fff;
+  font-size: 18px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+.trailer-iframe {
+  width: 100%;
+  aspect-ratio: 16/9;
+  border: 0;
+}
+
 /* ── Description expand/collapse ── */
 .md-desc-wrap { display: flex; flex-direction: column; gap: 8px; }
 

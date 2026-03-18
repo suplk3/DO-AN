@@ -29,6 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $the_loai = trim($_POST['the_loai'] ?? '');
     $thoi_luong = trim($_POST['thoi_luong'] ?? '');
     $noi_dung = trim($_POST['noi_dung'] ?? '');
+    $trailer_url = trim($_POST['trailer_url'] ?? ($phim['trailer_url'] ?? ''));
     $ngay_khoi_chieu = !empty($_POST['ngay_khoi_chieu']) ? $_POST['ngay_khoi_chieu'] : null;
 
     if ($ten === '') {
@@ -88,9 +89,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (empty($errors)) {
-        $sql = "UPDATE phim SET ten_phim = ?, the_loai = ?, thoi_luong = ?, mo_ta = ?, poster = ?, banner = ?, ngay_khoi_chieu = ? WHERE id = ?";
-        $stmt = mysqli_prepare($conn, $sql);
-        mysqli_stmt_bind_param($stmt, 'sssssssi', $ten, $the_loai, $thoi_luong, $noi_dung, $poster, $banner, $ngay_khoi_chieu, $id);
+        if (column_exists($conn, 'phim', 'trailer_url')) {
+            $sql = "UPDATE phim SET ten_phim = ?, the_loai = ?, thoi_luong = ?, mo_ta = ?, poster = ?, banner = ?, trailer_url = ?, ngay_khoi_chieu = ? WHERE id = ?";
+            $stmt = mysqli_prepare($conn, $sql);
+            mysqli_stmt_bind_param($stmt, 'ssssssssi', $ten, $the_loai, $thoi_luong, $noi_dung, $poster, $banner, $trailer_url, $ngay_khoi_chieu, $id);
+        } else {
+            $sql = "UPDATE phim SET ten_phim = ?, the_loai = ?, thoi_luong = ?, mo_ta = ?, poster = ?, banner = ?, ngay_khoi_chieu = ? WHERE id = ?";
+            $stmt = mysqli_prepare($conn, $sql);
+            mysqli_stmt_bind_param($stmt, 'sssssssi', $ten, $the_loai, $thoi_luong, $noi_dung, $poster, $banner, $ngay_khoi_chieu, $id);
+        }
         $ok = mysqli_stmt_execute($stmt);
         mysqli_stmt_close($stmt);
 
@@ -197,6 +204,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <label for="banner">Thay banner</label>
             <input id="banner" type="file" name="banner" accept="image/*">
             <small style="color: #6b7280; margin-left: 10px;">Banner hiển thị ở trang chủ</small>
+        </div>
+
+        <div class="form-row">
+            <label for="trailer_url">Trailer (YouTube URL)</label>
+            <input id="trailer_url" type="text" name="trailer_url" value="<?= htmlspecialchars($phim['trailer_url'] ?? '') ?>" placeholder="https://youtu.be/xxxx">
         </div>
 
         <div class="form-row">

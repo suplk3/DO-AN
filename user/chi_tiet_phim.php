@@ -46,6 +46,37 @@ $tc = mysqli_fetch_assoc(mysqli_query($conn,
     "SELECT COUNT(*) AS c FROM comments WHERE target_type='phim' AND target_id=$id"
 ));
 if ($tc) $tong_cmt = (int)$tc['c'];
+
+// ── Rating (1-5) ──
+$rating_avg = 0;
+$rating_total = 0;
+$my_rating = 0;
+if (table_exists($conn, 'ratings')) {
+    $rating_row = mysqli_fetch_assoc(mysqli_query($conn,
+        "SELECT AVG(rating) AS avg_rating, COUNT(*) AS total FROM ratings WHERE phim_id=$id"
+    ));
+    if ($rating_row) {
+        $rating_avg = $rating_row['avg_rating'] !== null ? round((float)$rating_row['avg_rating'], 1) : 0;
+        $rating_total = (int)$rating_row['total'];
+    }
+    if ($me_id) {
+        $mr = mysqli_fetch_assoc(mysqli_query($conn,
+            "SELECT rating FROM ratings WHERE user_id=$me_id AND phim_id=$id LIMIT 1"
+        ));
+        if ($mr) $my_rating = (int)$mr['rating'];
+    }
+}
+
+// ── Notifications count ──
+$notif_unread = 0;
+if ($me_id) {
+    if (table_exists($conn, 'notifications')) {
+        $nr = mysqli_fetch_assoc(mysqli_query($conn,
+            "SELECT COUNT(*) AS c FROM notifications WHERE user_id=$me_id AND is_read=0"
+        ));
+        $notif_unread = (int)($nr['c'] ?? 0);
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -60,6 +91,7 @@ if ($tc) $tong_cmt = (int)$tc['c'];
 <link rel="stylesheet" href="../assets/css/search.css">
     <link rel="stylesheet" href="../assets/css/user-menu.css">
 <link rel="stylesheet" href="../assets/css/social.css">
+<link rel="stylesheet" href="../assets/css/theme-toggle.css">
 
 </head>
 <body class="movie-detail-page">
@@ -82,12 +114,16 @@ if ($tc) $tong_cmt = (int)$tc['c'];
         <div class="search-dropdown" id="searchDropdown"></div>
       </div>
       <div class="header-nav-right">
+        <button class="theme-toggle-btn" id="themeToggle">🌓 Giao diện</button>
         <?php if (isset($_SESSION['user_id'])):
           $is_admin = (isset($_SESSION['vai_tro']) && $_SESSION['vai_tro'] === 'admin');
           $ten = htmlspecialchars($_SESSION['ten_nguoi_dung'] ?? ($_SESSION['ten'] ?? 'Tôi'));
           $av  = mysqli_fetch_assoc(mysqli_query($conn,"SELECT avatar FROM users WHERE id=".(int)$_SESSION['user_id']));
           $avatar = $av['avatar'] ?? null;
         ?>
+        <a href="notifications.php" class="notif-link">🔔
+          <?php if ($notif_unread > 0): ?><span class="notif-badge"><?= $notif_unread ?></span><?php endif; ?>
+        </a>
         <div class="user-menu-wrap">
           <button class="user-menu-btn" id="userMenuBtn">
             <?php if ($avatar): ?>
@@ -107,6 +143,7 @@ if ($tc) $tong_cmt = (int)$tc['c'];
             <a href="../user/ve_cua_toi.php" class="user-dropdown-item">🎟️ Vé của tôi</a>
             <?php if ($is_admin): ?>
             <div class="user-dropdown-divider"></div>
+            <a href="../admin/dashboard.php" class="user-dropdown-item">📊 Dashboard</a>
             <a href="../admin/phim.php" class="user-dropdown-item">🎬 Quản lý phim</a>
             <a href="../admin/suat_chieu.php" class="user-dropdown-item">🗓️ Quản lý suất chiếu</a>
             <a href="../admin/quan_ly_user.php" class="user-dropdown-item">👥 Quản lý user</a>
@@ -212,6 +249,24 @@ if ($tc) $tong_cmt = (int)$tc['c'];
           <a href="../auth/login.php" class="btn-outline open-login-modal">🔐 Đăng nhập để đặt vé</a>
         <?php endif; ?>
         <a href="#showtimes" class="btn-sm">🗓️ Xem suất chiếu</a>
+        <?php if (!empty($phim['trailer_url'])): ?>
+          <button class="btn-sm trailer-btn" type="button" data-trailer="<?= htmlspecialchars($phim['trailer_url']) ?>">▶ Trailer</button>
+        <?php endif; ?>
+      </div>
+
+      <div class="rating-block">
+        <div class="rating-stars" id="ratingStars" data-current="<?= (int)$my_rating ?>">
+          <?php for ($i=1; $i<=5; $i++): ?>
+            <button class="star <?= $i <= $my_rating ? 'active' : '' ?>" data-value="<?= $i ?>">★</button>
+          <?php endfor; ?>
+        </div>
+        <div class="rating-summary">
+          Điểm trung bình: <strong id="avgRating"><?= $rating_total > 0 ? $rating_avg : 'Chưa có' ?></strong>
+          ( <span id="ratingCount"><?= $rating_total ?></span> đánh giá )
+          <?php if (!$me_id): ?>
+            — <a href="../auth/login.php" style="color:#a78bfa;font-weight:700;">Đăng nhập</a> để chấm điểm
+          <?php endif; ?>
+        </div>
       </div>
     </div>
   </section>
@@ -627,6 +682,14 @@ function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(
   <div>© <?= date('Y') ?> TTVH Cinemas — Thiết kế gọn, responsive.</div>
 </footer>
 
+<!-- Trailer modal -->
+<div class="trailer-modal" id="trailerModal">
+  <div class="trailer-box">
+    <button class="trailer-close" id="trailerClose">×</button>
+    <iframe class="trailer-iframe" id="trailerIframe" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+  </div>
+</div>
+
 <script>
 (function () {
   /* Header shrink */
@@ -857,6 +920,112 @@ function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(
   });
   document.addEventListener('click', function() {
     dd.classList.remove('open');
+  });
+})();
+</script>
+<script>
+// Theme toggle
+(function(){
+  var body = document.body;
+  var btn = document.getElementById('themeToggle');
+  var stored = localStorage.getItem('theme') || 'dark';
+  body.setAttribute('data-theme', stored);
+  if (!btn) return;
+  btn.addEventListener('click', function(){
+    var cur = body.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+    body.setAttribute('data-theme', cur);
+    localStorage.setItem('theme', cur);
+  });
+})();
+
+// Trailer modal
+(function(){
+  var modal = document.getElementById('trailerModal');
+  var iframe = document.getElementById('trailerIframe');
+  var closeBtn = document.getElementById('trailerClose');
+  var btns = document.querySelectorAll('.trailer-btn');
+  if (!modal || !iframe || !btns.length) return;
+
+  function toEmbed(url) {
+    if (!url) return '';
+    if (url.includes('youtube.com/watch')) {
+      var id = new URL(url).searchParams.get('v');
+      return id ? ('https://www.youtube.com/embed/' + id + '?autoplay=1') : url;
+    }
+    if (url.includes('youtu.be/')) {
+      var id2 = url.split('youtu.be/')[1].split(/[?&]/)[0];
+      return 'https://www.youtube.com/embed/' + id2 + '?autoplay=1';
+    }
+    return url;
+  }
+
+  function open(url) {
+    iframe.src = toEmbed(url);
+    modal.classList.add('open');
+  }
+  function close() {
+    modal.classList.remove('open');
+    iframe.src = '';
+  }
+
+  btns.forEach(function(b){
+    b.addEventListener('click', function(){
+      open(b.getAttribute('data-trailer'));
+    });
+  });
+  modal.addEventListener('click', function(e){
+    if (e.target === modal) close();
+  });
+  if (closeBtn) closeBtn.addEventListener('click', close);
+})();
+
+// Rating
+(function(){
+  var starsWrap = document.getElementById('ratingStars');
+  if (!starsWrap) return;
+  var stars = starsWrap.querySelectorAll('.star');
+  var current = parseInt(starsWrap.dataset.current || '0');
+  var avgEl = document.getElementById('avgRating');
+  var countEl = document.getElementById('ratingCount');
+  var isLogged = <?= $me_id ? 'true' : 'false' ?>;
+
+  function render(val) {
+    stars.forEach(function(s){
+      var v = parseInt(s.dataset.value || '0');
+      if (v <= val) s.classList.add('active');
+      else s.classList.remove('active');
+    });
+  }
+  render(current);
+
+  stars.forEach(function(s){
+    s.addEventListener('mouseenter', function(){
+      render(parseInt(s.dataset.value || '0'));
+    });
+    s.addEventListener('mouseleave', function(){
+      render(current);
+    });
+    s.addEventListener('click', async function(){
+      var val = parseInt(s.dataset.value || '0');
+      if (!isLogged) {
+        alert('Bạn cần đăng nhập để đánh giá.');
+        return;
+      }
+      const res = await fetch('rating_api.php', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({phim_id: <?= (int)$id ?>, rating: val})
+      });
+      const data = await res.json();
+      if (data.ok) {
+        current = data.my || val;
+        render(current);
+        if (avgEl) avgEl.textContent = data.avg > 0 ? data.avg : 'Chưa có';
+        if (countEl) countEl.textContent = data.total || 0;
+      } else {
+        alert(data.message || 'Không thể đánh giá.');
+      }
+    });
   });
 })();
 </script>
