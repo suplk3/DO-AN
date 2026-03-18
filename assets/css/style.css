@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 /* ============================================================
    TTVH Cinemas – Global Stylesheet  (Cinematic Luxury Theme)
    ============================================================ */
@@ -40,7 +40,7 @@
 
 /* ── Reset & Base ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-=======
+
 body {
     margin: 0;
     font-family: Arial, sans-serif;
@@ -764,7 +764,6 @@ input[type=text]:focus, textarea:focus{outline:none;box-shadow:0 6px 18px rgba(3
         opacity: 0;
     }
 }
->>>>>>> 0ac481a443f3cbcb22ee39bd0fb33665c3864856
 
 html {
     scroll-behavior: smooth;
