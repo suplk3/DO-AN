@@ -2,6 +2,16 @@
 session_start();
 include "../config/db.php";
 $force_show_login = (isset($_GET['show_login']) && !isset($_SESSION['user_id']));
+$notif_unread = 0;
+if (isset($_SESSION['user_id'])) {
+    if (table_exists($conn, 'notifications')) {
+        $uid = (int)$_SESSION['user_id'];
+        $nr = mysqli_fetch_assoc(mysqli_query($conn,
+            "SELECT COUNT(*) AS c FROM notifications WHERE user_id=$uid AND is_read=0"
+        ));
+        $notif_unread = (int)($nr['c'] ?? 0);
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -19,6 +29,7 @@ $force_show_login = (isset($_GET['show_login']) && !isset($_SESSION['user_id']))
     <link rel="stylesheet" href="../assets/css/login-modal.css">
     <link rel="stylesheet" href="../assets/css/search.css">
     <link rel="stylesheet" href="../assets/css/user-menu.css">
+    <link rel="stylesheet" href="../assets/css/theme-toggle.css">
     
 </head>
 <body class="user-index">
@@ -52,12 +63,16 @@ $force_show_login = (isset($_GET['show_login']) && !isset($_SESSION['user_id']))
     <div class="search-dropdown" id="searchDropdown"></div>
 </div>
             <div class="header-nav-right">
+                <button class="theme-toggle-btn" id="themeToggle">🌓 Giao diện</button>
                 <?php if (isset($_SESSION['user_id'])):
                     $is_admin = (isset($_SESSION['vai_tro']) && $_SESSION['vai_tro'] === 'admin');
                     $ten = htmlspecialchars($_SESSION['ten_nguoi_dung'] ?? ($_SESSION['ten'] ?? 'Tôi'));
                     $avatar_sql = mysqli_fetch_assoc(mysqli_query($conn, "SELECT avatar FROM users WHERE id=".(int)$_SESSION['user_id']));
                     $avatar = $avatar_sql['avatar'] ?? null;
                 ?>
+                <a href="notifications.php" class="notif-link">🔔
+                    <?php if ($notif_unread > 0): ?><span class="notif-badge"><?= $notif_unread ?></span><?php endif; ?>
+                </a>
                 <div class="user-menu-wrap">
                     <button class="user-menu-btn" id="userMenuBtn">
                         <?php if ($avatar): ?>
@@ -77,6 +92,7 @@ $force_show_login = (isset($_GET['show_login']) && !isset($_SESSION['user_id']))
                         <a href="../user/ve_cua_toi.php" class="user-dropdown-item">🎟️ Vé của tôi</a>
                         <?php if ($is_admin): ?>
                         <div class="user-dropdown-divider"></div>
+                        <a href="../admin/dashboard.php" class="user-dropdown-item">📊 Dashboard</a>
                         <a href="../admin/phim.php" class="user-dropdown-item">🎬 Quản lý phim</a>
                         <a href="../admin/suat_chieu.php" class="user-dropdown-item">🗓️ Quản lý suất chiếu</a>
                         <a href="../admin/quan_ly_user.php" class="user-dropdown-item">👥 Quản lý user</a>
@@ -343,6 +359,21 @@ if (userMenuBtn && userDropdown) {
     });
     document.addEventListener('click', () => userDropdown.classList.remove('open'));
 }
+</script>
+<script>
+// Theme toggle
+(function(){
+  var body = document.body;
+  var btn = document.getElementById('themeToggle');
+  var stored = localStorage.getItem('theme') || 'dark';
+  body.setAttribute('data-theme', stored);
+  if (!btn) return;
+  btn.addEventListener('click', function(){
+    var cur = body.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+    body.setAttribute('data-theme', cur);
+    localStorage.setItem('theme', cur);
+  });
+})();
 </script>
 </body>
 </html>

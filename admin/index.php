@@ -265,15 +265,8 @@ $quick_stats = mysqli_fetch_assoc($quick_stats_result);
         </div>
 
         <!-- Main Menu -->
-        <h2 class="section-title">📊 QUẢN LÝ DOANH THU & THỐNG KÊ</h2>
+        <h2 class="section-title">� QUẢN LÝ TỔNG QUÁT</h2>
         <div class="menu-grid">
-            <div class="menu-card">
-                <div class="menu-card-header">📈</div>
-                <div class="menu-card-title">Dashboard Thống Kê</div>
-                <div class="menu-card-content">Xem tổng quan doanh thu tháng, tỷ lệ lấp đầy phòng, top phim doanh thu cao nhất</div>
-                <a href="dashboard_advanced.php" class="menu-card-link">Xem Chi Tiết →</a>
-            </div>
-
             <div class="menu-card">
                 <div class="menu-card-header">👤</div>
                 <div class="menu-card-title">Quản Lý Người Dùng</div>

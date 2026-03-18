@@ -16,6 +16,10 @@ $payment_method = $_POST['payment_method'];
 $user_id = $_SESSION['user_id'] ?? 1; // Fallback for testing
 $suat_chieu_id = (int)$_POST['suat_chieu_id'];
 $ghe_array = array_filter(explode(",", $_POST['ghe']));
+$voucher_code = trim($_POST['voucher_code'] ?? '');
+$combo_items_raw = $_POST['combo_items'] ?? '[]';
+$combo_items = json_decode($combo_items_raw, true);
+if (!is_array($combo_items)) $combo_items = [];
 
 if (empty($ghe_array)) {
     die("Lỗi: Chưa chọn ghế nào.");
@@ -119,7 +123,125 @@ mysqli_stmt_close($stmt);
 $seat_list = htmlspecialchars(implode(", ", $ghe_array));
 $seat_count = count($ghe_array);
 $price_per_seat = (isset($info['gia']) && $info['gia'] !== null) ? (int)$info['gia'] : 0;
-$total_amount = $seat_count * $price_per_seat;
+$ticket_total = $seat_count * $price_per_seat;
+
+// --- Combo total ---
+$combo_total = 0;
+$combo_validated = [];
+if (table_exists($conn, 'combos') && !empty($combo_items)) {
+    $ids = [];
+    $qty_map = [];
+    foreach ($combo_items as $it) {
+        $cid = (int)($it['id'] ?? 0);
+        $qty = (int)($it['qty'] ?? 0);
+        if ($cid > 0 && $qty > 0) {
+            $ids[] = $cid;
+            $qty_map[$cid] = $qty;
+        }
+    }
+    if ($ids) {
+        $id_list = implode(',', array_unique($ids));
+        $q = mysqli_query($conn, "SELECT id, ten, gia FROM combos WHERE active=1 AND id IN ($id_list)");
+        while ($r = mysqli_fetch_assoc($q)) {
+            $cid = (int)$r['id'];
+            $qty = $qty_map[$cid] ?? 0;
+            if ($qty > 0) {
+                $gia = (int)$r['gia'];
+                $combo_total += $gia * $qty;
+                $combo_validated[] = ['id'=>$cid,'ten'=>$r['ten'],'qty'=>$qty,'gia'=>$gia];
+            }
+        }
+    }
+}
+
+$sub_total = $ticket_total + $combo_total;
+
+// --- Voucher validate ---
+$voucher_discount = 0;
+$voucher_id = null;
+if ($voucher_code !== '' && table_exists($conn, 'vouchers') && table_exists($conn, 'voucher_usages')) {
+    $stmt = mysqli_prepare($conn, "SELECT * FROM vouchers WHERE code = ? LIMIT 1");
+    mysqli_stmt_bind_param($stmt, "s", $voucher_code);
+    mysqli_stmt_execute($stmt);
+    $voucher = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
+    mysqli_stmt_close($stmt);
+
+    if ($voucher && (int)$voucher['active'] === 1) {
+        $today = date('Y-m-d');
+        $ok = true;
+        if (!empty($voucher['start_date']) && $today < $voucher['start_date']) $ok = false;
+        if (!empty($voucher['end_date']) && $today > $voucher['end_date']) $ok = false;
+        if ($sub_total < (int)$voucher['min_total']) $ok = false;
+        if (!is_null($voucher['usage_limit']) && (int)$voucher['used_count'] >= (int)$voucher['usage_limit']) $ok = false;
+
+        if ($ok) {
+            $uid = (int)$user_id;
+            $chk = mysqli_prepare($conn, "SELECT id FROM voucher_usages WHERE voucher_id=? AND user_id=? LIMIT 1");
+            mysqli_stmt_bind_param($chk, "ii", $voucher['id'], $uid);
+            mysqli_stmt_execute($chk);
+            $used = mysqli_fetch_assoc(mysqli_stmt_get_result($chk));
+            mysqli_stmt_close($chk);
+            if (!$used) {
+                if ($voucher['discount_type'] === 'percent') {
+                    $voucher_discount = (int)round($sub_total * ((int)$voucher['discount_value']) / 100);
+                } else {
+                    $voucher_discount = (int)$voucher['discount_value'];
+                }
+                if (!empty($voucher['max_discount']) && $voucher_discount > (int)$voucher['max_discount']) {
+                    $voucher_discount = (int)$voucher['max_discount'];
+                }
+                if ($voucher_discount > $sub_total) $voucher_discount = $sub_total;
+                if ($voucher_discount > 0) $voucher_id = (int)$voucher['id'];
+            }
+        }
+    }
+}
+
+$total_amount = max(0, $sub_total - $voucher_discount);
+
+// --- Save voucher usage ---
+if ($voucher_id && $voucher_discount > 0 && table_exists($conn, 'voucher_usages')) {
+    $uid = (int)$user_id;
+    $stmt = mysqli_prepare($conn,
+        "INSERT IGNORE INTO voucher_usages (voucher_id, user_id, suat_chieu_id, discount_amount)
+         VALUES (?, ?, ?, ?)"
+    );
+    mysqli_stmt_bind_param($stmt, "iiii", $voucher_id, $uid, $suat_chieu_id, $voucher_discount);
+    mysqli_stmt_execute($stmt);
+    mysqli_stmt_close($stmt);
+
+    if (table_exists($conn, 'vouchers')) {
+        mysqli_query($conn, "UPDATE vouchers SET used_count = used_count + 1 WHERE id = " . (int)$voucher_id);
+    }
+}
+
+// --- Save combo orders ---
+if (!empty($combo_validated) && table_exists($conn, 'combo_orders')) {
+    $stmt = mysqli_prepare($conn,
+        "INSERT INTO combo_orders (user_id, suat_chieu_id, combo_id, so_luong)
+         VALUES (?, ?, ?, ?)"
+    );
+    foreach ($combo_validated as $cb) {
+        $cid = (int)$cb['id'];
+        $qty = (int)$cb['qty'];
+        mysqli_stmt_bind_param($stmt, "iiii", $user_id, $suat_chieu_id, $cid, $qty);
+        mysqli_stmt_execute($stmt);
+    }
+    mysqli_stmt_close($stmt);
+}
+
+// --- Notification ---
+if ($info && table_exists($conn, 'notifications')) {
+    $title = "Đặt vé thành công";
+    $body  = "Phim " . ($info['ten_phim'] ?? '') . " — " .
+             date('d/m/Y', strtotime($info['ngay'])) . " " . date('H:i', strtotime($info['gio'])) .
+             " | " . $seat_count . " ghế";
+    $link  = "ve_cua_toi.php";
+    $stmt  = mysqli_prepare($conn, "INSERT INTO notifications (user_id, title, body, link) VALUES (?,?,?,?)");
+    mysqli_stmt_bind_param($stmt, "isss", $user_id, $title, $body, $link);
+    mysqli_stmt_execute($stmt);
+    mysqli_stmt_close($stmt);
+}
 
 $movie_name = $info['ten_phim'] ?? 'N/A';
 $poster_path = (!empty($info['poster'])) ? "../assets/images/" . htmlspecialchars($info['poster']) : "https://via.placeholder.com/560x315.png?text=Movie+Poster";
@@ -398,6 +520,30 @@ mysqli_close($conn);
                         <span class="seat-list"><?= $seat_list ?> (<?= $seat_count ?> ghế)</span>
                     </div>
                 </div>
+                <?php if ($combo_total > 0): ?>
+                <div class="info-section full-width-section">
+                    <div class="details">
+                        <strong>Combo</strong>
+                        <span>
+                            <?php
+                                $combo_text = [];
+                                foreach ($combo_validated as $cb) {
+                                    $combo_text[] = $cb['ten'] . " x" . $cb['qty'];
+                                }
+                                echo htmlspecialchars(implode(", ", $combo_text));
+                            ?>
+                        </span>
+                    </div>
+                </div>
+                <?php endif; ?>
+                <?php if ($voucher_discount > 0): ?>
+                <div class="info-section full-width-section">
+                    <div class="details">
+                        <strong>Voucher</strong>
+                        <span>-<?= number_format($voucher_discount, 0, ',', '.') ?>₫ (<?= htmlspecialchars($voucher_code) ?>)</span>
+                    </div>
+                </div>
+                <?php endif; ?>
             </div>
             <div class="ticket-cutout"></div>
             <div class="ticket-bottom-part">

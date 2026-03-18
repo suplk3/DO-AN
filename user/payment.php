@@ -34,6 +34,15 @@ $seat_count = count($ghe_list);
 $Price = isset($info['gia']) ? (int)$info['gia'] : 0;
 $total_amount = $Price * $seat_count;
 
+// combos (if table exists)
+$combos = [];
+if (table_exists($conn, 'combos')) {
+    $combo_rs = mysqli_query($conn, "SELECT * FROM combos WHERE active=1 ORDER BY id ASC");
+    if ($combo_rs) {
+        while ($c = mysqli_fetch_assoc($combo_rs)) $combos[] = $c;
+    }
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -43,6 +52,7 @@ $total_amount = $Price * $seat_count;
 <title>Thanh toán vé - <?= htmlspecialchars($info['ten_phim'] ?? '') ?></title>
 <link rel="stylesheet" href="../assets/css/style.css">
 <link rel="stylesheet" href="../assets/css/user-index.css">
+<link rel="stylesheet" href="../assets/css/theme-toggle.css">
 <style>
 body {
     background-color: #0a0a0a; /* Slightly darker background */
@@ -113,6 +123,50 @@ body {
     border-color: #7FFF00;
     box-shadow: 0 0 8px rgba(127, 255, 0, 0.4);
     outline: none;
+}
+/* Voucher + combo */
+.voucher-row {
+    display: flex;
+    gap: 8px;
+}
+.btn-apply {
+    background: #7FFF00;
+    color: #000;
+    border: none;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.voucher-msg {
+    margin-top: 6px;
+    font-size: 13px;
+    color: #a3e635;
+}
+.voucher-msg.error { color: #fca5a5; }
+.combo-list { display: grid; gap: 10px; }
+.combo-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 12px;
+    background: #252525;
+    border: 1px solid #3b3b3b;
+    border-radius: 10px;
+}
+.combo-name { font-weight: 600; }
+.combo-desc { font-size: 12px; color: #9ca3af; }
+.combo-price { font-weight: 700; color: #7FFF00; }
+.combo-qty {
+    width: 64px;
+    text-align: center;
+    padding: 6px;
+    border-radius: 6px;
+    border: 1px solid #444;
+    background: #1f1f1f;
+    color: #fff;
 }
 /* New Payment Methods Style */
 .payment-methods {
@@ -270,6 +324,7 @@ h2, h3 { color: #7FFF00; }
             <a href="index.php" class="nav-link">🎬 PHIM</a>
         </nav>
         <div class="actions">
+            <button class="theme-toggle-btn" id="themeToggle">🌓 Giao diện</button>
             <a href="ve_cua_toi.php" class="link">🎟️ VÉ CỦA TÔI</a>
         </div>
     </div>
@@ -289,12 +344,17 @@ h2, h3 { color: #7FFF00; }
         <form action="dat_ve.php" method="POST" id="payment-form">
             <input type="hidden" name="suat_chieu_id" value="<?= $suat_chieu_id ?>">
             <input type="hidden" name="ghe" value="<?= htmlspecialchars(implode(",", $ghe_list)) ?>">
+            <input type="hidden" name="voucher_code" id="voucher_code">
+            <input type="hidden" name="voucher_discount" id="voucher_discount" value="0">
+            <input type="hidden" name="combo_items" id="combo_items" value="[]">
 
             <div class="section">
                 <div class="section-title">Bước 1: Mã giảm giá & Điểm thưởng</div>
-                <div class="input-group">
-                    <input type="text" id="voucher" name="voucher" placeholder="Mã giảm giá">
+                <div class="input-group voucher-row">
+                    <input type="text" id="voucher" name="voucher_input" placeholder="Mã giảm giá">
+                    <button type="button" class="btn-apply" id="btnApplyVoucher">Áp dụng</button>
                 </div>
+                <div class="voucher-msg" id="voucherMessage"></div>
                 <div class="input-group">
                     <input type="text" id="ttvh_points" name="ttvh_points" placeholder="Sử dụng điểm TTVH">
                 </div>
@@ -308,7 +368,27 @@ h2, h3 { color: #7FFF00; }
             </div>
 
             <div class="section">
-                <div class="section-title">Bước 3: Hình thức thanh toán</div>
+                <div class="section-title">Bước 3: Combo bắp nước</div>
+                <div class="combo-list">
+                    <?php if (empty($combos)): ?>
+                        <div style="color:#9ca3af;font-size:13px;">Hiện chưa có combo.</div>
+                    <?php else: foreach ($combos as $cb): ?>
+                        <div class="combo-item" data-combo-id="<?= (int)$cb['id'] ?>" data-combo-price="<?= (int)$cb['gia'] ?>">
+                            <div>
+                                <div class="combo-name"><?= htmlspecialchars($cb['ten']) ?></div>
+                                <?php if (!empty($cb['mo_ta'])): ?>
+                                    <div class="combo-desc"><?= htmlspecialchars($cb['mo_ta']) ?></div>
+                                <?php endif; ?>
+                                <div class="combo-price"><?= number_format((int)$cb['gia'], 0, ',', '.') ?>₫</div>
+                            </div>
+                            <input type="number" class="combo-qty" min="0" value="0">
+                        </div>
+                    <?php endforeach; endif; ?>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Bước 4: Hình thức thanh toán</div>
                 <div class="payment-methods">
                     <div class="payment-option">
                         <input type="radio" id="pay-card" name="payment_method" value="card">
@@ -397,8 +477,11 @@ h2, h3 { color: #7FFF00; }
         <?php endif; ?>
         <div class="summary-row"><span>Ghế:</span><span style="font-weight:bold; color: #7FFF00;"><?= $seat_list ?> (<?= $seat_count ?>)</span></div>
         <div class="summary-row"><span>Giá vé:</span><span><?= fmt_money($Price) ?></span></div>
+        <div class="summary-row"><span>Tạm tính vé:</span><span id="ticket-subtotal"><?= fmt_money($total_amount) ?></span></div>
+        <div class="summary-row"><span>Combo:</span><span id="combo-subtotal"><?= fmt_money(0) ?></span></div>
+        <div class="summary-row"><span>Giảm voucher:</span><span id="voucher-discount">-</span></div>
         <hr style="border-color: #333; margin: 10px 0;">
-        <div class="summary-row total"><span>TỔNG CỘNG:</span><span><?= fmt_money($total_amount) ?></span></div>
+        <div class="summary-row total"><span>TỔNG CỘNG:</span><span id="final-total"><?= fmt_money($total_amount) ?></span></div>
 
         <div class="countdown" id="countdown">Thời gian giữ vé: <span id="time">10:00</span></div>
     </div>
@@ -415,6 +498,100 @@ document.addEventListener('DOMContentLoaded', function() {
     const paymentOptions = document.querySelectorAll('.payment-option');
     const validationMessage = document.getElementById('validation-message');
     let hasInteracted = false;
+    const baseTotal = <?= (int)$total_amount ?>;
+    const seatCount = <?= (int)$seat_count ?>;
+    const suatId = <?= (int)$suat_chieu_id ?>;
+
+    const voucherInput = document.getElementById('voucher');
+    const voucherBtn = document.getElementById('btnApplyVoucher');
+    const voucherMsg = document.getElementById('voucherMessage');
+    const voucherCodeInput = document.getElementById('voucher_code');
+    const voucherDiscountInput = document.getElementById('voucher_discount');
+    const comboItemsInput = document.getElementById('combo_items');
+
+    const comboItems = document.querySelectorAll('.combo-item');
+    const comboSubtotalEl = document.getElementById('combo-subtotal');
+    const ticketSubtotalEl = document.getElementById('ticket-subtotal');
+    const voucherDiscountEl = document.getElementById('voucher-discount');
+    const finalTotalEl = document.getElementById('final-total');
+    let currentDiscount = 0;
+    let voucherApplied = false;
+
+    function fmtMoney(n) {
+        return n.toLocaleString('vi-VN') + '₫';
+    }
+    function getComboItems() {
+        const items = [];
+        comboItems.forEach(item => {
+            const id = parseInt(item.dataset.comboId || item.dataset.comboid || 0);
+            const qty = parseInt(item.querySelector('.combo-qty').value || 0);
+            if (id > 0 && qty > 0) items.push({id, qty});
+        });
+        return items;
+    }
+    function getComboTotal() {
+        let sum = 0;
+        comboItems.forEach(item => {
+            const price = parseInt(item.dataset.comboPrice || 0);
+            const qty = parseInt(item.querySelector('.combo-qty').value || 0);
+            if (qty > 0) sum += price * qty;
+        });
+        return sum;
+    }
+    function updateTotals() {
+        const comboTotal = getComboTotal();
+        const sub = baseTotal + comboTotal;
+        const finalTotal = Math.max(0, sub - currentDiscount);
+
+        if (ticketSubtotalEl) ticketSubtotalEl.textContent = fmtMoney(baseTotal);
+        if (comboSubtotalEl) comboSubtotalEl.textContent = fmtMoney(comboTotal);
+        if (voucherDiscountEl) voucherDiscountEl.textContent = currentDiscount > 0 ? ('-' + fmtMoney(currentDiscount)) : '-';
+        if (finalTotalEl) finalTotalEl.textContent = fmtMoney(finalTotal);
+
+        comboItemsInput.value = JSON.stringify(getComboItems());
+    }
+
+    async function applyVoucher() {
+        const code = (voucherInput.value || '').trim();
+        if (!code) {
+            voucherApplied = false;
+            currentDiscount = 0;
+            voucherCodeInput.value = '';
+            voucherDiscountInput.value = 0;
+            voucherMsg.textContent = '';
+            voucherMsg.classList.remove('error');
+            updateTotals();
+            return;
+        }
+        const payload = {
+            code,
+            suat_chieu_id: suatId,
+            seat_count: seatCount,
+            combo_items: getComboItems()
+        };
+        const res = await fetch('apply_voucher.php', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.ok) {
+            voucherApplied = true;
+            currentDiscount = parseInt(data.discount || 0);
+            voucherCodeInput.value = code;
+            voucherDiscountInput.value = currentDiscount;
+            voucherMsg.textContent = data.message || 'Áp dụng voucher thành công.';
+            voucherMsg.classList.remove('error');
+        } else {
+            voucherApplied = false;
+            currentDiscount = 0;
+            voucherCodeInput.value = '';
+            voucherDiscountInput.value = 0;
+            voucherMsg.textContent = data.message || 'Voucher không hợp lệ.';
+            voucherMsg.classList.add('error');
+        }
+        updateTotals();
+    }
 
     function validate() {
         const isAgreed = agree.checked;
@@ -501,8 +678,44 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    if (voucherBtn) {
+        voucherBtn.addEventListener('click', applyVoucher);
+    }
+    if (voucherInput) {
+        voucherInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                applyVoucher();
+            }
+        });
+    }
+    comboItems.forEach(item => {
+        const qtyInput = item.querySelector('.combo-qty');
+        if (!qtyInput) return;
+        qtyInput.addEventListener('input', function() {
+            updateTotals();
+            if (voucherApplied) applyVoucher();
+        });
+    });
+
+    updateTotals();
     validate(); // Initial check
 });
+</script>
+<script>
+// Theme toggle
+(function(){
+  var body = document.body;
+  var btn = document.getElementById('themeToggle');
+  var stored = localStorage.getItem('theme') || 'dark';
+  body.setAttribute('data-theme', stored);
+  if (!btn) return;
+  btn.addEventListener('click', function(){
+    var cur = body.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+    body.setAttribute('data-theme', cur);
+    localStorage.setItem('theme', cur);
+  });
+})();
 </script>
 
 </body>
