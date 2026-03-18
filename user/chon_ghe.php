@@ -25,10 +25,7 @@ SELECT
     ) AS da_dat
 FROM ghe
 WHERE ghe.phong_id = (SELECT phong_id FROM suat_chieu WHERE id = $suat_chieu_id LIMIT 1)
--- order by row letter then seat number for natural ordering
-ORDER BY
-    LEFT(ghe.ten_ghe, 1),
-    CAST(SUBSTRING(ghe.ten_ghe, 2) AS UNSIGNED)
+ORDER BY ghe.ten_ghe
 ";
 $result = mysqli_query($conn, $sql);
 if (!$result) {
@@ -75,6 +72,7 @@ $pct_trong = $tong_ghe > 0 ? round($ghe_trong / $tong_ghe * 100) : 0;
 <!DOCTYPE html>
 <html lang="vi">
 <head>
+<<<<<<< HEAD
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Chọn ghế — <?= htmlspecialchars($info['ten_phim']) ?></title>
@@ -298,10 +296,30 @@ $pct_trong = $tong_ghe > 0 ? round($ghe_trong / $tong_ghe * 100) : 0;
   .btn-checkout { width: 100%; text-align: center; }
 }
 </style>
+=======
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Chọn ghế - <?= htmlspecialchars($info['ten_phim']) ?></title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/movie-detail.css">
+    <style>
+    /* ensure seat labels are always white for visibility */
+    .seat-selection .seat {
+        color: #fff !important;
+    }
+    .seat-selection .seat.booked {
+        color: #fff !important;
+    }
+    .seat-selection .seat:hover {
+        color: #fff !important;
+    }
+    </style>
+>>>>>>> 0ac481a443f3cbcb22ee39bd0fb33665c3864856
 </head>
 <body class="movie-detail-page">
 
 <header class="header">
+<<<<<<< HEAD
   <div class="header-inner">
     <a href="index.php" class="logo">TTVH</a>
     <nav class="header-nav">
@@ -318,6 +336,17 @@ $pct_trong = $tong_ghe > 0 ? round($ghe_trong / $tong_ghe * 100) : 0;
       </div>
     </nav>
   </div>
+=======
+    <div class="header-inner">
+        <div class="logo">CGV</div>
+        <nav class="menu">
+            <a href="index.php" class="nav-link">🎬 PHIM</a>
+        </nav>
+        <div class="actions">
+            <a href="ve_cua_toi.php" class="link">🎟️ VÉ CỦA TÔI</a>
+        </div>
+    </div>
+>>>>>>> 0ac481a443f3cbcb22ee39bd0fb33665c3864856
 </header>
 
 <main class="md-container">
@@ -407,13 +436,27 @@ $pct_trong = $tong_ghe > 0 ? round($ghe_trong / $tong_ghe * 100) : 0;
 
     <div class="seat-wrapper">
 <?php
-// build nested array of seats grouped by row letter
-$rows = [];
+$currentRow = '';
 while ($row = mysqli_fetch_assoc($result)) {
     $rowChar = substr($row['ten_ghe'], 0, 1);
-    $rows[$rowChar][] = $row;
+
+    if ($currentRow != $rowChar) {
+        if ($currentRow != '') echo '</div>';
+        echo "<div class='seat-row'>";
+        $currentRow = $rowChar;
+    }
+
+    $class = $row['da_dat'] ? 'seat booked' : 'seat';
+
+    echo "<button 
+            class='$class' 
+            data-seat='{$row['ten_ghe']}'
+            ".($row['da_dat'] ? 'disabled' : '').">
+            {$row['ten_ghe']}
+          </button>";
 }
 
+<<<<<<< HEAD
 $maxCount = 0;
 foreach ($rows as $r) {
     $maxCount = max($maxCount, count($r));
@@ -437,6 +480,10 @@ foreach ($rows as $rowChar => $rowSeats) {
     echo "</div>";
     echo "</div>";
 }
+=======
+
+if ($currentRow != '') echo '</div>';
+>>>>>>> 0ac481a443f3cbcb22ee39bd0fb33665c3864856
 ?>
         </div>
     </div><!-- end seat-wrapper -->
@@ -445,10 +492,16 @@ foreach ($rows as $rowChar => $rowSeats) {
     <div class="seat-legend">
       <div class="legend-item"><div class="legend-dot available"></div>Còn trống</div>
 
+<<<<<<< HEAD
       <div class="legend-item"><div class="legend-dot selected-l"></div>Đang chọn</div>
       <div class="legend-item"><div class="legend-dot booked-l"></div>Đã đặt</div>
     </div>
   </section>
+=======
+            <form action="chon_combo.php" method="POST">
+                <input type="hidden" name="ghe" id="seat-input">
+                <input type="hidden" name="suat_chieu_id" value="<?= $suat_chieu_id ?>">
+>>>>>>> 0ac481a443f3cbcb22ee39bd0fb33665c3864856
 
   <!-- Sticky checkout bar -->
   <div class="checkout-bar">
@@ -470,7 +523,13 @@ foreach ($rows as $rowChar => $rowSeats) {
   </div>
 </main>
 
+<<<<<<< HEAD
 <footer class="footer"><div>© <?= date('Y') ?> TTVH Cinemas</div></footer>
+=======
+<footer class="footer">
+    <div>© <?= date('Y') ?> CGV Cinemas — Thiết kế gọn, responsive.</div>
+</footer>
+>>>>>>> 0ac481a443f3cbcb22ee39bd0fb33665c3864856
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -557,6 +616,7 @@ document.addEventListener('DOMContentLoaded', function() {
         updateCheckoutUI(); // Cập nhật lại UI
     });
 
+<<<<<<< HEAD
 // Ngăn chặn thanh toán nếu chưa chọn ghế
     const checkoutForm = document.querySelector('form[action="payment.php"]');
     if (checkoutForm) {
@@ -572,6 +632,37 @@ document.addEventListener('DOMContentLoaded', function() {
                         bar.style.borderTopColor = '';
                         bar.style.boxShadow = '';
                     }, 800);
+=======
+    // Hàm kiểm tra và cập nhật trạng thái ghế từ server (polling)
+    async function updateBookedSeats() {
+        try {
+            const response = await fetch(`../get_seats.php?suat_id=${suatChieuId}&_=${new Date().getTime()}`);
+            if (!response.ok) {
+                console.error("Lỗi khi lấy trạng thái ghế. Status:", response.status);
+                return;
+            }
+            const serverSeats = await response.json();
+
+            let selectionChanged = false; // Cờ để kiểm tra xem lựa chọn có bị thay đổi không
+
+            serverSeats.forEach(serverSeat => {
+                const seatElement = seatWrapper.querySelector(`[data-seat='${serverSeat.ten_ghe}']`);
+                if (!seatElement) return;
+
+                const isBookedOnServer = serverSeat.da_dat === 1;
+                const isBookedOnClient = seatElement.classList.contains('booked');
+
+                // Chỉ cập nhật nếu trạng thái trên server là 'booked' và client chưa cập nhật
+                if (isBookedOnServer && !isBookedOnClient) {
+                    seatElement.classList.add('booked');
+                    seatElement.classList.remove('selected'); // Bỏ chọn nếu người khác đã đặt
+                    seatElement.disabled = true;
+
+                    if (selectedSeats.includes(serverSeat.ten_ghe)) {
+                        selectedSeats = selectedSeats.filter(s => s !== serverSeat.ten_ghe);
+                        selectionChanged = true;
+                    }
+>>>>>>> 0ac481a443f3cbcb22ee39bd0fb33665c3864856
                 }
             }
         });

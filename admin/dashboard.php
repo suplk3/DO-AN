@@ -68,6 +68,7 @@ $latest = mysqli_query($conn,
       <a class="btn" href="phim.php">🎬 Quản lý phim</a>
       <a class="btn" href="suat_chieu.php">🗓️ Quản lý suất chiếu</a>
       <a class="btn" href="quan_ly_user.php">👥 Quản lý user</a>
+      <a class="btn" href="quan_ly_combo.php">🍿 Quản lý Combo</a>
       <a class="btn" href="../user/index.php">🏠 Trang người dùng</a>
     </div>
     <div class="title">📊 Admin Dashboard</div>

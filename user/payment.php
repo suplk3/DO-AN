@@ -159,14 +159,42 @@ body {
 .combo-name { font-weight: 600; }
 .combo-desc { font-size: 12px; color: #9ca3af; }
 .combo-price { font-weight: 700; color: #7FFF00; }
-.combo-qty {
-    width: 64px;
-    text-align: center;
-    padding: 6px;
-    border-radius: 6px;
-    border: 1px solid #444;
+.qty-control {
+    display: flex;
+    align-items: center;
     background: #1f1f1f;
+    border-radius: 8px;
+    border: 1px solid #444;
+    overflow: hidden;
+}
+.qty-btn {
+    background: #2c2c2c;
     color: #fff;
+    border: none;
+    width: 32px;
+    height: 32px;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+.qty-btn:hover { background: #3c3c3c; color: #7FFF00; }
+.combo-qty {
+    width: 40px;
+    height: 32px;
+    text-align: center;
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+}
+.combo-qty[type=number]::-webkit-inner-spin-button, 
+.combo-qty[type=number]::-webkit-outer-spin-button { 
+    -webkit-appearance: none; 
+    margin: 0; 
 }
 /* New Payment Methods Style */
 .payment-methods {
@@ -302,17 +330,23 @@ h2, h3 { color: #7FFF00; }
     align-items: center;
     gap: 10px;
     margin: 20px 0;
-    white-space: nowrap; /* Force single line */
+    white-space: normal; /* Allow wrapping */
 }
 .agreement-group input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     flex-shrink: 0;
+    cursor: pointer;
 }
 .agreement-group label {
-    font-size: 15px; /* Slightly smaller font */
-    line-height: 1.4;
+    flex: 1; /* Stretch to take remaining space */
+    text-align: justify; /* Fill available text space */
+    font-size: 13px; /* Smaller font for better readability */
+    line-height: 1.5;
     color: #ccc;
+    font-weight: normal;
+    text-transform: none;
+    cursor: pointer;
 }
 </style>
 </head>
@@ -368,7 +402,7 @@ h2, h3 { color: #7FFF00; }
             </div>
 
             <div class="section">
-                <div class="section-title">Bước 3: Combo bắp nước</div>
+                <div class="section-title">Bước 3: Combo & Bắp Nước</div>
                 <div class="combo-list">
                     <?php if (empty($combos)): ?>
                         <div style="color:#9ca3af;font-size:13px;">Hiện chưa có combo.</div>
@@ -381,7 +415,11 @@ h2, h3 { color: #7FFF00; }
                                 <?php endif; ?>
                                 <div class="combo-price"><?= number_format((int)$cb['gia'], 0, ',', '.') ?>₫</div>
                             </div>
-                            <input type="number" class="combo-qty" min="0" value="0">
+                            <div class="qty-control">
+                                <button type="button" class="qty-btn minus-btn">-</button>
+                                <input type="number" class="combo-qty" min="0" value="0" readonly>
+                                <button type="button" class="qty-btn plus-btn">+</button>
+                            </div>
                         </div>
                     <?php endforeach; endif; ?>
                 </div>
@@ -457,7 +495,7 @@ h2, h3 { color: #7FFF00; }
 
             <div class="agreement-group">
                 <input type="checkbox" id="agree" name="agree">
-                <label for="agree" style="font-size: 15px;">Tôi đồng ý với điều khoản sử dụng và xác nhận mua vé cho người có độ tuổi phù hợp.</label>
+                <label for="agree">Tôi đồng ý với điều khoản sử dụng và xác nhận mua vé cho người có độ tuổi phù hợp.</label>
             </div>
 
             <div id="validation-message" style="color: #ffcc80; margin-bottom: 10px; display: none; text-align:center;">Vui lòng đồng ý điều khoản và chọn hình thức thanh toán.</div>
@@ -691,7 +729,26 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     comboItems.forEach(item => {
         const qtyInput = item.querySelector('.combo-qty');
+        const minusBtn = item.querySelector('.minus-btn');
+        const plusBtn = item.querySelector('.plus-btn');
+
         if (!qtyInput) return;
+
+        if (minusBtn && plusBtn) {
+            minusBtn.addEventListener('click', () => {
+                let val = parseInt(qtyInput.value) || 0;
+                if (val > 0) {
+                    qtyInput.value = val - 1;
+                    qtyInput.dispatchEvent(new Event('input'));
+                }
+            });
+            plusBtn.addEventListener('click', () => {
+                let val = parseInt(qtyInput.value) || 0;
+                qtyInput.value = val + 1;
+                qtyInput.dispatchEvent(new Event('input'));
+            });
+        }
+
         qtyInput.addEventListener('input', function() {
             updateTotals();
             if (voucherApplied) applyVoucher();
