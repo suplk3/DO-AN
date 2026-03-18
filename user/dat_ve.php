@@ -9,18 +9,15 @@ if (!isset($_POST['suat_chieu_id'], $_POST['ghe']) || empty($_POST['ghe'])) {
 
 $user_id       = $_SESSION['user_id'] ?? 1;
 $suat_chieu_id = (int)$_POST['suat_chieu_id'];
-<<<<<<< HEAD
 $ghe_array = array_filter(explode(",", $_POST['ghe']));
 $voucher_code = trim($_POST['voucher_code'] ?? '');
 $combo_items_raw = $_POST['combo_items'] ?? '[]';
 $combo_items = json_decode($combo_items_raw, true);
 if (!is_array($combo_items)) $combo_items = [];
-=======
 $ghe_array     = array_filter(explode(",", $_POST['ghe']));
 $combos_json   = $_POST['combos_json']  ?? '[]';
 $tong_combo    = (float)($_POST['tong_combo'] ?? 0);
 $combos_chon   = json_decode($combos_json, true) ?: [];
->>>>>>> 0ac481a443f3cbcb22ee39bd0fb33665c3864856
 
 if (empty($ghe_array)) die("Lỗi: Chưa chọn ghế nào.");
 
@@ -34,20 +31,16 @@ if ($row = mysqli_fetch_assoc($result)) $phong_id = (int)$row['phong_id'];
 mysqli_stmt_close($stmt);
 if (!$phong_id) die("Lỗi: Suất chiếu không tồn tại.");
 
-<<<<<<< HEAD
 if (!$phong_id) {
     die("Lỗi: Suất chiếu không tồn tại.");
 }
 
 // --- Begin Transaction với SERIALIZABLE để chống double booking ---
 mysqli_query($conn, "SET SESSION TRANSACTION ISOLATION LEVEL SERIALIZABLE");
-=======
-// ── Transaction: Lưu vé ─────────────────────────────────────
 $inserted_ve_ids = [];
->>>>>>> 0ac481a443f3cbcb22ee39bd0fb33665c3864856
+
 mysqli_begin_transaction($conn);
 try {
-<<<<<<< HEAD
     // Chuẩn bị statements
     // SELECT FOR UPDATE: lock hàng ghế lại trong transaction
     // Nếu 2 request cùng lúc, request sau sẽ chờ request trước commit/rollback
@@ -257,76 +250,6 @@ $ticket_id_display = 'TTVH-' . str_pad($last_ve_id ?? 0, 8, '0', STR_PAD_LEFT);
 // QR Code & Barcode data
 $qr_data = "TicketID: $ticket_id_display | Movie: $movie_name | Seats: $seat_list | Total: $total_amount";
 $qr_code_url = "https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=" . urlencode($qr_data);
-
-=======
-    $get_ghe   = mysqli_prepare($conn, "SELECT id FROM ghe WHERE ten_ghe = ? AND phong_id = ?");
-    $ins_ve    = mysqli_prepare($conn, "INSERT INTO ve (user_id, ghe_id, suat_chieu_id) VALUES (?, ?, ?)");
-
-    foreach ($ghe_array as $ten_ghe) {
-        mysqli_stmt_bind_param($get_ghe, "si", $ten_ghe, $phong_id);
-        mysqli_stmt_execute($get_ghe);
-        $ghe_row = mysqli_fetch_assoc(mysqli_stmt_get_result($get_ghe));
-        if (!$ghe_row) throw new Exception("Ghế '{$ten_ghe}' không tồn tại trong phòng này.");
-        $ghe_id = (int)$ghe_row['id'];
-
-        mysqli_stmt_bind_param($ins_ve, "iii", $user_id, $ghe_id, $suat_chieu_id);
-        if (!mysqli_stmt_execute($ins_ve)) throw new Exception("Không thể đặt ghế '{$ten_ghe}'. Ghế có thể đã được người khác đặt.");
-        $inserted_ve_ids[] = mysqli_insert_id($conn);
-    }
-    mysqli_stmt_close($get_ghe);
-    mysqli_stmt_close($ins_ve);
-
-    // ── Lưu combo (nếu có) ──────────────────────────────────
-    if (!empty($combos_chon) && !empty($inserted_ve_ids)) {
-        // Lấy giá thực từ DB (tránh giả mạo giá từ client)
-        $ids_str = implode(',', array_map('intval', array_column($combos_chon, 'combo_id')));
-        $gia_map = [];
-        if ($ids_str) {
-            $r_gia = mysqli_query($conn, "SELECT id, gia FROM combos WHERE id IN ($ids_str)");
-            while ($row_g = mysqli_fetch_assoc($r_gia)) $gia_map[$row_g['id']] = $row_g['gia'];
-        }
-
-        $ins_combo = mysqli_prepare($conn,
-            "INSERT INTO dat_ve_combo (ve_id, combo_id, so_luong, don_gia) VALUES (?, ?, ?, ?)"
-        );
-        $first_ve_id = $inserted_ve_ids[0]; // gắn combo vào vé đầu tiên của đơn
-        foreach ($combos_chon as $item) {
-            $cid  = (int)$item['combo_id'];
-            $qty  = max(1, (int)$item['so_luong']);
-            $dgia = $gia_map[$cid] ?? 0;
-            mysqli_stmt_bind_param($ins_combo, "iiid", $first_ve_id, $cid, $qty, $dgia);
-            mysqli_stmt_execute($ins_combo);
-        }
-        mysqli_stmt_close($ins_combo);
-
-        // Tính lại tong_combo từ giá DB
-        $tong_combo = 0;
-        foreach ($combos_chon as $item) {
-            $cid = (int)$item['combo_id'];
-            $tong_combo += ($gia_map[$cid] ?? 0) * max(1, (int)$item['so_luong']);
-        }
-    }
-
-    mysqli_commit($conn);
-
-} catch (Exception $e) {
-    mysqli_rollback($conn);
-    die("Đã xảy ra lỗi trong quá trình đặt vé: " . $e->getMessage());
-}
-
-// ── Lấy thông tin để hiển thị ────────────────────────────────
-$sql_info = "
-SELECT p.ten_phim, p.poster, p.the_loai, p.thoi_luong,
-       sc.ngay, sc.gio, sc.gia,
-       pc.ten_phong, r.ten_rap
-FROM suat_chieu sc
-JOIN phim p ON sc.phim_id = p.id
-JOIN phong_chieu pc ON sc.phong_id = pc.id
-JOIN rap r ON pc.rap_id = r.id
-WHERE sc.id = $suat_chieu_id
-";
-$info = mysqli_fetch_assoc(mysqli_query($conn, $sql_info));
->>>>>>> 0ac481a443f3cbcb22ee39bd0fb33665c3864856
 
 // Lấy tên combo để hiển thị
 $combo_display = [];
@@ -645,90 +568,115 @@ body.success-page{
   </div>
 </header>
 
-<<<<<<< HEAD
-<main>
-    <div class="ticket-container">
-        <div class="success-message">🎉 Đặt vé thành công! 🎉</div>
-        <div class="ticket">
-            <div class="ticket-header">
-                <div class="ticket-header-content">
-                    <h2><?= htmlspecialchars($movie_name) ?></h2>
-                </div>
-            </div>
-            <div class="ticket-body">
-                <div class="info-grid">
-                    <div class="info-section">
-                        <div class="details">
-                            <strong>Ngày chiếu</strong>
-                            <span><?= htmlspecialchars($show_date) ?></span>
-                        </div>
-                    </div>
-                    <div class="info-section">
-                        <div class="details">
-                            <strong>Giờ chiếu</strong>
-                            <span><?= htmlspecialchars($show_time) ?></span>
-                        </div>
-                    </div>
-                </div>
-                <div class="info-grid">
-                     <div class="info-section full-width-section">
-                        <div class="details">
-                            <strong>Rạp/Phòng</strong>
-                            <span><?= htmlspecialchars($rap_name) ?> / <?= htmlspecialchars($phong_name) ?></span>
-                        </div>
-                    </div>
-                </div>
-                <div class="info-section full-width-section">
-                    <div class="details">
-                        <strong>Ghế</strong>
-                        <span class="seat-list"><?= $seat_list ?> (<?= $seat_count ?> ghế)</span>
-                    </div>
-                </div>
-                <?php if ($combo_total > 0): ?>
-                <div class="info-section full-width-section">
-                    <div class="details">
-                        <strong>Combo</strong>
-                        <span>
-                            <?php
-                                $combo_text = [];
-                                foreach ($combo_validated as $cb) {
-                                    $combo_text[] = $cb['ten'] . " x" . $cb['qty'];
-                                }
-                                echo htmlspecialchars(implode(", ", $combo_text));
-                            ?>
-                        </span>
-                    </div>
-                </div>
-                <?php endif; ?>
-                <?php if ($voucher_discount > 0): ?>
-                <div class="info-section full-width-section">
-                    <div class="details">
-                        <strong>Voucher</strong>
-                        <span>-<?= number_format($voucher_discount, 0, ',', '.') ?>₫ (<?= htmlspecialchars($voucher_code) ?>)</span>
-                    </div>
-                </div>
-                <?php endif; ?>
-            </div>
-            <div class="ticket-cutout"></div>
-            <div class="ticket-bottom-part">
-                <div class="ticket-qr-section">
-                    <img class="qr-code" src="<?= $qr_code_url ?>" alt="Ticket QR Code">
-                    <div class="ticket-id"><?= htmlspecialchars($ticket_id_display) ?></div>
-                </div>
-                <div class="ticket-total-section">
-                    <div class="total-amount">
-                        <span>Tổng cộng</span>
-                        <div><?= number_format($total_amount, 0, ',', '.') ?>₫</div>
-                    </div>
-                    
-                </div>
-            </div>
-        </div>
-=======
 <main class="success-wrap">
   <div class="ticket-card">
     <div class="ticket-top-bar"></div>
->>>>>>> 0ac481a443f3cbcb22ee39bd0fb33665c3864856
+
+    <!-- Header -->
+    <div class="ticket-header">
+      <div class="success-icon">🎉</div>
+      <div class="ticket-headline">
+        <h1>Đặt vé thành công!</h1>
+        <p>Cảm ơn bạn đã đặt vé tại CGV. Hẹn gặp bạn tại rạp!</p>
+      </div>
+      <div class="order-code"><?= $ma_don ?></div>
+    </div>
+
+    <!-- Body -->
+    <div class="ticket-body">
+      <!-- Poster -->
+      <div class="ticket-poster">
+        <img src="../assets/images/<?= htmlspecialchars($info['poster'] ?? '') ?>"
+             alt="poster"
+             onerror="this.src='../assets/images/avengers.jpg'">
+        <img class="qr-code" style="width:100px; height: 100px; margin-top:20px" src="<?= $qr_code_url ?>" alt="Ticket QR Code">
+      </div>
+
+      <!-- Info -->
+      <div class="ticket-info">
+        <h2 class="info-movie-title"><?= htmlspecialchars($info['ten_phim'] ?? '') ?></h2>
+        <div class="info-grid">
+          <div class="info-cell">
+            <label>📅 Ngày chiếu</label>
+            <div class="val"><?= $ngay_chieu ?></div>
+          </div>
+          <div class="info-cell">
+            <label>🕐 Giờ chiếu</label>
+            <div class="val"><?= $gio_chieu ?></div>
+          </div>
+          <div class="info-cell">
+            <label>🏠 Rạp</label>
+            <div class="val"><?= htmlspecialchars($info['ten_rap'] ?? '') ?></div>
+          </div>
+          <div class="info-cell">
+            <label>🎬 Phòng</label>
+            <div class="val"><?= htmlspecialchars($info['ten_phong'] ?? '') ?></div>
+          </div>
+          <div class="info-cell" style="grid-column:1/-1">
+            <label>💺 Ghế</label>
+            <div class="val seats">
+              <?php foreach ($ghe_array as $g): ?>
+              <span class="seat-chip"><?= htmlspecialchars(trim($g)) ?></span>
+              <?php endforeach; ?>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /ticket-body -->
+
+    <!-- Combo tags -->
+    <?php if ($combo_total > 0 || !empty($combo_validated)): ?>
+    <div class="combo-in-ticket">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:8px;">🍿 Combo đã chọn</div>
+      <?php foreach ($combo_validated as $cd): ?>
+        <span class="combo-tag">
+          <?= htmlspecialchars($cd['ten']) ?> ×<?= $cd['qty'] ?> &nbsp;—&nbsp;<?= fmt_m((isset($cd['gia']) ? $cd['gia'] : 0) * (isset($cd['qty']) ? $cd['qty'] : 1)) ?>
+        </span>
+      <?php endforeach; ?>
+    </div>
+    <?php endif; ?>
+
+    <!-- Perforation -->
+    <div class="ticket-perforation"></div>
+
+    <!-- Price breakdown -->
+    <div class="ticket-price">
+      <table class="price-table">
+        <tr>
+          <td>Vé xem phim (<?= $so_ghe ?> ghế × <?= fmt_m($gia_ve) ?>)</td>
+          <td><?= fmt_m($tong_ve) ?></td>
+        </tr>
+        <?php if ($combo_total > 0 || $tong_combo > 0): ?>
+        <tr>
+          <td>Combo bắp nước</td>
+          <td><?= fmt_m($combo_total > 0 ? $combo_total : $tong_combo) ?></td>
+        </tr>
+        <?php endif; ?>
+        <?php if (isset($voucher_discount) && $voucher_discount > 0): ?>
+        <tr>
+          <td>Voucher (<?= htmlspecialchars($voucher_code) ?>)</td>
+          <td style="color:var(--accent-red)">-<?= fmt_m($voucher_discount) ?></td>
+        </tr>
+        <?php endif; ?>
+        <tr class="total-row">
+          <td>Tổng thanh toán</td>
+          <td><?= fmt_m($total_amount) ?></td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Actions -->
+    <div class="ticket-actions">
+      <a href="index.php" class="btn-home">🏠 Về trang chủ</a>
+      <a href="ve_cua_toi.php" class="btn-ve">🎟️ Xem vé của tôi</a>
+    </div>
+  </div><!-- /ticket-card -->
+
+  <div class="enjoy-note">
+    Vui lòng <strong>đến trước giờ chiếu 15 phút</strong> để nhận vé và combo.<br>
+    Mã đơn: <strong><?= $ma_don ?></strong> — Chúc bạn xem phim vui vẻ! 🎬
+  </div>
+</main>
 
     <!-- Header -->
     <div class="ticket-header">
