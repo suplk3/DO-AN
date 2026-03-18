@@ -231,8 +231,6 @@ $quick_stats = mysqli_fetch_assoc($quick_stats_result);
     <div class="container">
         <header>
             <div>
-                <h1>🎬 Admin Dashboard</h1>
-            </div>
             <div class="user-info">
                 <p>Xin chào,</p>
                 <p class="username"><?php echo htmlspecialchars($_SESSION['user_name'] ?? 'Admin'); ?></p>

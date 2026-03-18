@@ -92,7 +92,6 @@ if (isset($_SESSION['user_id'])) {
                         <a href="../user/ve_cua_toi.php" class="user-dropdown-item">🎟️ Vé của tôi</a>
                         <?php if ($is_admin): ?>
                         <div class="user-dropdown-divider"></div>
-                        <a href="../admin/dashboard.php" class="user-dropdown-item">📊 Dashboard</a>
                         <a href="../admin/phim.php" class="user-dropdown-item">🎬 Quản lý phim</a>
                         <a href="../admin/suat_chieu.php" class="user-dropdown-item">🗓️ Quản lý suất chiếu</a>
                         <a href="../admin/quan_ly_user.php" class="user-dropdown-item">👥 Quản lý user</a>
