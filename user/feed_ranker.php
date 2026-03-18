@@ -120,6 +120,32 @@ class FeedRanker {
         $r = mysqli_query($this->conn, $sql_a);
         while ($row = mysqli_fetch_assoc($r)) $posts[$row['id']] = $row;
 
+        // ── Nguồn A2: Public feed (mọi bài gần đây) ─────────────────
+        $sql_public = "
+            SELECT p.*,
+                   u.ten AS ten_user, u.avatar,
+                   'public' AS source,
+                   (SELECT COUNT(*) FROM reactions
+                    WHERE target_type='post' AND target_id=p.id) AS tong_reaction,
+                   (SELECT COUNT(*) FROM comments
+                    WHERE target_type='post' AND target_id=p.id) AS tong_comment,
+                   (SELECT loai FROM reactions
+                    WHERE target_type='post' AND target_id=p.id AND user_id=$me
+                    LIMIT 1) AS my_reaction,
+                   ph.ten_phim, ph.poster AS phim_poster, ph.the_loai AS phim_genre
+            FROM posts p
+            JOIN users u ON p.user_id = u.id
+            LEFT JOIN phim ph ON p.phim_id = ph.id
+            WHERE p.created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+            $impression_filter
+            ORDER BY p.created_at DESC
+            LIMIT 200
+        ";
+        $r = mysqli_query($this->conn, $sql_public);
+        while ($row = mysqli_fetch_assoc($r)) {
+            if (!isset($posts[$row['id']])) $posts[$row['id']] = $row;
+        }
+
         // ── Nguồn B: Interest-based (phim cùng thể loại yêu thích) ──
         $interest_topics = $this->getTopInterests(5);
         if (!empty($interest_topics)) {
