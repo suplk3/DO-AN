@@ -47,13 +47,21 @@ body.user-index .header.shrink {
     background: rgba(6,8,14,0.92);
 }
 body.user-index .header-inner {
-    max-width: 1320px;
+    max-width: 1400px;
     margin: 0 auto;
     height: 100%;
     display: flex;
     align-items: center;
-    gap: 16px;
-    padding: 0 20px;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 0 24px;
+}
+
+body.user-index .menu {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
 }
 
 /* ── Logo ── */
@@ -76,11 +84,21 @@ body.user-index .logo:hover { color: #ff4d6d; text-shadow: 0 0 30px rgba(255,77,
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 100%;
+    flex: 1; /* Chiếm hết không gian còn lại sau logo */
     gap: 12px;
 }
-.header-nav-left,
-.header-nav-right { display: flex; align-items: center; gap: 6px; }
+.header-nav-left {
+    flex: 1;
+    display: flex;
+    justify-content: center; /* Căn giữa menu bên trái */
+    gap: 10px;
+}
+.header-nav-right { 
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
+    justify-content: flex-end;
+}
 
 .header-nav-left .nav-link {
     display: inline-flex;
@@ -287,6 +305,7 @@ body.user-index .movie-title {
     color: #f1f5f9;
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2; /* Thuộc tính chuẩn */
     -webkit-box-orient: vertical;
     overflow: hidden;
 }

@@ -77,6 +77,37 @@ try {
     mysqli_stmt_close($lock_stmt);
     mysqli_stmt_close($insert_ve_stmt);
 
+
+// ── Cộng điểm TTVH sau khi mua vé ────────────────────────────────
+// Tự động add column nếu chưa có
+if (!column_exists($conn, "users", "points")) {
+    mysqli_query($conn, "ALTER TABLE users ADD COLUMN points INT DEFAULT 0 NOT NULL");
+}
+
+// Lấy giá suất chiếu để tính điểm (1.000đ = 1 điểm)
+$gia_suat = 0;
+$gs = mysqli_prepare($conn, "SELECT gia FROM suat_chieu WHERE id = ?");
+mysqli_stmt_bind_param($gs, "i", $suat_chieu_id);
+mysqli_stmt_execute($gs);
+$gs_row = mysqli_fetch_assoc(mysqli_stmt_get_result($gs));
+mysqli_stmt_close($gs);
+if ($gs_row) $gia_suat = (int)$gs_row["gia"];
+$earned_points = (int)floor($gia_suat * count($ghe_array) / 1000);
+if ($earned_points > 0) {
+    mysqli_query($conn, "UPDATE users SET points = points + $earned_points WHERE id = $user_id");
+}
+
+// ── Đánh dấu thẻ quà tặng đã dùng ─────────────────────────────────
+$giftcard_code = trim($_POST["giftcard_code"] ?? "");
+if ($giftcard_code !== "") {
+    if (table_exists($conn, "gift_cards")) {
+        $gcStmt = mysqli_prepare($conn, "UPDATE gift_cards SET used=1, used_by=?, used_at=NOW() WHERE code=? AND used=0");
+        mysqli_stmt_bind_param($gcStmt, "is", $user_id, $giftcard_code);
+        mysqli_stmt_execute($gcStmt);
+        mysqli_stmt_close($gcStmt);
+    }
+}
+
 } catch (Exception $e) {
     mysqli_rollback($conn);
     $msg = $e->getMessage();
@@ -190,12 +221,12 @@ $total_amount = max(0, $sub_total - $voucher_discount);
 if ($voucher_id && $voucher_discount > 0 && table_exists($conn, 'voucher_usages')) {
     $uid = (int)$user_id;
     $stmt = mysqli_prepare($conn,
-        "INSERT IGNORE INTO voucher_usages (voucher_id, user_id, suat_chieu_id, discount_amount)
-         VALUES (?, ?, ?, ?)"
+        "INSERT IGNORE INTO voucher_usages (voucher_id, user_id) VALUES (?, ?)"
     );
-    mysqli_stmt_bind_param($stmt, "iiii", $voucher_id, $uid, $suat_chieu_id, $voucher_discount);
+    mysqli_stmt_bind_param($stmt, "ii", $voucher_id, $uid);
     mysqli_stmt_execute($stmt);
     mysqli_stmt_close($stmt);
+
 
     if (table_exists($conn, 'vouchers')) {
         mysqli_query($conn, "UPDATE vouchers SET used_count = used_count + 1 WHERE id = " . (int)$voucher_id);
