@@ -60,6 +60,37 @@ $q_suat = mysqli_query($conn, $sql_suat);
 <link rel="stylesheet" href="../assets/css/user-index.css">
 <link rel="stylesheet" href="../assets/css/login-modal.css">
 <link rel="stylesheet" href="../assets/css/search.css">
+<style>
+/* Responsive tweaks for chon_suat.php */
+.movie-info-card {
+  display: flex; align-items: center; gap: 16px;
+  background: linear-gradient(135deg,#111827,#0d1322);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 16px; padding: 16px 20px;
+  margin-bottom: 28px;
+}
+.date-scroll-container {
+  display: flex; gap: 10px; margin-bottom: 32px;
+  overflow-x: auto; padding-bottom: 8px;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+.date-scroll-container::-webkit-scrollbar { height: 6px; }
+.date-scroll-container::-webkit-scrollbar-track { background: transparent; }
+.date-scroll-container::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 6px; }
+.date-scroll-container > a { scroll-snap-align: start; flex-shrink: 0; min-width: 70px; }
+
+.showtime-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px; margin-bottom: 40px;
+}
+@media (max-width: 480px) {
+  .movie-info-card { flex-direction: row; align-items: flex-start; gap: 12px; }
+  .movie-info-card img { width: 70px; height: 100px; object-fit: cover; }
+  .showtime-grid { grid-template-columns: 1fr; gap: 12px; }
+}
+</style>
 </head>
 <body class="user-index">
 
@@ -97,7 +128,7 @@ $q_suat = mysqli_query($conn, $sql_suat);
   <?php
   $pi = mysqli_fetch_assoc(mysqli_query($conn, "SELECT ten_phim,poster,the_loai,thoi_luong FROM phim WHERE id=$phim_id"));
   if ($pi): ?>
-  <div style="display:flex;align-items:center;gap:16px;background:linear-gradient(135deg,#111827,#0d1322);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:16px 20px;margin-bottom:28px;">
+  <div class="movie-info-card">
     <img src="../assets/images/<?= htmlspecialchars($pi['poster']) ?>" style="width:52px;height:74px;object-fit:cover;border-radius:8px;flex-shrink:0;" alt="">
     <div>
       <div style="font-size:17px;font-weight:800;color:#f1f5f9;margin-bottom:6px;"><?= htmlspecialchars($pi['ten_phim']) ?></div>
@@ -111,7 +142,7 @@ $q_suat = mysqli_query($conn, $sql_suat);
 
   <h1 class="page-title" style="text-align:left;font-size:20px;margin-bottom:20px;">🗓️ Chọn ngày chiếu</h1>
 
-  <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:32px;">
+  <div class="date-scroll-container">
     <?php if (empty($ngay_list)): ?>
       <p style="color:#64748b;">Không có ngày chiếu nào.</p>
     <?php else: foreach ($ngay_list as $d):
@@ -142,7 +173,7 @@ $q_suat = mysqli_query($conn, $sql_suat);
       <div style="font-size:13px;">Hãy chọn ngày khác</div>
     </div>
   <?php else: ?>
-  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-bottom:40px;">
+  <div class="showtime-grid">
     <?php while ($s = mysqli_fetch_assoc($q_suat)):
       $gio   = substr($s['gio'], 0, 5);
       $gia   = number_format($s['gia'], 0, ',', '.');
