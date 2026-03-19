@@ -47,13 +47,21 @@ body.user-index .header.shrink {
     background: rgba(6,8,14,0.92);
 }
 body.user-index .header-inner {
-    max-width: 1320px;
+    max-width: 1400px;
     margin: 0 auto;
     height: 100%;
     display: flex;
     align-items: center;
-    gap: 16px;
-    padding: 0 20px;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 0 24px;
+}
+
+body.user-index .menu {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
 }
 
 /* ── Logo ── */
@@ -76,11 +84,21 @@ body.user-index .logo:hover { color: #ff4d6d; text-shadow: 0 0 30px rgba(255,77,
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 100%;
+    flex: 1; /* Chiếm hết không gian còn lại sau logo */
     gap: 12px;
 }
-.header-nav-left,
-.header-nav-right { display: flex; align-items: center; gap: 6px; }
+.header-nav-left {
+    flex: 1;
+    display: flex;
+    justify-content: center; /* Căn giữa menu bên trái */
+    gap: 10px;
+}
+.header-nav-right { 
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
+    justify-content: flex-end;
+}
 
 .header-nav-left .nav-link {
     display: inline-flex;
@@ -287,6 +305,7 @@ body.user-index .movie-title {
     color: #f1f5f9;
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2; /* Thuộc tính chuẩn */
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
@@ -520,8 +539,13 @@ body.user-index .footer {
     .banner-overlay { padding: 32px 22px 20px; }
 }
 @media (max-width: 640px) {
-    body.user-index { padding-top: 56px; }
-    body.user-index .header-inner { padding: 0 12px; }
+    body.user-index { padding-top: 140px; }
+    body.user-index .header { height: auto; padding: 12px 0; }
+    body.user-index .header.shrink { height: auto; }
+    body.user-index .header-inner { padding: 0 12px; flex-direction: column-reverse; align-items: center; gap: 12px; }
+    .header-nav { flex-wrap: wrap; justify-content: center; }
+    .header-nav-left, .header-nav-right { flex: 1; justify-content: center; }
+    body.user-index .logo { margin-bottom: 4px; }
     body.user-index .container { padding: 20px 14px; }
     body.user-index .movies { gap: 12px; grid-template-columns: repeat(2, 1fr); }
     body.user-index .poster { height: 200px; }
@@ -533,6 +557,7 @@ body.user-index .footer {
 }
 @media (max-width: 420px) {
     body.user-index .page-title { font-size: 24px; }
+    body.user-index { padding-top: 155px; }
     .banner-prev { left: 8px; }
     .banner-next { right: 8px; }
 }

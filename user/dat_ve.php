@@ -77,6 +77,37 @@ try {
     mysqli_stmt_close($lock_stmt);
     mysqli_stmt_close($insert_ve_stmt);
 
+
+// ── Cộng điểm TTVH sau khi mua vé ────────────────────────────────
+// Tự động add column nếu chưa có
+if (!column_exists($conn, "users", "points")) {
+    mysqli_query($conn, "ALTER TABLE users ADD COLUMN points INT DEFAULT 0 NOT NULL");
+}
+
+// Lấy giá suất chiếu để tính điểm (1.000đ = 1 điểm)
+$gia_suat = 0;
+$gs = mysqli_prepare($conn, "SELECT gia FROM suat_chieu WHERE id = ?");
+mysqli_stmt_bind_param($gs, "i", $suat_chieu_id);
+mysqli_stmt_execute($gs);
+$gs_row = mysqli_fetch_assoc(mysqli_stmt_get_result($gs));
+mysqli_stmt_close($gs);
+if ($gs_row) $gia_suat = (int)$gs_row["gia"];
+$earned_points = (int)floor($gia_suat * count($ghe_array) / 1000);
+if ($earned_points > 0) {
+    mysqli_query($conn, "UPDATE users SET points = points + $earned_points WHERE id = $user_id");
+}
+
+// ── Đánh dấu thẻ quà tặng đã dùng ─────────────────────────────────
+$giftcard_code = trim($_POST["giftcard_code"] ?? "");
+if ($giftcard_code !== "") {
+    if (table_exists($conn, "gift_cards")) {
+        $gcStmt = mysqli_prepare($conn, "UPDATE gift_cards SET used=1, used_by=?, used_at=NOW() WHERE code=? AND used=0");
+        mysqli_stmt_bind_param($gcStmt, "is", $user_id, $giftcard_code);
+        mysqli_stmt_execute($gcStmt);
+        mysqli_stmt_close($gcStmt);
+    }
+}
+
 } catch (Exception $e) {
     mysqli_rollback($conn);
     $msg = $e->getMessage();
@@ -190,12 +221,12 @@ $total_amount = max(0, $sub_total - $voucher_discount);
 if ($voucher_id && $voucher_discount > 0 && table_exists($conn, 'voucher_usages')) {
     $uid = (int)$user_id;
     $stmt = mysqli_prepare($conn,
-        "INSERT IGNORE INTO voucher_usages (voucher_id, user_id, suat_chieu_id, discount_amount)
-         VALUES (?, ?, ?, ?)"
+        "INSERT IGNORE INTO voucher_usages (voucher_id, user_id) VALUES (?, ?)"
     );
-    mysqli_stmt_bind_param($stmt, "iiii", $voucher_id, $uid, $suat_chieu_id, $voucher_discount);
+    mysqli_stmt_bind_param($stmt, "ii", $voucher_id, $uid);
     mysqli_stmt_execute($stmt);
     mysqli_stmt_close($stmt);
+
 
     if (table_exists($conn, 'vouchers')) {
         mysqli_query($conn, "UPDATE vouchers SET used_count = used_count + 1 WHERE id = " . (int)$voucher_id);
@@ -648,107 +679,6 @@ body.success-page{
         <tr>
           <td>Voucher (<?= htmlspecialchars($voucher_code) ?>)</td>
           <td style="color:var(--accent-red) !important">-<?= fmt_m($voucher_discount) ?></td>
-        </tr>
-        <?php endif; ?>
-        <tr class="total-row">
-          <td>Tổng thanh toán</td>
-          <td><?= fmt_m($tong_thanh_toan) ?></td>
-        </tr>
-      </table>
-    </div>
-
-    <!-- Actions -->
-    <div class="ticket-actions">
-      <a href="index.php" class="btn-home">🏠 Về trang chủ</a>
-      <a href="ve_cua_toi.php" class="btn-ve">🎟️ Xem vé của tôi</a>
-    </div>
-  </div><!-- /ticket-card -->
-
-  <div class="enjoy-note">
-    Vui lòng <strong>đến trước giờ chiếu 15 phút</strong> để nhận vé và combo.<br>
-    Mã đơn: <strong><?= $ma_don ?></strong> — Chúc bạn xem phim vui vẻ! 🎬
-  </div>
-</main>
->>>>>>> origin/main
-
-    <!-- Header -->
-    <div class="ticket-header">
-      <div class="success-icon">🎉</div>
-      <div class="ticket-headline">
-        <h1>Đặt vé thành công!</h1>
-        <p>Cảm ơn bạn đã đặt vé tại CGV. Hẹn gặp bạn tại rạp!</p>
-      </div>
-      <div class="order-code"><?= $ma_don ?></div>
-    </div>
-
-    <!-- Body -->
-    <div class="ticket-body">
-      <!-- Poster -->
-      <div class="ticket-poster">
-        <img src="../assets/images/<?= htmlspecialchars($info['poster'] ?? '') ?>"
-             alt="poster"
-             onerror="this.src='../assets/images/avengers.jpg'">
-      </div>
-
-      <!-- Info -->
-      <div class="ticket-info">
-        <h2 class="info-movie-title"><?= htmlspecialchars($info['ten_phim'] ?? '') ?></h2>
-        <div class="info-grid">
-          <div class="info-cell">
-            <label>📅 Ngày chiếu</label>
-            <div class="val"><?= $ngay_chieu ?></div>
-          </div>
-          <div class="info-cell">
-            <label>🕐 Giờ chiếu</label>
-            <div class="val"><?= $gio_chieu ?></div>
-          </div>
-          <div class="info-cell">
-            <label>🏠 Rạp</label>
-            <div class="val"><?= htmlspecialchars($info['ten_rap'] ?? '') ?></div>
-          </div>
-          <div class="info-cell">
-            <label>🎬 Phòng</label>
-            <div class="val"><?= htmlspecialchars($info['ten_phong'] ?? '') ?></div>
-          </div>
-          <div class="info-cell" style="grid-column:1/-1">
-            <label>💺 Ghế</label>
-            <div class="val seats">
-              <?php foreach ($ghe_array as $g): ?>
-              <span class="seat-chip"><?= htmlspecialchars(trim($g)) ?></span>
-              <?php endforeach; ?>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div><!-- /ticket-body -->
-
-    <!-- Combo tags -->
-    <?php if (!empty($combo_display)): ?>
-    <div class="combo-in-ticket">
-      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:8px;">🍿 Combo đã chọn</div>
-      <?php foreach ($combo_display as $cd): ?>
-        <span class="combo-tag">
-          <?= htmlspecialchars($cd['ten']) ?> ×<?= $cd['qty'] ?>
-          &nbsp;—&nbsp;<?= fmt_m($cd['gia'] * $cd['qty']) ?>
-        </span>
-      <?php endforeach; ?>
-    </div>
-    <?php endif; ?>
-
-    <!-- Perforation -->
-    <div class="ticket-perforation"></div>
-
-    <!-- Price breakdown -->
-    <div class="ticket-price">
-      <table class="price-table">
-        <tr>
-          <td>Vé xem phim (<?= $so_ghe ?> ghế × <?= fmt_m($gia_ve) ?>)</td>
-          <td><?= fmt_m($tong_ve) ?></td>
-        </tr>
-        <?php if ($tong_combo > 0): ?>
-        <tr>
-          <td>Combo bắp nước</td>
-          <td><?= fmt_m($tong_combo) ?></td>
         </tr>
         <?php endif; ?>
         <tr class="total-row">
