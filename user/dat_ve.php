@@ -14,10 +14,6 @@ $voucher_code = trim($_POST['voucher_code'] ?? '');
 $combo_items_raw = $_POST['combo_items'] ?? '[]';
 $combo_items = json_decode($combo_items_raw, true);
 if (!is_array($combo_items)) $combo_items = [];
-$ghe_array     = array_filter(explode(",", $_POST['ghe']));
-$combos_json   = $_POST['combos_json']  ?? '[]';
-$tong_combo    = (float)($_POST['tong_combo'] ?? 0);
-$combos_chon   = json_decode($combos_json, true) ?: [];
 
 if (empty($ghe_array)) die("Lỗi: Chưa chọn ghế nào.");
 
@@ -31,14 +27,9 @@ if ($row = mysqli_fetch_assoc($result)) $phong_id = (int)$row['phong_id'];
 mysqli_stmt_close($stmt);
 if (!$phong_id) die("Lỗi: Suất chiếu không tồn tại.");
 
-if (!$phong_id) {
-    die("Lỗi: Suất chiếu không tồn tại.");
-}
-
 // --- Begin Transaction với SERIALIZABLE để chống double booking ---
 mysqli_query($conn, "SET SESSION TRANSACTION ISOLATION LEVEL SERIALIZABLE");
 $inserted_ve_ids = [];
-
 mysqli_begin_transaction($conn);
 try {
     // Chuẩn bị statements
@@ -251,34 +242,25 @@ $ticket_id_display = 'TTVH-' . str_pad($last_ve_id ?? 0, 8, '0', STR_PAD_LEFT);
 $qr_data = "TicketID: $ticket_id_display | Movie: $movie_name | Seats: $seat_list | Total: $total_amount";
 $qr_code_url = "https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=" . urlencode($qr_data);
 
-// Lấy tên combo để hiển thị
+// ── Map HEAD variables to HTML structure variables ───────────────────
 $combo_display = [];
-if (!empty($combos_chon)) {
-    $ids_str = implode(',', array_map('intval', array_column($combos_chon, 'combo_id')));
-    $r_c = mysqli_query($conn, "SELECT id, ten_combo, gia FROM combos WHERE id IN ($ids_str)");
-    $cn_map = [];
-    while ($rc = mysqli_fetch_assoc($r_c)) $cn_map[$rc['id']] = $rc;
-    foreach ($combos_chon as $item) {
-        $cid = (int)$item['combo_id'];
-        $qty = (int)$item['so_luong'];
-        if (isset($cn_map[$cid])) {
-            $combo_display[] = ['ten' => $cn_map[$cid]['ten_combo'], 'qty' => $qty, 'gia' => $cn_map[$cid]['gia']];
-        }
+if (!empty($combo_validated)) {
+    foreach ($combo_validated as $cb) {
+        $combo_display[] = ['ten' => $cb['ten'], 'qty' => $cb['qty'], 'gia' => $cb['gia']];
     }
 }
+$tong_combo = $combo_total ?? 0;
+$so_ghe = $seat_count ?? 0;
+$gia_ve = $price_per_seat ?? 0;
+$tong_ve = $ticket_total ?? 0;
+$tong_thanh_toan = $total_amount ?? 0;
+$ngay_chieu = $show_date ?? '';
+$gio_chieu = $show_time ?? '';
+$ma_don = $ticket_id_display ?? '';
 
-mysqli_close($conn);
-
-// ── Format helpers ────────────────────────────────────────────
-$seat_list     = implode(", ", array_map('trim', $ghe_array));
-$so_ghe        = count($ghe_array);
-$gia_ve        = (float)($info['gia'] ?? 0);
-$tong_ve       = $so_ghe * $gia_ve;
-$tong_thanh_toan = $tong_ve + $tong_combo;
-$ngay_chieu    = $info ? date('d/m/Y', strtotime($info['ngay'])) : '';
-$gio_chieu     = $info ? date('H:i', strtotime($info['gio'])) : '';
-$ma_don        = 'CGV' . str_pad($inserted_ve_ids[0] ?? 0, 6, '0', STR_PAD_LEFT);
-function fmt_m($n){ return number_format($n, 0, ',', '.') . '₫'; }
+if (!function_exists('fmt_m')) {
+    function fmt_m($n){ return number_format($n, 0, ',', '.') . '₫'; }
+}
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -465,27 +447,37 @@ body.success-page{
 .ticket-price{
   padding:18px 24px;
 }
-.price-table{width:100%;}
-.price-table tr td{
-  padding:5px 0;
-  font-size:13px;
-  color:var(--muted);
+.price-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: transparent !important;
 }
-.price-table tr td:last-child{
-  text-align:right;font-weight:600;color:var(--text);
+.price-table tr td {
+  padding: 8px 0 !important;
+  font-size: 14px !important;
+  color: var(--muted) !important;
+  background: transparent !important;
+  border: none !important;
+  text-align: left !important;
 }
-.price-table .total-row td{
-  border-top:1px solid var(--border);
-  padding-top:10px;
-  font-size:16px;
-  font-weight:700;
-  color:var(--text);
+.price-table tr td:last-child {
+  text-align: right !important;
+  font-weight: 600;
+  color: var(--text) !important;
 }
-.price-table .total-row td:last-child{
-  font-size:22px;
-  color:var(--gold);
-  font-family:'Bebas Neue',sans-serif;
-  letter-spacing:1px;
+.price-table .total-row td {
+  border-top: 1px dashed var(--border) !important;
+  padding-top: 16px !important;
+  margin-top: 8px !important;
+  font-size: 16px !important;
+  font-weight: 700;
+  color: var(--text) !important;
+}
+.price-table .total-row td:last-child {
+  font-size: 22px !important;
+  color: var(--gold) !important;
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 1px;
 }
 
 /* Combo section in ticket */
@@ -571,7 +563,6 @@ body.success-page{
 <main class="success-wrap">
   <div class="ticket-card">
     <div class="ticket-top-bar"></div>
-
     <!-- Header -->
     <div class="ticket-header">
       <div class="success-icon">🎉</div>
@@ -625,12 +616,13 @@ body.success-page{
     </div><!-- /ticket-body -->
 
     <!-- Combo tags -->
-    <?php if ($combo_total > 0 || !empty($combo_validated)): ?>
+    <?php if (!empty($combo_display)): ?>
     <div class="combo-in-ticket">
       <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:8px;">🍿 Combo đã chọn</div>
-      <?php foreach ($combo_validated as $cd): ?>
+      <?php foreach ($combo_display as $cd): ?>
         <span class="combo-tag">
-          <?= htmlspecialchars($cd['ten']) ?> ×<?= $cd['qty'] ?> &nbsp;—&nbsp;<?= fmt_m((isset($cd['gia']) ? $cd['gia'] : 0) * (isset($cd['qty']) ? $cd['qty'] : 1)) ?>
+          <?= htmlspecialchars($cd['ten']) ?> ×<?= $cd['qty'] ?>
+          &nbsp;—&nbsp;<?= fmt_m($cd['gia'] * $cd['qty']) ?>
         </span>
       <?php endforeach; ?>
     </div>
@@ -646,21 +638,21 @@ body.success-page{
           <td>Vé xem phim (<?= $so_ghe ?> ghế × <?= fmt_m($gia_ve) ?>)</td>
           <td><?= fmt_m($tong_ve) ?></td>
         </tr>
-        <?php if ($combo_total > 0 || $tong_combo > 0): ?>
+        <?php if ($tong_combo > 0): ?>
         <tr>
           <td>Combo bắp nước</td>
-          <td><?= fmt_m($combo_total > 0 ? $combo_total : $tong_combo) ?></td>
+          <td><?= fmt_m($tong_combo) ?></td>
         </tr>
         <?php endif; ?>
         <?php if (isset($voucher_discount) && $voucher_discount > 0): ?>
         <tr>
           <td>Voucher (<?= htmlspecialchars($voucher_code) ?>)</td>
-          <td style="color:var(--accent-red)">-<?= fmt_m($voucher_discount) ?></td>
+          <td style="color:var(--accent-red) !important">-<?= fmt_m($voucher_discount) ?></td>
         </tr>
         <?php endif; ?>
         <tr class="total-row">
           <td>Tổng thanh toán</td>
-          <td><?= fmt_m($total_amount) ?></td>
+          <td><?= fmt_m($tong_thanh_toan) ?></td>
         </tr>
       </table>
     </div>
@@ -677,6 +669,7 @@ body.success-page{
     Mã đơn: <strong><?= $ma_don ?></strong> — Chúc bạn xem phim vui vẻ! 🎬
   </div>
 </main>
+>>>>>>> origin/main
 
     <!-- Header -->
     <div class="ticket-header">
