@@ -242,8 +242,7 @@ $ticket_id_display = 'TTVH-' . str_pad($last_ve_id ?? 0, 8, '0', STR_PAD_LEFT);
 $qr_data = "TicketID: $ticket_id_display | Movie: $movie_name | Seats: $seat_list | Total: $total_amount";
 $qr_code_url = "https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=" . urlencode($qr_data);
 
-
-// ── Map HEAD variables to 0ac4 HTML structure variables ───────────────────
+// ── Map HEAD variables to HTML structure variables ───────────────────
 $combo_display = [];
 if (!empty($combo_validated)) {
     foreach ($combo_validated as $cb) {
@@ -564,6 +563,113 @@ body.success-page{
 <main class="success-wrap">
   <div class="ticket-card">
     <div class="ticket-top-bar"></div>
+    <!-- Header -->
+    <div class="ticket-header">
+      <div class="success-icon">🎉</div>
+      <div class="ticket-headline">
+        <h1>Đặt vé thành công!</h1>
+        <p>Cảm ơn bạn đã đặt vé tại CGV. Hẹn gặp bạn tại rạp!</p>
+      </div>
+      <div class="order-code"><?= $ma_don ?></div>
+    </div>
+
+    <!-- Body -->
+    <div class="ticket-body">
+      <!-- Poster -->
+      <div class="ticket-poster">
+        <img src="../assets/images/<?= htmlspecialchars($info['poster'] ?? '') ?>"
+             alt="poster"
+             onerror="this.src='../assets/images/avengers.jpg'">
+        <img class="qr-code" style="width:100px; height: 100px; margin-top:20px" src="<?= $qr_code_url ?>" alt="Ticket QR Code">
+      </div>
+
+      <!-- Info -->
+      <div class="ticket-info">
+        <h2 class="info-movie-title"><?= htmlspecialchars($info['ten_phim'] ?? '') ?></h2>
+        <div class="info-grid">
+          <div class="info-cell">
+            <label>📅 Ngày chiếu</label>
+            <div class="val"><?= $ngay_chieu ?></div>
+          </div>
+          <div class="info-cell">
+            <label>🕐 Giờ chiếu</label>
+            <div class="val"><?= $gio_chieu ?></div>
+          </div>
+          <div class="info-cell">
+            <label>🏠 Rạp</label>
+            <div class="val"><?= htmlspecialchars($info['ten_rap'] ?? '') ?></div>
+          </div>
+          <div class="info-cell">
+            <label>🎬 Phòng</label>
+            <div class="val"><?= htmlspecialchars($info['ten_phong'] ?? '') ?></div>
+          </div>
+          <div class="info-cell" style="grid-column:1/-1">
+            <label>💺 Ghế</label>
+            <div class="val seats">
+              <?php foreach ($ghe_array as $g): ?>
+              <span class="seat-chip"><?= htmlspecialchars(trim($g)) ?></span>
+              <?php endforeach; ?>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /ticket-body -->
+
+    <!-- Combo tags -->
+    <?php if (!empty($combo_display)): ?>
+    <div class="combo-in-ticket">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:8px;">🍿 Combo đã chọn</div>
+      <?php foreach ($combo_display as $cd): ?>
+        <span class="combo-tag">
+          <?= htmlspecialchars($cd['ten']) ?> ×<?= $cd['qty'] ?>
+          &nbsp;—&nbsp;<?= fmt_m($cd['gia'] * $cd['qty']) ?>
+        </span>
+      <?php endforeach; ?>
+    </div>
+    <?php endif; ?>
+
+    <!-- Perforation -->
+    <div class="ticket-perforation"></div>
+
+    <!-- Price breakdown -->
+    <div class="ticket-price">
+      <table class="price-table">
+        <tr>
+          <td>Vé xem phim (<?= $so_ghe ?> ghế × <?= fmt_m($gia_ve) ?>)</td>
+          <td><?= fmt_m($tong_ve) ?></td>
+        </tr>
+        <?php if ($tong_combo > 0): ?>
+        <tr>
+          <td>Combo bắp nước</td>
+          <td><?= fmt_m($tong_combo) ?></td>
+        </tr>
+        <?php endif; ?>
+        <?php if (isset($voucher_discount) && $voucher_discount > 0): ?>
+        <tr>
+          <td>Voucher (<?= htmlspecialchars($voucher_code) ?>)</td>
+          <td style="color:var(--accent-red) !important">-<?= fmt_m($voucher_discount) ?></td>
+        </tr>
+        <?php endif; ?>
+        <tr class="total-row">
+          <td>Tổng thanh toán</td>
+          <td><?= fmt_m($tong_thanh_toan) ?></td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Actions -->
+    <div class="ticket-actions">
+      <a href="index.php" class="btn-home">🏠 Về trang chủ</a>
+      <a href="ve_cua_toi.php" class="btn-ve">🎟️ Xem vé của tôi</a>
+    </div>
+  </div><!-- /ticket-card -->
+
+  <div class="enjoy-note">
+    Vui lòng <strong>đến trước giờ chiếu 15 phút</strong> để nhận vé và combo.<br>
+    Mã đơn: <strong><?= $ma_don ?></strong> — Chúc bạn xem phim vui vẻ! 🎬
+  </div>
+</main>
+>>>>>>> origin/main
 
     <!-- Header -->
     <div class="ticket-header">
