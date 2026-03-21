@@ -134,27 +134,44 @@ if (isset($_GET['modal']) && $_GET['modal'] == '1') {
   <link rel="stylesheet" href="../assets/css/login-modal.css">
   <style>
     *, *::before, *::after { box-sizing: border-box; }
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
     body {
       margin: 0; min-height: 100vh;
-      background: radial-gradient(ellipse 100% 60% at 50% 0%, #1a0a2e 0%, #060912 55%);
+      background: linear-gradient(-45deg, #1a0a2e, #060912, #240a2a, #0b1a3d);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
       font-family: 'Be Vietnam Pro', system-ui, sans-serif;
       padding: 24px 16px;
     }
     .brand {
-      font-size: 28px; font-weight: 900;
-      color: #e8192c; letter-spacing: 1px;
+      font-size: 32px; font-weight: 900;
+      color: #fff; letter-spacing: 1.5px;
       text-decoration: none; margin-bottom: 28px;
-      text-shadow: 0 0 20px rgba(232,25,44,0.4);
+      text-shadow: 0 0 15px rgba(232,25,44,0.8), 0 0 25px rgba(232,25,44,0.5);
+      transition: transform 0.3s;
     }
+    .brand:hover { transform: scale(1.05); }
     .login-modal.is-inline {
       width: 100%; max-width: 880px;
-      animation: modalIn .4s cubic-bezier(0.22,1,0.36,1);
+      animation: modalIn .5s cubic-bezier(0.22,1,0.36,1);
     }
     @keyframes modalIn {
-      from { opacity: 0; transform: scale(0.95) translateY(20px); }
-      to   { opacity: 1; transform: scale(1) translateY(0); }
+      from { opacity: 0; transform: scale(0.92) translateY(30px); filter: blur(10px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
+    }
+    /* Thêm hiệu ứng kính viễn vọng cho auth-card */
+    .login-modal.is-inline .auth-card {
+      background: rgba(10, 15, 30, 0.4);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
     }
   </style>
 </head>

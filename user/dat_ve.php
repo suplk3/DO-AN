@@ -577,6 +577,7 @@ body.success-page{
       <?php if (isset($_SESSION['vai_tro']) && $_SESSION['vai_tro'] === 'admin'): ?>
         <a href="../admin/phim.php" class="nav-link admin">⚙️ QUẢN LÝ PHIM</a>
         <a href="../admin/suat_chieu.php" class="nav-link admin">⚙️ SUẤT CHIẾU</a>
+        <a href="../admin/quan_ly_chat.php" class="nav-link admin">💬 TIN NHẮN</a>
       <?php endif; ?>
     </nav>
     <div class="actions">
@@ -722,5 +723,6 @@ body.success-page{
 })();
 </script>
 <script src="../assets/js/login-modal.js"></script>
+<?php include "chat_widget.php"; ?>
 </body>
 </html>
