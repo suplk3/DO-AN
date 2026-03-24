@@ -93,6 +93,20 @@ $quick_stats = mysqli_fetch_assoc($quick_stats_result);
             align-items: center;
             gap: 10px;
             flex-wrap: wrap;
+            transition: max-height 0.25s ease, opacity 0.25s ease;
+        }
+
+        .navbar .nav-links.open {
+            display: flex;
+            max-height: 400px;
+            opacity: 1;
+        }
+
+        .navbar .nav-links.closed {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            display: block;
         }
 
         .navbar .nav-links a {
@@ -268,6 +282,35 @@ $quick_stats = mysqli_fetch_assoc($quick_stats_result);
         }
 
         @media (max-width: 768px) {
+            .navbar {
+                border-radius: 12px;
+                padding: 10px 12px;
+            }
+
+            .navbar .nav-toggle {
+                display: block;
+            }
+
+            .navbar .nav-links {
+                display: none;
+                flex-direction: column;
+                width: 100%;
+                margin-top: 8px;
+                border-radius: 10px;
+                padding: 8px;
+                background: rgba(255,255,255,0.9);
+            }
+
+            .navbar .nav-links.open {
+                display: flex;
+            }
+
+            .navbar .nav-links a {
+                width: 100%;
+                text-align: center;
+                padding: 10px 12px;
+            }
+
             header {
                 flex-direction: column;
                 text-align: center;
@@ -292,7 +335,7 @@ $quick_stats = mysqli_fetch_assoc($quick_stats_result);
         <nav class="navbar">
             <div class="brand"><span>🎬</span> Admin Dashboard</div>
             <button class="nav-toggle" aria-label="Mở menu">☰</button>
-            <div class="nav-links">
+            <div class="nav-links closed">
                 <a href="dashboard.php">📊 Tổng Quan</a>
                 <a href="phim.php">🎥 Phim</a>
                 <a href="suat_chieu.php">🗓️ Suất Chiếu</a>
@@ -413,11 +456,7 @@ $quick_stats = mysqli_fetch_assoc($quick_stats_result);
         if (navToggle && navLinksContainer) {
             navToggle.addEventListener('click', () => {
                 navLinksContainer.classList.toggle('open');
-                if (navLinksContainer.classList.contains('open')) {
-                    navLinksContainer.style.maxHeight = navLinksContainer.scrollHeight + 'px';
-                } else {
-                    navLinksContainer.style.maxHeight = null;
-                }
+                navLinksContainer.classList.toggle('closed');
             });
         }
     </script>
