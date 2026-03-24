@@ -98,7 +98,7 @@ $quick_stats = mysqli_fetch_assoc($quick_stats_result);
 
         .navbar .nav-links.open {
             display: flex;
-            max-height: 400px;
+            max-height: 420px;
             opacity: 1;
         }
 
@@ -106,17 +106,36 @@ $quick_stats = mysqli_fetch_assoc($quick_stats_result);
             max-height: 0;
             opacity: 0;
             overflow: hidden;
-            display: block;
+            display: flex;
+            flex-direction: column;
         }
 
         .navbar .nav-links a {
-            color: #334155;
+            color: #1e293b;
             text-decoration: none;
-            background: rgba(102, 126, 234, 0.12);
-            padding: 8px 12px;
-            border-radius: 10px;
-            font-weight: 600;
-            transition: all 0.2s ease;
+            background: linear-gradient(120deg, rgba(99,179,237,0.15), rgba(129,148,244,0.2));
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid rgba(99,179,237,0.25);
+            box-shadow: inset 0 0 0 0 rgba(99,179,237,0.3);
+            transition: all 0.25s ease;
+        }
+
+        .navbar .nav-links a:hover,
+        .navbar .nav-links a.active {
+            color: #fff;
+            background: linear-gradient(120deg, #4f46e5, #3b82f6);
+            border-color: rgba(59,130,246,0.6);
+            box-shadow: 0 8px 18px rgba(59,130,246,0.25);
+            transform: translateY(-1px);
+        }
+
+        .navbar .nav-links a.active {
+            font-weight: 800;
         }
 
         .navbar .nav-links a:hover {
@@ -335,8 +354,8 @@ $quick_stats = mysqli_fetch_assoc($quick_stats_result);
         <nav class="navbar">
             <div class="brand"><span>🎬</span> Admin Dashboard</div>
             <button class="nav-toggle" aria-label="Mở menu">☰</button>
-            <div class="nav-links closed">
-                <a href="dashboard.php">📊 Tổng Quan</a>
+            <div class="nav-links">
+                <a href="dashboard.php" class="active">📊 Tổng Quan</a>
                 <a href="phim.php">🎥 Phim</a>
                 <a href="suat_chieu.php">🗓️ Suất Chiếu</a>
                 <a href="quan_ly_user.php">👥 User</a>
