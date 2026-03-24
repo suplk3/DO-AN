@@ -88,6 +88,12 @@ $quick_stats = mysqli_fetch_assoc($quick_stats_result);
             font-size: 24px;
         }
 
+        @media (max-width: 768px) {
+            .navbar .brand span {
+                font-size: 24px;
+            }
+        }
+
         .navbar .nav-links {
             display: flex;
             align-items: center;
@@ -652,6 +658,20 @@ $quick_stats = mysqli_fetch_assoc($quick_stats_result);
                 navLinksContainer.classList.toggle('closed');
             });
         }
+
+        // Thay đổi icon logo ở mobile thành icon cuộn phim
+        const brandIcon = document.querySelector('.navbar .brand span');
+        function updateBrandIcon() {
+            if (!brandIcon) return;
+            if (window.innerWidth <= 768) {
+                brandIcon.textContent = '🎞️';
+            } else {
+                brandIcon.textContent = '🎬';
+            }
+        }
+
+        updateBrandIcon();
+        window.addEventListener('resize', updateBrandIcon);
     </script>
 </body>
 </html>
