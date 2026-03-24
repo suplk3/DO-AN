@@ -290,11 +290,18 @@ if (userMenuBtn && userDropdown) {
   var btn = document.getElementById('themeToggle');
   var stored = localStorage.getItem('theme') || 'dark';
   body.setAttribute('data-theme', stored);
+  function updateIcon(theme) {
+    if (!btn) return;
+    btn.innerHTML = theme === 'light' ? '&#9728;' : '&#127769;'; // ☀️ or 🌙
+    btn.title = theme === 'light' ? 'Chuyển sang tối' : 'Chuyển sang sáng';
+  }
+  updateIcon(stored);
   if (!btn) return;
   btn.addEventListener('click', function(){
     var cur = body.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
     body.setAttribute('data-theme', cur);
     localStorage.setItem('theme', cur);
+    updateIcon(cur);
   });
 })();
 </script>
