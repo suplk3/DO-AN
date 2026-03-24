@@ -56,34 +56,34 @@ if (!isset($active_page)) {
                 </a>
                 <?php endif; ?>
             </div>
-            <div class="search-wrap" id="searchWrap">
-                <input type="text" id="searchInput" class="search-bar"
-                       placeholder="Tìm phim, thể loại..." autocomplete="off">
-                <span class="search-icon">&#128269;</span>
-                <span class="search-spinner"></span>
-                <div class="search-dropdown" id="searchDropdown"></div>
-            </div>
             <div class="header-nav-right">
                 <button class="header-search-trigger" id="mobileSearchTrigger">&#128269;</button>
-                <button class="theme-toggle-btn" id="themeToggle" title="Đổi giao diện">&#127916;</button>
+                <div class="search-wrap pc-only" id="searchWrap">
+                    <input type="text" id="searchInput" class="search-bar"
+                           placeholder="Tìm phim, thể loại..." autocomplete="off">
+                    <span class="search-icon">&#128269;</span>
+                    <span class="search-spinner"></span>
+                    <div class="search-dropdown" id="searchDropdown"></div>
+                </div>
+                
+                <a href="../user/ve_cua_toi.php" class="header-btn pc-only" title="Vé của tôi">&#127916;</a>
+                <a href="notifications.php" class="header-btn pc-only" title="Thông báo">
+                    &#128276;
+                    <?php 
+                    $notif_unread = 0;
+                    if (isset($_SESSION['user_id']) && table_exists($conn, 'notifications')) {
+                        $uid = (int)$_SESSION['user_id'];
+                        $nr = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS c FROM notifications WHERE user_id=$uid AND is_read=0"));
+                        $notif_unread = (int)($nr['c'] ?? 0);
+                    }
+                    if ($notif_unread > 0): ?><span class="notif-badge"><?= $notif_unread ?></span><?php endif; ?>
+                </a>
                 <?php if (isset($_SESSION['user_id'])):
                     $is_admin = (isset($_SESSION['vai_tro']) && $_SESSION['vai_tro'] === 'admin');
                     $ten = htmlspecialchars($_SESSION['ten_nguoi_dung'] ?? ($_SESSION['ten'] ?? 'Tôi'));
                     $avatar_sql = mysqli_fetch_assoc(mysqli_query($conn, "SELECT avatar FROM users WHERE id=".(int)$_SESSION['user_id']));
                     $avatar = $avatar_sql['avatar'] ?? null;
-                    
-                    if (!isset($notif_unread)) {
-                        $notif_unread = 0;
-                        if (table_exists($conn, 'notifications')) {
-                            $uid = (int)$_SESSION['user_id'];
-                            $nr = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS c FROM notifications WHERE user_id=$uid AND is_read=0"));
-                            $notif_unread = (int)($nr['c'] ?? 0);
-                        }
-                    }
                 ?>
-                <a href="notifications.php" class="notif-link pc-only">&#128276;
-                    <?php if ($notif_unread > 0): ?><span class="notif-badge"><?= $notif_unread ?></span><?php endif; ?>
-                </a>
                 <div class="user-menu-wrap">
                     <button class="user-menu-btn" id="userMenuBtn">
                         <?php if ($avatar): ?>

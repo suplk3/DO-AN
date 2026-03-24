@@ -81,12 +81,20 @@
   font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.7);
   text-decoration: none; transition: all .25s ease;
 }
-.user-dropdown-item:hover { 
+.user-dropdown-item:hover,
+.user-dropdown-item.active { 
   background: rgba(255,255,255,.08); 
   color: #fff;
   transform: translateX(4px);
 }
-.user-dropdown-item.danger:hover { background: rgba(232,25,44,.1); color: #fca5a5; }
+.user-dropdown-item.danger {
+  border-left: 4px solid #f97316;
+  margin-left: -12px;
+  padding-left: 24px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+.user-dropdown-item.danger:hover { background: rgba(249,115,22,0.1); color: #fdba74; }
 .user-dropdown-divider {
   height: 1px; background: rgba(255,255,255,.06);
   margin: 4px 0;
