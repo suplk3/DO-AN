@@ -301,23 +301,53 @@ $quick_stats = mysqli_fetch_assoc($quick_stats_result);
         }
 
         @media (max-width: 768px) {
+            body {
+                padding: 12px;
+            }
+
+            .container {
+                max-width: 100%;
+                padding: 0;
+            }
+
             .navbar {
                 border-radius: 12px;
                 padding: 10px 12px;
             }
 
+            .navbar .brand {
+                font-size: 16px;
+            }
+
             .navbar .nav-toggle {
                 display: block;
+                background: rgba(59,130,246,0.12);
+                border: 1px solid rgba(59,130,246,0.4);
+                border-radius: 10px;
+                width: 44px;
+                height: 44px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 22px;
+                color: #334155;
             }
 
             .navbar .nav-links {
+                position: absolute;
+                left: 0;
+                right: 0;
+                top: 64px;
                 display: none;
                 flex-direction: column;
-                width: 100%;
-                margin-top: 8px;
-                border-radius: 10px;
-                padding: 8px;
-                background: rgba(255,255,255,0.9);
+                width: calc(100% - 24px);
+                margin: 0 auto;
+                border-radius: 14px;
+                padding: 10px;
+                background: rgba(15, 23, 42, 0.9);
+                backdrop-filter: blur(6px);
+                border: 1px solid rgba(148,163,184,0.35);
+                box-shadow: 0 12px 25px rgba(0,0,0,0.3);
             }
 
             .navbar .nav-links.open {
@@ -326,8 +356,25 @@ $quick_stats = mysqli_fetch_assoc($quick_stats_result);
 
             .navbar .nav-links a {
                 width: 100%;
-                text-align: center;
+                text-align: left;
                 padding: 10px 12px;
+                margin-bottom: 8px;
+                border-radius: 10px;
+                font-size: 14px;
+                color: #e2e8f0;
+                background: rgba(15, 23, 42, 0.65);
+            }
+
+            .navbar .nav-links a:last-child {
+                margin-bottom: 0;
+            }
+
+            .navbar .nav-links a.active,
+            .navbar .nav-links a:hover {
+                color: #fff;
+                background: linear-gradient(135deg, #2563eb, #7c3aed);
+                border-color: rgba(147,197,253,0.4);
+                box-shadow: 0 6px 16px rgba(59,130,246,0.25);
             }
 
             header {
@@ -339,12 +386,56 @@ $quick_stats = mysqli_fetch_assoc($quick_stats_result);
                 text-align: center;
             }
 
-            .menu-grid {
-                grid-template-columns: 1fr;
+            .user-info p {
+                font-size: 13px;
+            }
+
+            .logout-btn {
+                padding: 8px 16px;
+                margin-top: 8px;
+                font-size: 13px;
             }
 
             .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .stat-card {
+                padding: 18px;
+            }
+
+            .stat-card .value {
+                font-size: 28px;
+            }
+
+            .menu-grid {
+                grid-template-columns: 1fr;
+                gap: 14px;
+            }
+
+            .menu-card {
+                border-radius: 14px;
+            }
+
+            .menu-card-header {
+                padding: 24px 16px;
+                font-size: 26px;
+            }
+
+            .menu-card-title {
+                font-size: 16px;
+                padding: 12px 16px;
+            }
+
+            .menu-card-content {
+                font-size: 14px;
+                padding: 12px 16px;
+            }
+
+            .menu-card-link {
+                padding: 10px 12px;
+                font-size: 14px;
             }
         }
     </style>
