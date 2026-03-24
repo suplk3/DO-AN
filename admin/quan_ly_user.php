@@ -169,10 +169,10 @@ foreach ($ves as $v) {
 </head>
 <body class="user-index">
 
-<?php 
-$active_page = 'admin_user';
-include "../user/components/header.php"; 
-?>
+  <div class="page-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+      <h1 style="margin:0;">👥 Quản lý người dùng</h1>
+      <a href="index.php" style="color:#64748b; text-decoration:none;">⬅ Dashboard</a>
+  </div>
 
 <main class="container">
   <h1 class="page-title">👥 Quản lý người dùng</h1>

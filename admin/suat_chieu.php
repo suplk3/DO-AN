@@ -66,10 +66,10 @@ $stats = mysqli_fetch_assoc($stats_result);
 
 <div id="notification"></div>
 
-<?php 
-$active_page = 'admin_suat';
-include "../user/components/header.php"; 
-?>
+    <div class="page-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h1 style="margin:0;">🗓️ Quản lý suất chiếu</h1>
+        <a href="index.php" style="color:#64748b; text-decoration:none;">⬅ Dashboard</a>
+    </div>
 
 <!-- Stats Section -->
 <div class="stats-section">

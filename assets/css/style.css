@@ -272,100 +272,14 @@ button { font-family: inherit; cursor: pointer; }
     justify-content: flex-end;
 }
 
-/* Premium Global PC Navigation Links */
+/* Reverting to basic link style */
 .nav-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 18px;
-    color: rgba(255, 255, 255, 0.7);
-    font-weight: 700;
-    font-size: 13px;
-    letter-spacing: 0.5px;
-    text-decoration: none;
-    border-radius: 12px;
-    background: rgba(45, 42, 70, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    white-space: nowrap;
-}
-
-.nav-link .icon {
-    font-size: 15px;
-    opacity: 0.8;
-}
-
-.nav-link:hover {
-    color: #fff;
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.15);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
-}
-
-.nav-link.active {
-    background: #2d2a46;
-    border-color: rgba(255, 255, 255, 0.15);
-    color: #fff;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-}
-
-.header-btn {
-    width: 42px;
-    height: 42px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(45, 42, 70, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
     color: #fff;
     text-decoration: none;
-    font-size: 18px;
-    transition: all 0.3s ease;
-    position: relative;
-}
-
-.search-bar {
-    width: 100%;
-    padding: 10px 45px 10px 18px;
-    background: rgba(15, 23, 42, 0.8);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
-    color: #fff;
-    font-size: 14px;
     font-weight: 500;
-    transition: all 0.3s var(--ease-smooth);
 }
-
-.header-btn:hover {
-    background: rgba(45, 42, 70, 0.7);
-    border-color: rgba(255, 255, 255, 0.2);
-    transform: translateY(-2px);
-}
-
-.notif-badge {
-    position: absolute;
-    top: -4px;
-    right: -4px;
-    background: #e11d48;
-    color: #fff;
-    font-size: 10px;
+.nav-link.active {
     font-weight: 800;
-    min-width: 18px;
-    height: 18px;
-    padding: 0 4px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 2px solid #0f172a;
-}
-
-.nav-link.admin {
-    background: linear-gradient(135deg, rgba(232, 25, 44, 0.2), rgba(192, 16, 32, 0.15));
-    border-color: rgba(232, 25, 44, 0.3);
-    color: #fca5a5;
 }
 
 /* PC Header Alignment Cleanup */
