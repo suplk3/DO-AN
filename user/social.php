@@ -18,6 +18,7 @@ $fl = mysqli_fetch_assoc(mysqli_query($conn, "SELECT
     (SELECT COUNT(*) FROM follows WHERE following_id=$me) AS followers
 "));
 $me_info = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM users WHERE id=$me"));
+$show_community_chat = (($_SESSION['vai_tro'] ?? '') !== 'admin');
 
 $REACTIONS = ['like'=>'👍','love'=>'❤️','haha'=>'😂','wow'=>'😮','sad'=>'😢','angry'=>'😡'];
 ?>
@@ -92,7 +93,10 @@ $REACTIONS = ['like'=>'👍','love'=>'❤️','haha'=>'😂','wow'=>'😮','sad'
         </div>
       </div>
       <nav class="social-nav">
-        <a href="social.php" class="snav-item active"><span>🏠</span> Bảng tin</a>
+        <a href="#" class="snav-item active" id="feedNavTrigger"><span>🏠</span> Bảng tin</a>
+        <?php if ($show_community_chat): ?>
+        <a href="#" class="snav-item" id="chatNavTrigger"><span>💬</span> Trò chuyện</a>
+        <?php endif; ?>
         <a href="profile.php?id=<?= $me ?>" class="snav-item"><span>👤</span> Trang cá nhân</a>
         <a href="index.php" class="snav-item"><span>🎬</span> Xem phim</a>
         <a href="ve_cua_toi.php" class="snav-item"><span>🎟️</span> Vé của tôi</a>
@@ -101,6 +105,12 @@ $REACTIONS = ['like'=>'👍','love'=>'❤️','haha'=>'😂','wow'=>'😮','sad'
 
     <!-- CENTER: Feed -->
     <div class="social-feed">
+      <?php if ($show_community_chat): ?>
+      <div class="social-mobile-tabs">
+        <button type="button" class="social-mobile-tab active" id="feedMobileTrigger">Bảng tin</button>
+        <button type="button" class="social-mobile-tab" id="chatMobileTrigger">Trò chuyện</button>
+      </div>
+      <?php endif; ?>
 
       <!-- Compose box -->
       <div class="compose-box">
@@ -158,6 +168,41 @@ $REACTIONS = ['like'=>'👍','love'=>'❤️','haha'=>'😂','wow'=>'😮','sad'
       <?php foreach ($feed_rows as $post): ?>
       <?php include 'components/post_card.php'; ?>
       <?php endforeach; ?>
+      <?php endif; ?>
+
+      <?php if ($show_community_chat): ?>
+      <section class="community-chat-view" id="communityChatView" style="display:none;">
+        <div class="community-chat-shell">
+          <div class="community-chat-sidebar">
+            <div class="community-chat-sidebar-head">
+              <div>
+                <div class="community-chat-kicker">Tin nhắn cộng đồng</div>
+                <div class="community-chat-title">Trò chuyện</div>
+              </div>
+              <span class="community-chat-pill">Messenger</span>
+            </div>
+            <div class="community-chat-list" id="communityChatList">
+              <div class="community-chat-empty-list">Đang tải danh sách trò chuyện...</div>
+            </div>
+          </div>
+          <div class="community-chat-main">
+            <div class="community-chat-main-head">
+              <div id="communityChatHeaderAvatar" class="community-chat-avatar large admin">AD</div>
+              <div class="community-chat-main-copy">
+                <div class="community-chat-main-name" id="communityChatHeaderName">Chọn một cuộc trò chuyện</div>
+                <div class="community-chat-main-meta" id="communityChatHeaderMeta">Nhắn với admin hoặc những người bạn đang theo dõi.</div>
+              </div>
+            </div>
+            <div class="community-chat-messages" id="communityChatMessages">
+              <div class="community-chat-placeholder">Chọn một cuộc trò chuyện để bắt đầu nhắn tin.</div>
+            </div>
+            <form class="community-chat-compose" id="communityChatForm">
+              <input type="text" id="communityChatInput" placeholder="Nhập tin nhắn..." autocomplete="off" disabled>
+              <button type="submit" id="communityChatSend" disabled>Gửi</button>
+            </form>
+          </div>
+        </div>
+      </section>
       <?php endif; ?>
     </div>
 
@@ -432,7 +477,7 @@ document.addEventListener('click', e => {
 });
 
 function escHtml(s) {
-    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
 // Header shrink
@@ -516,6 +561,275 @@ function startFeedPolling() {
     pollingInterval = setInterval(pollFeed, feedPollIntervalMs);
 }
 startFeedPolling();
+</script>
+<script>
+const ENABLE_COMMUNITY_CHAT = <?= json_encode($show_community_chat) ?>;
+const communityChatState = {
+    initialized: false,
+    activeType: '',
+    activeUserId: 0,
+    contacts: [],
+    pollTimer: null
+};
+
+function setCommunityView(view) {
+    const showChat = ENABLE_COMMUNITY_CHAT && view === 'chat';
+    document.querySelectorAll('.compose-box, .post-card, .feed-empty').forEach(el => {
+        el.style.display = showChat ? 'none' : '';
+    });
+
+    const chatView = document.getElementById('communityChatView');
+    if (chatView) chatView.style.display = showChat ? 'block' : 'none';
+
+    const feedNav = document.getElementById('feedNavTrigger');
+    const chatNav = document.getElementById('chatNavTrigger');
+    const feedMobile = document.getElementById('feedMobileTrigger');
+    const chatMobile = document.getElementById('chatMobileTrigger');
+    if (feedNav) feedNav.classList.toggle('active', !showChat);
+    if (chatNav) chatNav.classList.toggle('active', showChat);
+    if (feedMobile) feedMobile.classList.toggle('active', !showChat);
+    if (chatMobile) chatMobile.classList.toggle('active', showChat);
+
+    if (showChat) initCommunityChat();
+}
+
+function getCommunityChatKey(type, userId) {
+    return `${type}:${userId || 0}`;
+}
+
+function getActiveCommunityContact() {
+    return communityChatState.contacts.find(contact =>
+        contact.type === communityChatState.activeType &&
+        Number(contact.user_id || 0) === Number(communityChatState.activeUserId || 0)
+    ) || null;
+}
+
+function buildCommunityAvatar(contact, large = false) {
+    const sizeClass = large ? ' large' : '';
+    if (contact.avatar) {
+        return `<div class="community-chat-avatar${sizeClass}"><img src="../assets/images/avatars/${escHtml(contact.avatar)}" alt=""></div>`;
+    }
+
+    const initials = contact.type === 'admin'
+        ? 'AD'
+        : escHtml((contact.name || '?').trim().charAt(0).toUpperCase());
+    const adminClass = contact.type === 'admin' ? ' admin' : '';
+    return `<div class="community-chat-avatar${sizeClass}${adminClass}">${initials}</div>`;
+}
+
+function renderCommunityContacts() {
+    const list = document.getElementById('communityChatList');
+    if (!list) return;
+
+    if (!communityChatState.contacts.length) {
+        list.innerHTML = '<div class="community-chat-empty-list">Chưa có cuộc trò chuyện nào.</div>';
+        return;
+    }
+
+    list.innerHTML = communityChatState.contacts.map(contact => {
+        const key = getCommunityChatKey(contact.type, contact.user_id);
+        const active = key === getCommunityChatKey(communityChatState.activeType, communityChatState.activeUserId);
+        const preview = contact.last_message || (contact.type === 'admin'
+            ? 'Hỏi admin về vé, thanh toán hoặc cộng đồng.'
+            : 'Bắt đầu cuộc trò chuyện mới.');
+
+        return `
+            <button type="button" class="community-chat-contact ${active ? 'active' : ''}" data-type="${contact.type}" data-user-id="${Number(contact.user_id || 0)}">
+                ${buildCommunityAvatar(contact)}
+                <span class="community-chat-contact-copy">
+                    <span class="community-chat-contact-top">
+                        <span class="community-chat-contact-name">${escHtml(contact.name)}</span>
+                        <span class="community-chat-contact-time">${escHtml(contact.last_time || '')}</span>
+                    </span>
+                    <span class="community-chat-contact-note">${escHtml(contact.note || '')}</span>
+                    <span class="community-chat-contact-preview">${preview}</span>
+                </span>
+            </button>
+        `;
+    }).join('');
+
+    list.querySelectorAll('.community-chat-contact').forEach(button => {
+        button.addEventListener('click', () => {
+            selectCommunityConversation(button.dataset.type, Number(button.dataset.userId || 0));
+        });
+    });
+}
+
+function updateCommunityChatHeader() {
+    const headerAvatar = document.getElementById('communityChatHeaderAvatar');
+    const headerName = document.getElementById('communityChatHeaderName');
+    const headerMeta = document.getElementById('communityChatHeaderMeta');
+    const input = document.getElementById('communityChatInput');
+    const send = document.getElementById('communityChatSend');
+    const activeContact = getActiveCommunityContact();
+
+    if (!activeContact) {
+        if (headerAvatar) headerAvatar.outerHTML = '<div id="communityChatHeaderAvatar" class="community-chat-avatar large admin">AD</div>';
+        if (headerName) headerName.textContent = 'Chọn một cuộc trò chuyện';
+        if (headerMeta) headerMeta.textContent = 'Nhắn với admin hoặc những người bạn đang theo dõi.';
+        if (input) {
+            input.value = '';
+            input.disabled = true;
+            input.placeholder = 'Nhập tin nhắn...';
+        }
+        if (send) send.disabled = true;
+        return;
+    }
+
+    if (headerAvatar) headerAvatar.outerHTML = buildCommunityAvatar(activeContact, true).replace('class="community-chat-avatar', 'id="communityChatHeaderAvatar" class="community-chat-avatar');
+    if (headerName) headerName.textContent = activeContact.name || 'Cuộc trò chuyện';
+    if (headerMeta) headerMeta.textContent = activeContact.note || (activeContact.type === 'admin' ? 'Hỗ trợ nhanh từ admin.' : 'Trò chuyện riêng trong cộng đồng.');
+    if (input) {
+        input.disabled = false;
+        input.placeholder = activeContact.type === 'admin'
+            ? 'Nhập tin nhắn cho admin...'
+            : `Nhắn cho ${activeContact.name}...`;
+    }
+    if (send) send.disabled = false;
+}
+
+function renderCommunityMessages(messages) {
+    const box = document.getElementById('communityChatMessages');
+    if (!box) return;
+
+    if (!messages.length) {
+        box.innerHTML = '<div class="community-chat-placeholder">Chưa có tin nhắn nào. Hãy gửi lời chào để bắt đầu.</div>';
+        return;
+    }
+
+    box.innerHTML = messages.map(message => `
+        <div class="community-chat-bubble ${message.is_mine ? 'mine' : 'theirs'}">
+            ${message.message}
+            <span class="community-chat-time">${escHtml(message.created_at || '')}</span>
+        </div>
+    `).join('');
+    box.scrollTop = box.scrollHeight;
+}
+
+async function loadCommunityMessages(forceScroll = false) {
+    if (!communityChatState.activeType) return;
+
+    const url = communityChatState.activeType === 'admin'
+        ? '../api/chat_api.php?action=get_messages'
+        : `../api/chat_api.php?action=get_messages&scope=direct&user_id=${communityChatState.activeUserId}`;
+
+    try {
+        const res = await fetch(url);
+        const data = await res.json();
+        if (!data.success) {
+            renderCommunityMessages([]);
+            return;
+        }
+
+        renderCommunityMessages(data.data || []);
+        if (forceScroll) {
+            const box = document.getElementById('communityChatMessages');
+            if (box) box.scrollTop = box.scrollHeight;
+        }
+    } catch (error) {
+        console.error('Community chat load error', error);
+    }
+}
+
+function selectCommunityConversation(type, userId) {
+    communityChatState.activeType = type;
+    communityChatState.activeUserId = Number(userId || 0);
+    renderCommunityContacts();
+    updateCommunityChatHeader();
+    loadCommunityMessages(true);
+}
+
+async function loadCommunityContacts() {
+    try {
+        const res = await fetch('../api/chat_api.php?action=get_chat_contacts');
+        const data = await res.json();
+        if (!data.success) return;
+
+        communityChatState.contacts = Array.isArray(data.data) ? data.data : [];
+        renderCommunityContacts();
+
+        const activeExists = getActiveCommunityContact();
+        if (!activeExists && communityChatState.contacts.length) {
+            const first = communityChatState.contacts[0];
+            selectCommunityConversation(first.type, first.user_id || 0);
+            return;
+        }
+
+        updateCommunityChatHeader();
+    } catch (error) {
+        console.error('Community contact load error', error);
+    }
+}
+
+async function submitCommunityMessage(event) {
+    event.preventDefault();
+
+    if (!communityChatState.activeType) return;
+    const input = document.getElementById('communityChatInput');
+    if (!input) return;
+
+    const message = input.value.trim();
+    if (!message) return;
+
+    const formData = new FormData();
+    formData.append('message', message);
+    if (communityChatState.activeType === 'user') {
+        formData.append('scope', 'direct');
+        formData.append('user_id', String(communityChatState.activeUserId));
+    }
+
+    try {
+        const res = await fetch('../api/chat_api.php?action=send', {
+            method: 'POST',
+            body: formData
+        });
+        const data = await res.json();
+        if (!data.success) {
+            alert(data.error || 'Không thể gửi tin nhắn.');
+            return;
+        }
+
+        input.value = '';
+        await loadCommunityMessages(true);
+        await loadCommunityContacts();
+    } catch (error) {
+        console.error('Community chat send error', error);
+    }
+}
+
+function initCommunityChat() {
+    if (!ENABLE_COMMUNITY_CHAT || communityChatState.initialized) return;
+
+    communityChatState.initialized = true;
+    const form = document.getElementById('communityChatForm');
+    if (form) form.addEventListener('submit', submitCommunityMessage);
+
+    loadCommunityContacts();
+    communityChatState.pollTimer = setInterval(() => {
+        const chatView = document.getElementById('communityChatView');
+        if (!chatView || chatView.style.display === 'none') return;
+        loadCommunityContacts();
+        loadCommunityMessages();
+    }, 2500);
+}
+
+document.getElementById('feedNavTrigger')?.addEventListener('click', event => {
+    event.preventDefault();
+    setCommunityView('feed');
+});
+
+document.getElementById('chatNavTrigger')?.addEventListener('click', event => {
+    event.preventDefault();
+    setCommunityView('chat');
+});
+
+document.getElementById('feedMobileTrigger')?.addEventListener('click', () => {
+    setCommunityView('feed');
+});
+
+document.getElementById('chatMobileTrigger')?.addEventListener('click', () => {
+    setCommunityView('chat');
+});
 </script>
 <script src="../assets/js/search.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
