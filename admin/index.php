@@ -59,6 +59,66 @@ $quick_stats = mysqli_fetch_assoc($quick_stats_result);
             font-weight: 800;
         }
 
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 999;
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(102, 126, 234, 0.25);
+            border-radius: 14px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 16px;
+        }
+
+        .navbar .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #334155;
+            font-weight: 900;
+            font-size: 18px;
+        }
+
+        .navbar .brand span {
+            font-size: 24px;
+        }
+
+        .navbar .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .navbar .nav-links a {
+            color: #334155;
+            text-decoration: none;
+            background: rgba(102, 126, 234, 0.12);
+            padding: 8px 12px;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .navbar .nav-links a:hover {
+            background: rgba(102, 126, 234, 0.25);
+            transform: translateY(-1px);
+        }
+
+        .navbar .nav-toggle {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 22px;
+            color: #334155;
+        }
+
         .user-info {
             text-align: right;
         }
@@ -229,8 +289,19 @@ $quick_stats = mysqli_fetch_assoc($quick_stats_result);
 </head>
 <body>
     <div class="container">
+        <nav class="navbar">
+            <div class="brand"><span>🎬</span> Admin Dashboard</div>
+            <button class="nav-toggle" aria-label="Mở menu">☰</button>
+            <div class="nav-links">
+                <a href="dashboard.php">📊 Tổng Quan</a>
+                <a href="phim.php">🎥 Phim</a>
+                <a href="suat_chieu.php">🗓️ Suất Chiếu</a>
+                <a href="quan_ly_user.php">👥 User</a>
+                <a href="quan_ly_voucher.php">🎟️ Voucher</a>
+            </div>
+        </nav>
+
         <header>
-            <div>
             <div class="user-info">
                 <p>Xin chào,</p>
                 <p class="username"><?php echo htmlspecialchars($_SESSION['user_name'] ?? 'Admin'); ?></p>
@@ -333,6 +404,21 @@ $quick_stats = mysqli_fetch_assoc($quick_stats_result);
                     banner.classList.remove('show');
                 }, 5000);
             }
+        }
+
+        // Responsive nav toggle
+        const navToggle = document.querySelector('.nav-toggle');
+        const navLinksContainer = document.querySelector('.nav-links');
+
+        if (navToggle && navLinksContainer) {
+            navToggle.addEventListener('click', () => {
+                navLinksContainer.classList.toggle('open');
+                if (navLinksContainer.classList.contains('open')) {
+                    navLinksContainer.style.maxHeight = navLinksContainer.scrollHeight + 'px';
+                } else {
+                    navLinksContainer.style.maxHeight = null;
+                }
+            });
         }
     </script>
 </body>
