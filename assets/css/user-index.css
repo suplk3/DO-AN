@@ -587,3 +587,183 @@ body.user-index .footer {
     padding: 2px 6px;
     border-radius: 999px;
 }
+/* ── Redesign Mobile optimization (Approved Plan) ── */
+@media (max-width: 768px) {
+    .pc-only { display: none !important; }
+
+    body.user-index {
+        padding-top: 60px; /* Reduced header height */
+        padding-bottom: 70px; /* Space for bottom nav */
+    }
+
+    body.user-index .header {
+        height: 60px !important;
+        background: rgba(8,9,15,0.9);
+    }
+
+    body.user-index .header-inner {
+        padding: 0 16px;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    body.user-index .logo {
+        font-size: 20px !important;
+        letter-spacing: 1px;
+    }
+
+    /* Simplify Header Nav */
+    .header-nav-left { display: none; } /* Moved to bottom nav */
+    
+    .search-wrap {
+        position: fixed;
+        top: 60px;
+        left: 0;
+        right: 0;
+        background: rgba(14,16,25,0.98);
+        padding: 12px 16px;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        z-index: 1000;
+        max-width: 100% !important;
+        transform: translateY(-100%);
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .search-wrap.mobile-active {
+        transform: translateY(0);
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .header-search-trigger {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 38px;
+        height: 38px;
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 12px;
+        color: #fff;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    /* Bottom Navigation Bar */
+    .mobile-nav-bar {
+        display: flex;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 65px;
+        background: rgba(14,16,25,0.85);
+        backdrop-filter: blur(20px) saturate(180%);
+        -webkit-backdrop-filter: blur(20px) saturate(180%);
+        border-top: 1px solid rgba(255,255,255,0.08);
+        z-index: 2000;
+        justify-content: space-around;
+        align-items: center;
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    .mobile-nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        text-decoration: none;
+        color: rgba(255,255,255,0.5);
+        transition: all 0.2s;
+        flex: 1;
+    }
+
+    .mobile-nav-item .m-icon {
+        font-size: 20px;
+        transition: transform 0.2s;
+        position: relative;
+    }
+
+    .mobile-nav-item .m-text {
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .mobile-nav-item.active {
+        color: #e8192c;
+    }
+
+    .mobile-nav-item.active .m-icon {
+        transform: translateY(-2px);
+        filter: drop-shadow(0 0 8px rgba(232,25,44,0.5));
+    }
+
+    .m-badge {
+        position: absolute;
+        top: -2px;
+        right: -4px;
+        width: 8px;
+        height: 8px;
+        background: #ef4444;
+        border-radius: 50%;
+        border: 2px solid #0e1019;
+    }
+
+    /* Optimized Movies Grid */
+    body.user-index .movies {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 12px !important;
+    }
+
+    body.user-index .movie-card {
+        border-radius: 14px;
+        background: rgba(255,255,255,0.03);
+        border-color: rgba(255,255,255,0.05);
+    }
+
+    body.user-index .poster {
+        height: 220px !important;
+    }
+
+    body.user-index .card-body {
+        padding: 10px;
+        gap: 6px;
+    }
+
+    body.user-index .movie-title {
+        font-size: 13px !important;
+    }
+
+    body.user-index .genre, body.user-index .duration {
+        font-size: 10px !important;
+    }
+
+    body.user-index .card-actions .btn {
+        padding: 7px 5px !important;
+        font-size: 10px !important;
+    }
+
+    /* Banner Tweaks */
+    .banner-carousel {
+        height: 240px !important;
+        margin-bottom: 24px !important;
+        border-radius: 16px !important;
+    }
+    .banner-title {
+        font-size: 22px !important;
+    }
+    .banner-overlay {
+        padding: 20px 16px !important;
+    }
+    .page-title {
+        font-size: 24px !important;
+        letter-spacing: 2px !important;
+    }
+}
+
+@media (min-width: 769px) {
+    .header-search-trigger, .mobile-nav-bar { display: none; }
+}

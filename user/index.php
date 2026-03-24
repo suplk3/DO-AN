@@ -63,6 +63,7 @@ if (isset($_SESSION['user_id'])) {
     <div class="search-dropdown" id="searchDropdown"></div>
 </div>
             <div class="header-nav-right">
+                <button class="header-search-trigger" id="mobileSearchTrigger">🔍</button>
                 <button class="theme-toggle-btn" id="themeToggle">🌓 Giao diện</button>
                 <?php if (isset($_SESSION['user_id'])):
                     $is_admin = (isset($_SESSION['vai_tro']) && $_SESSION['vai_tro'] === 'admin');
@@ -70,7 +71,7 @@ if (isset($_SESSION['user_id'])) {
                     $avatar_sql = mysqli_fetch_assoc(mysqli_query($conn, "SELECT avatar FROM users WHERE id=".(int)$_SESSION['user_id']));
                     $avatar = $avatar_sql['avatar'] ?? null;
                 ?>
-                <a href="notifications.php" class="notif-link">🔔
+                <a href="notifications.php" class="notif-link pc-only">🔔
                     <?php if ($notif_unread > 0): ?><span class="notif-badge"><?= $notif_unread ?></span><?php endif; ?>
                 </a>
                 <div class="user-menu-wrap">
@@ -80,8 +81,8 @@ if (isset($_SESSION['user_id'])) {
                         <?php else: ?>
                             <div class="user-menu-initial"><?= mb_substr($_SESSION['ten_nguoi_dung'] ?? ($_SESSION['ten'] ?? 'U'), 0, 1) ?></div>
                         <?php endif; ?>
-                        <span class="user-menu-name"><?= $ten ?></span>
-                        <span class="user-menu-arrow">▾</span>
+                        <span class="user-menu-name pc-only"><?= $ten ?></span>
+                        <span class="user-menu-arrow pc-only">▾</span>
                     </button>
                     <div class="user-dropdown" id="userDropdown">
                         <div class="user-dropdown-header">
@@ -112,6 +113,32 @@ if (isset($_SESSION['user_id'])) {
         </nav>
     </div>
 </header>
+
+<nav class="mobile-nav-bar">
+    <a href="index.php" class="mobile-nav-item active">
+        <span class="m-icon">🎬</span>
+        <span class="m-text">Phim</span>
+    </a>
+    <a href="sap_chieu.php" class="mobile-nav-item">
+        <span class="m-icon">🗓️</span>
+        <span class="m-text">Sắp chiếu</span>
+    </a>
+    <?php if (isset($_SESSION['user_id'])): ?>
+    <a href="social.php" class="mobile-nav-item">
+        <span class="m-icon">👥</span>
+        <span class="m-text">Xã hội</span>
+    </a>
+    <a href="notifications.php" class="mobile-nav-item">
+        <span class="m-icon">🔔<?php if ($notif_unread > 0): ?><em class="m-badge"></em><?php endif; ?></span>
+        <span class="m-text">Thông báo</span>
+    </a>
+    <?php else: ?>
+    <a href="../auth/login.php" class="mobile-nav-item open-login-modal">
+        <span class="m-icon">🔐</span>
+        <span class="m-text">Đăng nhập</span>
+    </a>
+    <?php endif; ?>
+</nav>
 
 <main class="container">
     <!-- Banner Carousel -->
@@ -374,6 +401,16 @@ if (userMenuBtn && userDropdown) {
     localStorage.setItem('theme', cur);
   });
 })();
+</script>
+<!-- Mobile Search Logic -->
+<script>
+document.getElementById('mobileSearchTrigger')?.addEventListener('click', function() {
+    const wrap = document.getElementById('searchWrap');
+    wrap?.classList.toggle('mobile-active');
+    if (wrap?.classList.contains('mobile-active')) {
+        document.getElementById('searchInput')?.focus();
+    }
+});
 </script>
 </body>
 </html>
