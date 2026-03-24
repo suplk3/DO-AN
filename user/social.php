@@ -34,40 +34,11 @@ $REACTIONS = ['like'=>'👍','love'=>'❤️','haha'=>'😂','wow'=>'😮','sad'
 <link rel="stylesheet" href="../assets/css/login-modal.css">
 <link rel="stylesheet" href="../assets/css/search.css">
 <link rel="stylesheet" href="../assets/css/social.css">
+<link rel="stylesheet" href="../assets/css/mobile-premium.css?v=<?php echo time(); ?>">
 </head>
 <body class="user-index">
 
-<header class="header">
-  <div class="header-inner">
-    <a href="index.php" class="logo">TTVH</a>
-    <nav class="header-nav">
-      <div class="header-nav-left">
-        <a href="index.php" class="nav-link"><span class="icon">🎬</span><span class="text">PHIM</span></a>
-        <a href="sap_chieu.php" class="nav-link"><span class="icon">🗓️</span><span class="text">SẮP CHIẾU</span></a>
-        <a href="social.php" class="nav-link active"><span class="icon">👥</span><span class="text">CỘNG ĐỒNG</span></a>
-      </div>
-      <div class="search-wrap" id="searchWrap">
-        <input type="text" id="searchInput" class="search-bar" placeholder="Tìm phim..." autocomplete="off">
-        <span class="search-icon">🔍</span><span class="search-spinner"></span>
-        <div class="search-dropdown" id="searchDropdown"></div>
-      </div>
-      <div class="header-nav-right">
-        <a href="profile.php?id=<?= $me ?>" class="hello">
-          <?php if ($me_info['avatar']): ?>
-            <img src="../assets/images/avatars/<?= htmlspecialchars($me_info['avatar']) ?>" class="avatar-xs" alt="">
-          <?php else: ?>
-            <span class="icon">👤</span>
-          <?php endif; ?>
-          <span class="text"><?= htmlspecialchars($me_info['ten']) ?></span>
-        </a>
-        <a href="../auth/logout.php" class="btn btn-sm btn-outline" onclick="return confirm('Đăng xuất?')">
-          <span class="icon">🚪</span><span class="text">ĐĂNG XUẤT</span>
-        </a>
-      </div>
-    </nav>
-  </div>
-</header>
-
+<?php $active_page = 'social'; include 'components/header.php'; ?>
 <main class="container">
   <div class="social-layout">
 

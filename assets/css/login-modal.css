@@ -1,10 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap');
+﻿@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap');
 
 /* ============================================================
-   TTVH Cinemas – Login Modal  (Cinematic Luxury Theme)
+   TTVH Cinemas â€“ Login Modal  (Cinematic Luxury Theme)
    ============================================================ */
 
-/* ── Overlay ── */
+/* â”€â”€ Overlay â”€â”€ */
 .login-overlay {
     position: fixed;
     inset: 0;
@@ -203,7 +203,7 @@
     .auth-panel { padding: 24px 20px; }
 }
 
-/* ── Hero features list ── */
+/* â”€â”€ Hero features list â”€â”€ */
 .hero-features {
   display: flex; flex-direction: column; gap: 10px;
   margin: 8px 0;
@@ -220,7 +220,7 @@
   font-size: 14px; flex-shrink: 0;
 }
 
-/* ── Mobile full-screen overlay ── */
+/* â”€â”€ Mobile full-screen overlay â”€â”€ */
 @media (max-width: 600px) {
   .login-overlay {
     padding: 0;

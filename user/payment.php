@@ -401,21 +401,10 @@ body.user-index[data-theme="light"] .agreement-group label { color: #4b5563 !imp
 body.user-index[data-theme="light"] .btn-next:disabled { background: #f3f4f6 !important; color: #9ca3af !important; border: 1px solid #e5e7eb !important; box-shadow: none !important; }
 label { width: auto !important; }
 </style>
+<link rel="stylesheet" href="../assets/css/mobile-premium.css?v=<?php echo time(); ?>">
 </head>
 <body class="user-index">
-<header class="header">
-    <div class="header-inner">
-        <div class="logo">TTVH</div>
-        <nav class="menu">
-            <a href="index.php" class="nav-link">🎬 PHIM</a>
-        </nav>
-        <div class="actions">
-            <button class="theme-toggle-btn" id="themeToggle">🌓 Giao diện</button>
-            <a href="ve_cua_toi.php" class="link">🎟️ VÉ CỦA TÔI</a>
-        </div>
-    </div>
-</header>
-
+<?php $active_page = ''; include 'components/header.php'; ?>
 <main class="container">
     <div class="left">
         <div class="movie-summary">

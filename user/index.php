@@ -31,89 +31,11 @@ if (isset($_SESSION['user_id'])) {
     <link rel="stylesheet" href="../assets/css/user-menu.css">
     <link rel="stylesheet" href="../assets/css/theme-toggle.css">
     
+<link rel="stylesheet" href="../assets/css/mobile-premium.css?v=<?php echo time(); ?>">
 </head>
 <body class="user-index">
 
-<header class="header">
-    <div class="header-inner">
-        <a href="index.php" class="logo">TTVH</a>
-        <nav class="header-nav">
-            <div class="header-nav-left">
-                <a href="index.php" class="nav-link active">
-                    <span class="icon">🎬</span>
-                    <span class="text">PHIM</span>
-                </a>
-                <a href="sap_chieu.php" class="nav-link">
-                    <span class="icon">🗓️</span>
-                    <span class="text">SẮP CHIẾU</span>
-                </a>
-                <?php if (isset($_SESSION['user_id'])): ?>
-                <a href="social.php" class="nav-link">
-                    <span class="icon">👥</span>
-                    <span class="text">CỘNG ĐỒNG</span>
-                </a>
-                <?php endif; ?>
-
-            </div>
-            <div class="search-wrap" id="searchWrap">
-    <input type="text" id="searchInput" class="search-bar"
-           placeholder="Tìm phim, thể loại..." autocomplete="off">
-    <span class="search-icon">🔍</span>
-    <span class="search-spinner"></span>
-    <div class="search-dropdown" id="searchDropdown"></div>
-</div>
-            <div class="header-nav-right">
-                <button class="theme-toggle-btn" id="themeToggle">🌓 Giao diện</button>
-                <?php if (isset($_SESSION['user_id'])):
-                    $is_admin = (isset($_SESSION['vai_tro']) && $_SESSION['vai_tro'] === 'admin');
-                    $ten = htmlspecialchars($_SESSION['ten_nguoi_dung'] ?? ($_SESSION['ten'] ?? 'Tôi'));
-                    $avatar_sql = mysqli_fetch_assoc(mysqli_query($conn, "SELECT avatar FROM users WHERE id=".(int)$_SESSION['user_id']));
-                    $avatar = $avatar_sql['avatar'] ?? null;
-                ?>
-                <a href="notifications.php" class="notif-link">🔔
-                    <?php if ($notif_unread > 0): ?><span class="notif-badge"><?= $notif_unread ?></span><?php endif; ?>
-                </a>
-                <div class="user-menu-wrap">
-                    <button class="user-menu-btn" id="userMenuBtn">
-                        <?php if ($avatar): ?>
-                            <img src="../assets/images/avatars/<?= htmlspecialchars($avatar) ?>" class="user-menu-avatar" alt="">
-                        <?php else: ?>
-                            <div class="user-menu-initial"><?= mb_substr($_SESSION['ten_nguoi_dung'] ?? ($_SESSION['ten'] ?? 'U'), 0, 1) ?></div>
-                        <?php endif; ?>
-                        <span class="user-menu-name"><?= $ten ?></span>
-                        <span class="user-menu-arrow">▾</span>
-                    </button>
-                    <div class="user-dropdown" id="userDropdown">
-                        <div class="user-dropdown-header">
-                            <span><?= $ten ?></span>
-                            <?php if ($is_admin): ?><span class="user-badge-admin">Admin</span><?php endif; ?>
-                        </div>
-                        <a href="profile.php?id=<?= (int)$_SESSION['user_id'] ?>" class="user-dropdown-item">👤 Trang cá nhân</a>
-                        <a href="../user/ve_cua_toi.php" class="user-dropdown-item">🎟️ Vé của tôi</a>
-                        <?php if ($is_admin): ?>
-                        <div class="user-dropdown-divider"></div>
-                        <a href="../admin/dashboard.php" class="user-dropdown-item">📊 Dashboard</a>
-                        <a href="../admin/phim.php" class="user-dropdown-item">🎬 Quản lý phim</a>
-                        <a href="../admin/suat_chieu.php" class="user-dropdown-item">🗓️ Quản lý suất chiếu</a>
-                        <a href="../admin/quan_ly_user.php" class="user-dropdown-item">👥 Quản lý user</a>
-                        <a href="../admin/quan_ly_chat.php" class="user-dropdown-item">💬 Quản lý tin nhắn</a>
-                        <?php endif; ?>
-                        <div class="user-dropdown-divider"></div>
-                        <a href="../auth/logout.php" class="user-dropdown-item danger"
-                           onclick="return confirm('Đăng xuất?')">🚪 Đăng xuất</a>
-                    </div>
-                </div>
-                <?php else: ?>
-                    <a href="../auth/login.php" class="btn btn-sm open-login-modal">
-                        <span class="icon">🔐</span>
-                        <span class="text">ĐĂNG NHẬP</span>
-                    </a>
-                <?php endif; ?>
-            </div>
-        </nav>
-    </div>
-</header>
-
+<?php $active_page = 'phim'; include 'components/header.php'; ?>
 <main class="container">
     <!-- Banner Carousel -->
     <?php

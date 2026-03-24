@@ -38,6 +38,7 @@ if (table_exists($conn, 'notifications')) {
     .noti-actions { display:flex; gap:8px; }
     .empty { padding:30px; text-align:center; color:#94a3b8; border:1px dashed #334155; border-radius:12px; }
   </style>
+<link rel="stylesheet" href="../assets/css/mobile-premium.css?v=<?php echo time(); ?>">
 </head>
 <body>
   <div class="wrap">

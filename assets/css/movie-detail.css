@@ -1,9 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap');
+﻿@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap');
 
-/* ══════════════════════════════════════════════
-   TTVH – Chi tiết phim  (movie-detail-page)
-   Font: Be Vietnam Pro (hỗ trợ tiếng Việt đầy đủ)
-   ══════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   TTVH â€“ Chi tiáº¿t phim  (movie-detail-page)
+   Font: Be Vietnam Pro (há»— trá»£ tiáº¿ng Viá»‡t Ä‘áº§y Ä‘á»§)
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
 :root {
   --bg:          #060912;
@@ -45,7 +45,7 @@ body.movie-detail-page::before {
 
 body.movie-detail-page > * { position: relative; z-index: 1; }
 
-/* ── Header ── */
+/* â”€â”€ Header â”€â”€ */
 .movie-detail-page .header {
   position: fixed;
   top: 0; left: 0; right: 0;
@@ -145,13 +145,13 @@ body.movie-detail-page > * { position: relative; z-index: 1; }
   border-color: rgba(255,255,255,.25); box-shadow: none;
 }
 
-/* ── Container ── */
+/* â”€â”€ Container â”€â”€ */
 .md-container {
   max-width: 1160px; margin: 0 auto;
   padding: 28px 20px 60px;
 }
 
-/* ── Back link ── */
+/* â”€â”€ Back link â”€â”€ */
 .back {
   display: inline-flex; align-items: center; gap: 6px;
   color: var(--muted); text-decoration: none;
@@ -161,7 +161,7 @@ body.movie-detail-page > * { position: relative; z-index: 1; }
 }
 .back:hover { color: var(--text); }
 
-/* ── Hero card ── */
+/* â”€â”€ Hero card â”€â”€ */
 .md-card {
   display: flex; gap: 36px;
   background: linear-gradient(135deg, #111827, #0d1322);
@@ -302,7 +302,7 @@ body.movie-detail-page > * { position: relative; z-index: 1; }
   border-color: rgba(255,255,255,.18); color: #fff;
 }
 
-/* ── Showtimes section ── */
+/* â”€â”€ Showtimes section â”€â”€ */
 .showtimes-block { margin-top: 8px; }
 
 .section-title {
@@ -409,7 +409,7 @@ body.movie-detail-page > * { position: relative; z-index: 1; }
   font-size: 13px; padding: 10px 16px;
 }
 
-/* ── Footer ── */
+/* â”€â”€ Footer â”€â”€ */
 .movie-detail-page .footer {
   margin-top: 60px; padding: 24px 20px;
   text-align: center; color: var(--muted);
@@ -417,9 +417,9 @@ body.movie-detail-page > * { position: relative; z-index: 1; }
   border-top: 1px solid var(--border);
 }
 
-/* ══════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    MOBILE RESPONSIVE
-   ══════════════════════════════════════════════ */
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
 @media (max-width: 768px) {
   .movie-detail-page .header-nav-left .nav-link .text { display: none; }
@@ -716,7 +716,7 @@ body.movie-detail-page > * { position: relative; z-index: 1; }
   border: 0;
 }
 
-/* ── Description expand/collapse ── */
+/* â”€â”€ Description expand/collapse â”€â”€ */
 .md-desc-wrap { display: flex; flex-direction: column; gap: 8px; }
 
 .md-short { margin: 0; }
@@ -748,3 +748,72 @@ body.movie-detail-page > * { position: relative; z-index: 1; }
   transition: transform .3s ease;
   font-size: 14px; line-height: 1;
 }
+
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   PREMIUM MOBILE REDESIGN (MATCHING HOME PAGE)
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+@media (max-width: 768px) {
+  .md-container { padding: 10px 10px 80px; }
+  
+  /* Hero Card Glassmorphism */
+  .md-card {
+    background: rgba(13, 19, 34, 0.4) !important;
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1) !important;
+    border-radius: 24px !important;
+    padding: 24px 16px !important;
+    margin-top: 10px;
+    gap: 16px;
+  }
+  
+  /* Make the poster look cinematic */
+  .md-poster { width: 220px !important; margin: 0 auto; }
+  .md-poster img {
+    border-radius: 16px;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.05);
+  }
+  
+  /* Text & Chips Align Center */
+  .md-info { text-align: center; align-items: center; width: 100%; }
+  .md-title { font-size: 26px !important; text-shadow: 0 2px 10px rgba(0,0,0,0.5); margin-bottom: 6px; }
+  .md-meta { justify-content: center; }
+  .md-details { align-items: center; text-align: center; width: 100%; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 16px; }
+  .md-detail-row { flex-direction: column; gap: 4px !important; margin-bottom: 8px; }
+  .md-detail-label { font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 0; }
+  .md-detail-value { font-size: 14px; font-weight: 600; }
+  
+  /* Actions */
+  .md-actions { width: 100%; flex-direction: column; gap: 12px; margin-top: 16px; }
+  .md-actions .btn-primary {
+    width: 100%; padding: 14px; border-radius: 16px; font-size: 16px; font-weight: 800;
+    box-shadow: 0 8px 24px rgba(232, 25, 44, 0.4);
+    justify-content: center;
+  }
+  .md-actions .btn-outline, .md-actions .btn-sm { width: 100%; padding: 14px; border-radius: 16px; justify-content: center; }
+
+  /* Showtimes / Rating Cards */
+  .showtime-card {
+    background: rgba(17, 24, 39, 0.45) !important;
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    border: 1px solid rgba(255,255,255,0.06) !important;
+    border-radius: 20px;
+    padding: 20px;
+  }
+  .rating-action-card {
+    background: rgba(124, 58, 237, 0.08) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(124, 58, 237, 0.2) !important;
+    border-radius: 20px;
+  }
+  .rating-overview-badge {
+    background: rgba(245, 197, 24, 0.1) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(245, 197, 24, 0.2) !important;
+  }
+}
+

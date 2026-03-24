@@ -295,28 +295,11 @@ $pct_trong = $tong_ghe > 0 ? round($ghe_trong / $tong_ghe * 100) : 0;
   .btn-checkout { width: 100%; text-align: center; }
 }
 </style>
+<link rel="stylesheet" href="../assets/css/mobile-premium.css?v=<?php echo time(); ?>">
 </head>
 <body class="movie-detail-page">
 
-<header class="header">
-  <div class="header-inner">
-    <a href="index.php" class="logo">TTVH</a>
-    <nav class="header-nav">
-      <div class="header-nav-left">
-        <a href="index.php" class="nav-link"><span class="icon">🎬</span><span class="text">PHIM</span></a>
-      </div>
-      <!-- Không cần search ở trang chọn ghế -->
-      <div class="header-nav-right">
-        <?php if (isset($_SESSION['user_id'])): ?>
-          <a href="../user/ve_cua_toi.php" class="btn btn-sm">
-            <span class="icon">🎟️</span><span class="text">VÉ CỦA TÔI</span>
-          </a>
-        <?php endif; ?>
-      </div>
-    </nav>
-  </div>
-</header>
-
+<?php $active_page = ''; include 'components/header.php'; ?>
 <main class="md-container">
   <a class="back" href="chi_tiet_phim.php?id=<?= $info['phim_id'] ?? 0 ?>">← Quay lại chi tiết phim</a>
 

@@ -3,19 +3,47 @@ if (session_status() == PHP_SESSION_NONE) session_start();
 include "check_admin.php";
 include "../config/db.php";
 
-$total_users = (int)(mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS c FROM users"))['c'] ?? 0);
-$total_movies = (int)(mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS c FROM phim"))['c'] ?? 0);
-$total_shows = (int)(mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS c FROM suat_chieu"))['c'] ?? 0);
-$total_tickets = (int)(mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS c FROM ve"))['c'] ?? 0);
+function admin_query($conn, $sql) {
+    $result = mysqli_query($conn, $sql);
+    if (!$result) {
+        error_log("[dashboard] MySQL error: " . mysqli_error($conn) . " | SQL: " . $sql);
+        return false;
+    }
+    return $result;
+}
 
-$rev_row = mysqli_fetch_assoc(mysqli_query($conn,
+$total_users = 0;
+if ($row = mysqli_fetch_assoc(admin_query($conn, "SELECT COUNT(*) AS c FROM users"))) {
+    $total_users = (int)$row['c'];
+}
+
+$total_movies = 0;
+if ($row = mysqli_fetch_assoc(admin_query($conn, "SELECT COUNT(*) AS c FROM phim"))) {
+    $total_movies = (int)$row['c'];
+}
+
+$total_shows = 0;
+if ($row = mysqli_fetch_assoc(admin_query($conn, "SELECT COUNT(*) AS c FROM suat_chieu"))) {
+    $total_shows = (int)$row['c'];
+}
+
+$total_tickets = 0;
+if ($row = mysqli_fetch_assoc(admin_query($conn, "SELECT COUNT(*) AS c FROM ve"))) {
+    $total_tickets = (int)$row['c'];
+}
+
+$total_revenue = 0;
+if ($row = mysqli_fetch_assoc(admin_query($conn,
     "SELECT SUM(sc.gia) AS revenue
      FROM ve v
      JOIN suat_chieu sc ON v.suat_chieu_id = sc.id"
-));
-$total_revenue = (int)($rev_row['revenue'] ?? 0);
+))) {
+    $total_revenue = (int)($row['revenue'] ?? 0);
+}
 
-$chart_query = mysqli_query($conn, "
+$chart_labels = [];
+$chart_data = [];
+$chart_query = admin_query($conn, "
     SELECT p.ten_phim, COUNT(v.id) as total_tickets 
     FROM phim p 
     LEFT JOIN suat_chieu sc ON p.id = sc.phim_id 
@@ -24,8 +52,6 @@ $chart_query = mysqli_query($conn, "
     ORDER BY total_tickets DESC 
     LIMIT 10
 ");
-$chart_labels = [];
-$chart_data = [];
 if ($chart_query) {
     while ($row = mysqli_fetch_assoc($chart_query)) {
         $chart_labels[] = $row['ten_phim'];
@@ -33,7 +59,7 @@ if ($chart_query) {
     }
 }
 
-$latest = mysqli_query($conn,
+$latest = admin_query($conn,
     "SELECT v.id, u.ten, p.ten_phim, sc.ngay, sc.gio
      FROM ve v
      JOIN users u ON v.user_id = u.id
