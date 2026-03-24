@@ -1,10 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap');
+﻿@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap');
 
 /* ============================================================
-   TTVH Cinemas – User Index Page  (Cinematic Luxury Theme)
+   TTVH Cinemas â€“ User Index Page  (Cinematic Luxury Theme)
    ============================================================ */
 
-/* ── Page Body ── */
+/* â”€â”€ Page Body â”€â”€ */
 body.user-index {
     --header-default-h: 66px;
     --header-shrink-h:  50px;
@@ -30,7 +30,7 @@ body.user-index::before {
     z-index: 0;
 }
 
-/* ── Fixed Header ── */
+/* â”€â”€ Fixed Header â”€â”€ */
 body.user-index .header {
     position: fixed;
     top: 0; left: 0; right: 0;
@@ -64,7 +64,7 @@ body.user-index .menu {
     gap: 15px;
 }
 
-/* ── Logo ── */
+/* â”€â”€ Logo â”€â”€ */
 body.user-index .logo {
     font-family: 'Be Vietnam Pro', sans-serif;
     font-size: 28px;
@@ -79,18 +79,18 @@ body.user-index .logo {
 body.user-index .header.shrink .logo { font-size: 22px; }
 body.user-index .logo:hover { color: #ff4d6d; text-shadow: 0 0 30px rgba(255,77,109,0.5); }
 
-/* ── Header Navigation ── */
+/* â”€â”€ Header Navigation â”€â”€ */
 .header-nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    flex: 1; /* Chiếm hết không gian còn lại sau logo */
+    flex: 1; /* Chiáº¿m háº¿t khĂ´ng gian cĂ²n láº¡i sau logo */
     gap: 12px;
 }
 .header-nav-left {
     flex: 1;
     display: flex;
-    justify-content: center; /* Căn giữa menu bên trái */
+    justify-content: center; /* CÄƒn giá»¯a menu bĂªn trĂ¡i */
     gap: 10px;
 }
 .header-nav-right { 
@@ -195,7 +195,7 @@ body.user-index .logo:hover { color: #ff4d6d; text-shadow: 0 0 30px rgba(255,77,
     box-shadow: none;
 }
 
-/* ── Main Container ── */
+/* â”€â”€ Main Container â”€â”€ */
 body.user-index .container {
     max-width: 1280px;
     margin: 0 auto;
@@ -204,7 +204,7 @@ body.user-index .container {
     z-index: 1;
 }
 
-/* ── Section Title ── */
+/* â”€â”€ Section Title â”€â”€ */
 body.user-index .page-title {
     text-align: center;
     font-family: 'Be Vietnam Pro', sans-serif;
@@ -223,7 +223,7 @@ body.user-index .page-title::after {
     border-radius: 2px;
 }
 
-/* ── Movies Grid ── */
+/* â”€â”€ Movies Grid â”€â”€ */
 body.user-index .movies {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
@@ -231,13 +231,13 @@ body.user-index .movies {
     align-items: start;
 }
 
-/* ── Card entrance animation ── */
+/* â”€â”€ Card entrance animation â”€â”€ */
 @keyframes cardFadeUp {
     from { opacity: 0; transform: translateY(36px); }
     to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ── Movie Card ── */
+/* â”€â”€ Movie Card â”€â”€ */
 body.user-index .movie-card {
     background: linear-gradient(160deg, #141722, #0e1019);
     border: 1px solid rgba(255,255,255,0.07);
@@ -249,13 +249,13 @@ body.user-index .movie-card {
     height: 100%;
     position: relative;
 
-    /* Ẩn sẵn — JS sẽ gán .is-visible để trigger */
+    /* áº¨n sáºµn â€” JS sáº½ gĂ¡n .is-visible Ä‘á»ƒ trigger */
     opacity: 0;
     transform: translateY(36px);
     transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
-/* Trigger animation khi JS thêm .is-visible */
+/* Trigger animation khi JS thĂªm .is-visible */
 body.user-index .movie-card.is-visible {
     animation: cardFadeUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
@@ -270,7 +270,7 @@ body.user-index .movie-card::before {
     z-index: 1;
 }
 
-/* Hover chỉ hoạt động sau khi card đã xuất hiện */
+/* Hover chá»‰ hoáº¡t Ä‘á»™ng sau khi card Ä‘Ă£ xuáº¥t hiá»‡n */
 body.user-index .movie-card.is-visible:hover {
     transform: translateY(-8px) scale(1.01);
     box-shadow: 0 20px 50px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,77,109,0.2);
@@ -305,7 +305,7 @@ body.user-index .movie-title {
     color: #f1f5f9;
     display: -webkit-box;
     -webkit-line-clamp: 2;
-    line-clamp: 2; /* Thuộc tính chuẩn */
+    line-clamp: 2; /* Thuá»™c tĂ­nh chuáº©n */
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
@@ -394,7 +394,7 @@ body.user-index .btn-sm:hover {
     color: #fff;
 }
 
-/* ── Footer ── */
+/* â”€â”€ Footer â”€â”€ */
 body.user-index .footer {
     margin-top: 60px;
     padding: 24px 20px;
@@ -406,7 +406,7 @@ body.user-index .footer {
     z-index: 1;
 }
 
-/* ── Banner Carousel ── */
+/* â”€â”€ Banner Carousel â”€â”€ */
 .banner-carousel {
     position: relative;
     width: 100%;
@@ -508,7 +508,7 @@ body.user-index .footer {
     transform: scale(1.4);
 }
 
-/* ── Misc ── */
+/* â”€â”€ Misc â”€â”€ */
 .no-movies {
     grid-column: 1 / -1;
     text-align: center;
@@ -520,7 +520,7 @@ body.user-index .footer {
 .release-date .label { color: #475569; }
 .release-date .date { font-weight: 700; background: rgba(245,197,24,0.1); padding: 2px 8px; border-radius: 4px; }
 
-/* ── Responsive ── */
+/* â”€â”€ Responsive â”€â”€ */
 @media (max-width: 1100px) {
     body.user-index .poster { height: 260px; }
 }
@@ -587,11 +587,11 @@ body.user-index .footer {
     padding: 2px 6px;
     border-radius: 999px;
 }
-/* ══════════════════════════════════════════════════════
-   MOBILE OPTIMIZATION (PREMIUM REDESIGN)  ·  max-width 768px
-   ══════════════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   MOBILE OPTIMIZATION (PREMIUM REDESIGN)  Â·  max-width 768px
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
-/* ─── Keyframes ─── */
+/* â”€â”€â”€ Keyframes â”€â”€â”€ */
 @keyframes navPop {
     0%   { transform: scale(1) translateY(0); }
     40%  { transform: scale(1.35) translateY(-6px); }
