@@ -4,6 +4,32 @@ if (!isset($active_page)) {
     $active_page = '';
 }
 ?>
+<style>
+/* FOOLPROOF MOBILE HIDES */
+@media (max-width: 768px) {
+    /* Force hide redundant PC elements on mobile */
+    .header-nav-right #themeToggle { display: none !important; }
+    .header-nav-right .notif-link { display: none !important; }
+    .user-menu-name { display: none !important; }
+    .user-menu-arrow { display: none !important; }
+    .header-nav-left { display: none !important; }
+    .pc-only { display: none !important; }
+    
+    /* Ensure the mobile bar sticks to bottom if external CSS fails */
+    .mobile-nav-bar {
+        display: flex !important;
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        z-index: 9999 !important;
+        background: rgba(10,11,18,0.95) !important;
+        flex-direction: row !important;
+        border-top: 1px solid rgba(255,255,255,0.1) !important;
+        padding-bottom: env(safe-area-inset-bottom, 8px) !important;
+    }
+}
+</style>
 <!-- ── Header ── -->
 <header class="header">
     <div class="header-inner">
