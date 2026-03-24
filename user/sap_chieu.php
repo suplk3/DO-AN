@@ -408,6 +408,5 @@ if (userMenuBtn && userDropdown) {
     document.addEventListener('click', () => userDropdown.classList.remove('open'));
 }
 </script>
-<?php include "chat_widget.php"; ?>
 </body>
 </html>

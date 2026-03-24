@@ -723,6 +723,5 @@ body.success-page{
 })();
 </script>
 <script src="../assets/js/login-modal.js"></script>
-<?php include "chat_widget.php"; ?>
 </body>
 </html>

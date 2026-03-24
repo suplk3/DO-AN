@@ -376,6 +376,5 @@ if (userMenuBtn && userDropdown) {
   });
 })();
 </script>
-<?php include "chat_widget.php"; ?>
 </body>
 </html>
