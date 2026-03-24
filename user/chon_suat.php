@@ -91,6 +91,7 @@ $q_suat = mysqli_query($conn, $sql_suat);
   .showtime-grid { grid-template-columns: 1fr; gap: 12px; }
 }
 </style>
+<link rel="stylesheet" href="../assets/css/mobile-premium.css?v=<?php echo time(); ?>">
 </head>
 <body class="user-index">
 

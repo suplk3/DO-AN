@@ -193,6 +193,7 @@ $ves = mysqli_fetch_all($result, MYSQLI_ASSOC);
   #printArea { display: block !important; }
 }
 </style>
+<link rel="stylesheet" href="../assets/css/mobile-premium.css?v=<?php echo time(); ?>">
 </head>
 <body class="user-index">
 

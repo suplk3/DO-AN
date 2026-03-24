@@ -31,6 +31,7 @@ if (isset($_SESSION['user_id'])) {
     <link rel="stylesheet" href="../assets/css/user-menu.css">
     <link rel="stylesheet" href="../assets/css/theme-toggle.css">
     
+<link rel="stylesheet" href="../assets/css/mobile-premium.css?v=<?php echo time(); ?>">
 </head>
 <body class="user-index">
 

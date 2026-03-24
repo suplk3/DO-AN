@@ -67,6 +67,7 @@ function time_ago($datetime) {
 <link rel="stylesheet" href="../assets/css/login-modal.css">
 <link rel="stylesheet" href="../assets/css/search.css">
 <link rel="stylesheet" href="../assets/css/social.css">
+<link rel="stylesheet" href="../assets/css/mobile-premium.css?v=<?php echo time(); ?>">
 </head>
 <body class="user-index">
 

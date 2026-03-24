@@ -4,9 +4,6 @@ if (!isset($active_page)) {
     $active_page = '';
 }
 ?>
-<!-- ── Premium Mobile CSS (Global) ── -->
-<link rel="stylesheet" href="../assets/css/mobile-premium.css?v=<?= time() ?>">
-
 <!-- ── Header ── -->
 <header class="header">
     <div class="header-inner">

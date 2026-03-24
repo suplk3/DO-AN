@@ -401,6 +401,7 @@ body.user-index[data-theme="light"] .agreement-group label { color: #4b5563 !imp
 body.user-index[data-theme="light"] .btn-next:disabled { background: #f3f4f6 !important; color: #9ca3af !important; border: 1px solid #e5e7eb !important; box-shadow: none !important; }
 label { width: auto !important; }
 </style>
+<link rel="stylesheet" href="../assets/css/mobile-premium.css?v=<?php echo time(); ?>">
 </head>
 <body class="user-index">
 <?php $active_page = ''; include 'components/header.php'; ?>

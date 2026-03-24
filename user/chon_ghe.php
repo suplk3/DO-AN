@@ -295,6 +295,7 @@ $pct_trong = $tong_ghe > 0 ? round($ghe_trong / $tong_ghe * 100) : 0;
   .btn-checkout { width: 100%; text-align: center; }
 }
 </style>
+<link rel="stylesheet" href="../assets/css/mobile-premium.css?v=<?php echo time(); ?>">
 </head>
 <body class="movie-detail-page">
 

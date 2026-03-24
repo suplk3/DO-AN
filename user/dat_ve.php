@@ -564,6 +564,7 @@ body.success-page{
 }
 .enjoy-note strong{color:var(--gold);}
 </style>
+<link rel="stylesheet" href="../assets/css/mobile-premium.css?v=<?php echo time(); ?>">
 </head>
 
 <body class="success-page user-index">

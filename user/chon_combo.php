@@ -419,6 +419,7 @@ body.combo-page {
 }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 </style>
+<link rel="stylesheet" href="../assets/css/mobile-premium.css?v=<?php echo time(); ?>">
 </head>
 <body class="combo-page movie-detail-page">
 

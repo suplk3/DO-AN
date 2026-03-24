@@ -129,6 +129,7 @@ if ($me_id) {
 <link rel="stylesheet" href="../assets/css/social.css">
 <link rel="stylesheet" href="../assets/css/theme-toggle.css">
 
+<link rel="stylesheet" href="../assets/css/mobile-premium.css?v=<?php echo time(); ?>">
 </head>
 <body class="movie-detail-page">
 
