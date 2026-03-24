@@ -1,4 +1,4 @@
-/* Search Bar Styling */
+﻿/* Search Bar Styling */
 .search-section {
     margin-bottom: 24px;
     display: flex;
@@ -170,7 +170,7 @@
 }
 
 .notification.success::before {
-    content: '✓';
+    content: 'âœ“';
     font-size: 18px;
     font-weight: 800;
 }
@@ -182,7 +182,7 @@
 }
 
 .notification.error::before {
-    content: '✕';
+    content: 'âœ•';
     font-size: 18px;
     font-weight: 800;
 }
@@ -234,7 +234,7 @@
 }
 
 /* Responsive */
-@media (max-width: 768px) {
+@media (max-width: 991px) {
     .search-section {
         flex-direction: column;
     }
@@ -271,3 +271,4 @@
         font-size: 18px;
     }
 }
+

@@ -1,9 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap');
+﻿@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap');
 
-/* ══════════════════════════════════════════════
-   TTVH – Chi tiết phim  (movie-detail-page)
-   Font: Be Vietnam Pro (hỗ trợ tiếng Việt đầy đủ)
-   ══════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   TTVH â€“ Chi tiáº¿t phim  (movie-detail-page)
+   Font: Be Vietnam Pro (há»— trá»£ tiáº¿ng Viá»‡t Ä‘áº§y Ä‘á»§)
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
 :root {
   --bg:          #060912;
@@ -45,7 +45,7 @@ body.movie-detail-page::before {
 
 body.movie-detail-page > * { position: relative; z-index: 1; }
 
-/* ── Header ── */
+/* â”€â”€ Header â”€â”€ */
 .movie-detail-page .header {
   position: fixed;
   top: 0; left: 0; right: 0;
@@ -145,13 +145,13 @@ body.movie-detail-page > * { position: relative; z-index: 1; }
   border-color: rgba(255,255,255,.25); box-shadow: none;
 }
 
-/* ── Container ── */
+/* â”€â”€ Container â”€â”€ */
 .md-container {
   max-width: 1160px; margin: 0 auto;
   padding: 28px 20px 60px;
 }
 
-/* ── Back link ── */
+/* â”€â”€ Back link â”€â”€ */
 .back {
   display: inline-flex; align-items: center; gap: 6px;
   color: var(--muted); text-decoration: none;
@@ -161,7 +161,7 @@ body.movie-detail-page > * { position: relative; z-index: 1; }
 }
 .back:hover { color: var(--text); }
 
-/* ── Hero card ── */
+/* â”€â”€ Hero card â”€â”€ */
 .md-card {
   display: flex; gap: 36px;
   background: linear-gradient(135deg, #111827, #0d1322);
@@ -302,7 +302,7 @@ body.movie-detail-page > * { position: relative; z-index: 1; }
   border-color: rgba(255,255,255,.18); color: #fff;
 }
 
-/* ── Showtimes section ── */
+/* â”€â”€ Showtimes section â”€â”€ */
 .showtimes-block { margin-top: 8px; }
 
 .section-title {
@@ -409,7 +409,7 @@ body.movie-detail-page > * { position: relative; z-index: 1; }
   font-size: 13px; padding: 10px 16px;
 }
 
-/* ── Footer ── */
+/* â”€â”€ Footer â”€â”€ */
 .movie-detail-page .footer {
   margin-top: 60px; padding: 24px 20px;
   text-align: center; color: var(--muted);
@@ -417,11 +417,11 @@ body.movie-detail-page > * { position: relative; z-index: 1; }
   border-top: 1px solid var(--border);
 }
 
-/* ══════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    MOBILE RESPONSIVE
-   ══════════════════════════════════════════════ */
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
-@media (max-width: 768px) {
+@media (max-width: 991px) {
   .movie-detail-page .header-nav-left .nav-link .text { display: none; }
   .movie-detail-page .header-nav-left .nav-link.admin { display: none; }
   .movie-detail-page .header-nav-left .nav-link { padding: 8px 10px; }
@@ -716,7 +716,7 @@ body.movie-detail-page > * { position: relative; z-index: 1; }
   border: 0;
 }
 
-/* ── Description expand/collapse ── */
+/* â”€â”€ Description expand/collapse â”€â”€ */
 .md-desc-wrap { display: flex; flex-direction: column; gap: 8px; }
 
 .md-short { margin: 0; }
@@ -749,10 +749,10 @@ body.movie-detail-page > * { position: relative; z-index: 1; }
   font-size: 14px; line-height: 1;
 }
 
-/* ══════════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    PREMIUM MOBILE REDESIGN (MATCHING HOME PAGE)
-   ══════════════════════════════════════════════════════ */
-@media (max-width: 768px) {
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+@media (max-width: 991px) {
   .md-container { padding: 10px 10px 80px; }
   
   /* Hero Card Glassmorphism */
@@ -816,3 +816,4 @@ body.movie-detail-page > * { position: relative; z-index: 1; }
     border: 1px solid rgba(245, 197, 24, 0.2) !important;
   }
 }
+

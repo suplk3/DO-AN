@@ -627,7 +627,7 @@ tr:hover td { background: rgba(255,255,255,0.025); }
     to   { opacity: 1; transform: translateX(-50%) scaleX(1); }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 991px) {
     .pc-only { display: none !important; }
 
     /* Apply padding to all body tags to make room for bottom nav */
@@ -697,3 +697,4 @@ tr:hover td { background: rgba(255,255,255,0.025); }
    ══════════════════════════════════════════════════════ */
 .mobile-nav-bar { display: none; }
 .header-search-trigger { display: none; }
+

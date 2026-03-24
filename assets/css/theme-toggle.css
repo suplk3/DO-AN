@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   --light-bg: #f6f7fb;
   --light-surface: #ffffff;
   --light-text: #0f172a;
@@ -21,7 +21,7 @@
   font-size: 16px;
   cursor: pointer;
 }
-@media (max-width: 768px) {
+@media (max-width: 991px) {
   .theme-toggle-btn {
     border-radius: 12px;
   }
@@ -72,3 +72,4 @@ body[data-theme="light"] .theme-toggle-btn {
   color: var(--light-text);
   border-color: var(--light-border);
 }
+

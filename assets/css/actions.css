@@ -1,4 +1,4 @@
-/* Actions Section Styling - Premium Dark Theme */
+﻿/* Actions Section Styling - Premium Dark Theme */
 
 .actions-section {
     display: flex;
@@ -290,7 +290,7 @@
 }
 
 /* Responsive */
-@media (max-width: 768px) {
+@media (max-width: 991px) {
     .action-row {
         flex-direction: column;
         align-items: flex-start;
@@ -336,3 +336,4 @@
         font-size: 12px;
     }
 }
+
