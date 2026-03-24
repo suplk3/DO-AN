@@ -9,9 +9,20 @@ if (!isset($active_page)) {
 @media (max-width: 768px) {
     .header-nav-left       { display: none !important; }
     .pc-only               { display: none !important; }
-    .header-nav-right #themeToggle  { display: none !important; }
-    .user-menu-name        { display: none !important; }
-    .user-menu-arrow       { display: none !important; }
+    
+    /* Completely hide redundant PC buttons in top naval area */
+    .header-nav-right #themeToggle,
+    .header-nav-right .notif-link,
+    .header-nav-right .user-menu-wrap,
+    .header-nav-right .btn-sm.open-login-modal { 
+        display: none !important; 
+    }
+
+    /* Keep ONLY search trigger in top header if needed, or hide everything */
+    .header-nav-right {
+        display: flex !important;
+        gap: 0 !important;
+    }
 
     /* Bottom nav always visible on mobile */
     .mobile-nav-bar {
@@ -25,6 +36,7 @@ if (!isset($active_page)) {
         flex-direction: row !important;
         border-top: 1px solid rgba(255,255,255,0.1) !important;
         height: 64px !important;
+        padding-bottom: env(safe-area-inset-bottom, 0) !important;
     }
 }
 /* Bottom nav hidden on desktop */
@@ -63,7 +75,7 @@ if (!isset($active_page)) {
             </div>
             <div class="header-nav-right">
                 <button class="header-search-trigger" id="mobileSearchTrigger">&#128269;</button>
-                 <button class="theme-toggle-btn" id="themeToggle" title="Đổi giao diện">&#127916;</button>
+                <button class="theme-toggle-btn" id="themeToggle" title="Đổi giao diện">&#127916;</button>
                 <?php if (isset($_SESSION['user_id'])):
                     $is_admin = (isset($_SESSION['vai_tro']) && $_SESSION['vai_tro'] === 'admin');
                     $ten = htmlspecialchars($_SESSION['ten_nguoi_dung'] ?? ($_SESSION['ten'] ?? 'Tôi'));
@@ -136,11 +148,20 @@ if (!isset($active_page)) {
     <?php if (isset($_SESSION['user_id'])): ?>
     <a href="social.php" class="mobile-nav-item <?= $active_page === 'social' ? 'active' : '' ?>">
         <span class="m-icon">&#128101;</span>
-        <span class="m-text">Xã hội</span>
+        <span class="m-text">Cộng đồng</span>
     </a>
-    <a href="notifications.php" class="mobile-nav-item <?= $active_page === 'notifications' ? 'active' : '' ?>">
-        <span class="m-icon">&#128276;<?php if (($notif_unread ?? 0) > 0): ?><em class="m-badge"></em><?php endif; ?></span>
-        <span class="m-text">Thông báo</span>
+    <?php endif; ?>
+    
+    <!-- New Mobile-only Tabs -->
+    <a href="javascript:void(0)" class="mobile-nav-item" id="mobileThemeToggle">
+        <span class="m-icon">&#127762;</span>
+        <span class="m-text">Giao diện</span>
+    </a>
+    
+    <?php if (isset($_SESSION['user_id'])): ?>
+    <a href="profile.php?id=<?= (int)$_SESSION['user_id'] ?>" class="mobile-nav-item <?= $active_page === 'profile' ? 'active' : '' ?>">
+        <span class="m-icon">&#128100;<?php if (($notif_unread ?? 0) > 0): ?><em class="m-badge"></em><?php endif; ?></span>
+        <span class="m-text">Tôi</span>
     </a>
     <?php else: ?>
     <a href="../auth/login.php" class="mobile-nav-item open-login-modal">
@@ -149,3 +170,27 @@ if (!isset($active_page)) {
     </a>
     <?php endif; ?>
 </nav>
+
+<script>
+// Mobile-specific Navigation UI Logic
+(function() {
+    // Prevent double initialization
+    if (window._mobileNavInit) return;
+    window._mobileNavInit = true;
+
+    // Theme toggle bridge
+    document.getElementById('mobileThemeToggle')?.addEventListener('click', function() {
+        document.getElementById('themeToggle')?.click();
+    });
+
+    // Mobile Search Logic
+    document.getElementById('mobileSearchTrigger')?.addEventListener('click', function() {
+        const wrap = document.getElementById('searchWrap');
+        if (!wrap) return;
+        wrap.classList.toggle('mobile-active');
+        if (wrap.classList.contains('mobile-active')) {
+            document.getElementById('searchInput')?.focus();
+        }
+    });
+})();
+</script>

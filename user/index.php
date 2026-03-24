@@ -298,15 +298,5 @@ if (userMenuBtn && userDropdown) {
   });
 })();
 </script>
-<!-- Mobile Search Logic -->
-<script>
-document.getElementById('mobileSearchTrigger')?.addEventListener('click', function() {
-    const wrap = document.getElementById('searchWrap');
-    wrap?.classList.toggle('mobile-active');
-    if (wrap?.classList.contains('mobile-active')) {
-        document.getElementById('searchInput')?.focus();
-    }
-});
-</script>
 </body>
 </html>
