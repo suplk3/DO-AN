@@ -181,6 +181,14 @@ $REACTIONS = ['like'=>'👍','love'=>'❤️','haha'=>'😂','wow'=>'😮','sad'
               </div>
               <span class="community-chat-pill">Messenger</span>
             </div>
+            <div class="community-chat-search">
+              <div class="community-chat-search-box">
+                <span class="community-chat-search-icon">⌕</span>
+                <input type="search" id="communityChatSearch" placeholder="Tìm admin hoặc chiến hữu..." autocomplete="off">
+                <button type="button" class="community-chat-search-clear" id="communityChatSearchClear" aria-label="Xóa tìm kiếm" hidden>×</button>
+              </div>
+              <div class="community-chat-search-suggestions" id="communityChatSuggestions" hidden></div>
+            </div>
             <div class="community-chat-list" id="communityChatList">
               <div class="community-chat-empty-list">Đang tải danh sách trò chuyện...</div>
             </div>
@@ -569,6 +577,8 @@ const communityChatState = {
     activeType: '',
     activeUserId: 0,
     contacts: [],
+    searchQuery: '',
+    contactsScrollTop: 0,
     pollTimer: null
 };
 
@@ -617,16 +627,139 @@ function buildCommunityAvatar(contact, large = false) {
     return `<div class="community-chat-avatar${sizeClass}${adminClass}">${initials}</div>`;
 }
 
+function normalizeCommunitySearch(value) {
+    return String(value || '')
+        .trim()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase();
+}
+
+function getCommunityContactSearchText(contact) {
+    const keywords = [
+        contact.name || '',
+        contact.note || '',
+        contact.last_message || '',
+        contact.type === 'admin' ? 'admin ho tro ve thanh toan cong dong' : 'chien huu ban theo doi tro chuyen',
+    ];
+
+    return normalizeCommunitySearch(keywords.join(' '));
+}
+
+function getFilteredCommunityContacts() {
+    const keyword = normalizeCommunitySearch(communityChatState.searchQuery);
+    if (!keyword) {
+        return communityChatState.contacts.slice();
+    }
+
+    return communityChatState.contacts.filter(contact => getCommunityContactSearchText(contact).includes(keyword));
+}
+
+function updateCommunitySearchClear() {
+    const clearButton = document.getElementById('communityChatSearchClear');
+    if (clearButton) {
+        clearButton.hidden = !communityChatState.searchQuery.trim();
+    }
+}
+
+function renderCommunitySearchSuggestions(forceOpen = false) {
+    const panel = document.getElementById('communityChatSuggestions');
+    const input = document.getElementById('communityChatSearch');
+    if (!panel || !input) return;
+
+    const hasFocus = document.activeElement === input;
+    const keyword = normalizeCommunitySearch(communityChatState.searchQuery);
+    const shouldOpen = forceOpen || hasFocus;
+
+    if (!shouldOpen) {
+        panel.hidden = true;
+        panel.innerHTML = '';
+        return;
+    }
+
+    let suggestions = communityChatState.contacts.slice();
+    if (keyword) {
+        suggestions = suggestions.filter(contact => getCommunityContactSearchText(contact).includes(keyword));
+    }
+
+    suggestions = suggestions.slice(0, keyword ? 6 : 5);
+    if (!suggestions.length) {
+        if (!keyword) {
+            panel.hidden = true;
+            panel.innerHTML = '';
+            return;
+        }
+
+        panel.hidden = false;
+        panel.innerHTML = '<div class="community-chat-search-caption">Gợi ý</div><div class="community-chat-search-empty">Không tìm thấy người dùng phù hợp.</div>';
+        return;
+    }
+
+    panel.hidden = false;
+    panel.innerHTML = `
+        <div class="community-chat-search-caption">${keyword ? 'Kết quả gợi ý' : 'Gợi ý nhanh'}</div>
+        ${suggestions.map(contact => `
+            <button type="button" class="community-chat-suggestion" data-type="${contact.type}" data-user-id="${Number(contact.user_id || 0)}">
+                ${buildCommunityAvatar(contact)}
+                <span class="community-chat-suggestion-copy">
+                    <span class="community-chat-suggestion-name">${escHtml(contact.name || 'Người dùng')}</span>
+                    <span class="community-chat-suggestion-note">${escHtml(contact.note || (contact.type === 'admin' ? 'Hỗ trợ nhanh từ admin.' : 'Mở cuộc trò chuyện'))}</span>
+                </span>
+            </button>
+        `).join('')}
+    `;
+
+    panel.querySelectorAll('.community-chat-suggestion').forEach(button => {
+        button.addEventListener('click', () => {
+            const inputEl = document.getElementById('communityChatSearch');
+            if (inputEl) {
+                inputEl.value = '';
+                inputEl.blur();
+            }
+            communityChatState.searchQuery = '';
+            communityChatState.contactsScrollTop = 0;
+            updateCommunitySearchClear();
+            panel.hidden = true;
+            panel.innerHTML = '';
+            renderCommunityContacts();
+            selectCommunityConversation(button.dataset.type, Number(button.dataset.userId || 0));
+        });
+    });
+}
+
+function setCommunitySearchQuery(value, options = {}) {
+    const nextValue = String(value || '');
+    const changed = nextValue !== communityChatState.searchQuery;
+    communityChatState.searchQuery = nextValue;
+    if (changed) {
+        communityChatState.contactsScrollTop = 0;
+    }
+
+    updateCommunitySearchClear();
+    renderCommunityContacts();
+    renderCommunitySearchSuggestions(!!options.keepOpen);
+}
+
 function renderCommunityContacts() {
     const list = document.getElementById('communityChatList');
     if (!list) return;
 
+    const previousScrollTop = communityChatState.contactsScrollTop || list.scrollTop || 0;
+    const visibleContacts = getFilteredCommunityContacts();
+
     if (!communityChatState.contacts.length) {
         list.innerHTML = '<div class="community-chat-empty-list">Chưa có cuộc trò chuyện nào.</div>';
+        communityChatState.contactsScrollTop = 0;
         return;
     }
 
-    list.innerHTML = communityChatState.contacts.map(contact => {
+    if (!visibleContacts.length) {
+        list.innerHTML = '<div class="community-chat-empty-list">Không tìm thấy chiến hữu hoặc admin phù hợp.</div>';
+        communityChatState.contactsScrollTop = 0;
+        return;
+    }
+
+    list.innerHTML = visibleContacts.map(contact => {
         const key = getCommunityChatKey(contact.type, contact.user_id);
         const active = key === getCommunityChatKey(communityChatState.activeType, communityChatState.activeUserId);
         const preview = contact.last_message || (contact.type === 'admin'
@@ -648,11 +781,18 @@ function renderCommunityContacts() {
         `;
     }).join('');
 
+    list.scrollTop = previousScrollTop;
+    communityChatState.contactsScrollTop = list.scrollTop;
+
     list.querySelectorAll('.community-chat-contact').forEach(button => {
         button.addEventListener('click', () => {
             selectCommunityConversation(button.dataset.type, Number(button.dataset.userId || 0));
         });
     });
+
+    list.onscroll = () => {
+        communityChatState.contactsScrollTop = list.scrollTop;
+    };
 }
 
 function updateCommunityChatHeader() {
@@ -747,6 +887,7 @@ async function loadCommunityContacts() {
 
         communityChatState.contacts = Array.isArray(data.data) ? data.data : [];
         renderCommunityContacts();
+        renderCommunitySearchSuggestions();
 
         const activeExists = getActiveCommunityContact();
         if (!activeExists && communityChatState.contacts.length) {
@@ -802,7 +943,41 @@ function initCommunityChat() {
 
     communityChatState.initialized = true;
     const form = document.getElementById('communityChatForm');
+    const searchInput = document.getElementById('communityChatSearch');
+    const searchClear = document.getElementById('communityChatSearchClear');
     if (form) form.addEventListener('submit', submitCommunityMessage);
+    if (searchInput) {
+        searchInput.addEventListener('input', event => {
+            setCommunitySearchQuery(event.target.value, { keepOpen: true });
+        });
+        searchInput.addEventListener('focus', () => {
+            renderCommunitySearchSuggestions(true);
+        });
+        searchInput.addEventListener('blur', () => {
+            setTimeout(() => renderCommunitySearchSuggestions(false), 120);
+        });
+        searchInput.addEventListener('keydown', event => {
+            if (event.key === 'Escape') {
+                searchInput.value = '';
+                setCommunitySearchQuery('', { keepOpen: false });
+                searchInput.blur();
+            }
+        });
+    }
+    if (searchClear) {
+        searchClear.addEventListener('click', () => {
+            if (searchInput) {
+                searchInput.value = '';
+                searchInput.focus();
+            }
+            setCommunitySearchQuery('', { keepOpen: true });
+        });
+    }
+    document.addEventListener('click', event => {
+        if (!event.target.closest('.community-chat-search')) {
+            renderCommunitySearchSuggestions(false);
+        }
+    });
 
     loadCommunityContacts();
     communityChatState.pollTimer = setInterval(() => {
