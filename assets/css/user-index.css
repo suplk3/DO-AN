@@ -1,4 +1,4 @@
-﻿@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap');
 
 /* ============================================================
    TTVH Cinemas â€“ User Index Page  (Cinematic Luxury Theme)
@@ -549,6 +549,201 @@ body.user-index .footer {
     body.user-index .container { padding: 20px 14px; }
     body.user-index .movies { gap: 12px; grid-template-columns: repeat(2, 1fr); }
     body.user-index .poster { height: 200px; }
+}
+body.user-index .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(232,25,44,0.45);
+}
+body.user-index .btn-outline {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.5);
+    padding: 8px 10px;
+    border-radius: 9px;
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+    text-align: center;
+    flex: 1;
+}
+body.user-index .btn-outline:hover {
+    background: rgba(255,255,255,0.06);
+    border-color: rgba(255,255,255,0.25);
+    color: #fff;
+}
+body.user-index .btn-sm {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.5);
+    padding: 7px 10px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 11px;
+    text-decoration: none;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+body.user-index .btn-sm:hover {
+    border-color: rgba(255,255,255,0.2);
+    color: #fff;
+}
+
+/* â”€â”€ Footer â”€â”€ */
+body.user-index .footer {
+    margin-top: 60px;
+    padding: 24px 20px;
+    text-align: center;
+    color: #475569;
+    font-size: 13px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    position: relative;
+    z-index: 1;
+}
+
+/* â”€â”€ Banner Carousel â”€â”€ */
+.banner-carousel {
+    position: relative;
+    width: 100%;
+    height: 420px;
+    overflow: hidden;
+    border-radius: 20px;
+    margin-bottom: 40px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06);
+}
+.banner-slides { width: 100%; height: 100%; }
+.banner-slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.7s ease;
+    pointer-events: none;
+    z-index: 0;
+}
+.banner-slide.active { opacity: 1; pointer-events: auto; z-index: 1; }
+.banner-slide a { display: block; width: 100%; height: 100%; }
+.banner-slide img { width: 100%; height: 100%; object-fit: cover; }
+.banner-overlay {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 48px 36px 28px;
+    background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 55%, transparent 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+}
+.banner-title {
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-size: 42px;
+    letter-spacing: 2px;
+    color: #fff;
+    margin: 0;
+    line-height: 1;
+}
+.banner-cta {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 24px;
+    background: linear-gradient(135deg, #e8192c, #c01020);
+    color: #fff;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    border-radius: 25px;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 20px rgba(232,25,44,0.4);
+}
+.banner-slide:hover .banner-cta {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(232,25,44,0.55);
+}
+.banner-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 46px; height: 46px;
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 50%;
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.banner-nav:hover {
+    background: rgba(232,25,44,0.5);
+    border-color: rgba(232,25,44,0.6);
+    transform: translateY(-50%) scale(1.08);
+}
+.banner-prev { left: 18px; }
+.banner-next { right: 18px; }
+.banner-dots {
+    position: absolute;
+    bottom: 20px; left: 50%;
+    transform: translateX(-50%);
+    display: flex; gap: 8px;
+    z-index: 10;
+}
+.banner-dot {
+    width: 8px; height: 8px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.banner-dot.active, .banner-dot:hover {
+    background: #fff;
+    transform: scale(1.4);
+}
+
+/* â”€â”€ Misc â”€â”€ */
+.no-movies {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 80px 20px;
+    color: #475569;
+    font-size: 15px;
+}
+.release-date { font-size: 12px; color: #f5c518; display: flex; align-items: center; gap: 6px; margin-top: 2px; }
+.release-date .label { color: #475569; }
+.release-date .date { font-weight: 700; background: rgba(245,197,24,0.1); padding: 2px 8px; border-radius: 4px; }
+
+/* â”€â”€ Responsive â”€â”€ */
+@media (max-width: 1100px) {
+    body.user-index .poster { height: 260px; }
+}
+@media (max-width: 768px) {
+    .header-nav-left .nav-link .text { display: none; }
+    .header-nav-left .nav-link.admin { display: none; }
+    .header-nav-left .nav-link { padding: 8px 10px; }
+    .header-nav-right .hello .text { display: none; }
+    .header-nav-right .hello { padding: 6px 10px; }
+    .header-nav-right .btn .text,
+    .header-nav-right .btn-outline .text { display: none; }
+    .header-nav-right .btn,
+    .header-nav-right .btn-outline { padding: 8px 10px; min-width: 36px; justify-content: center; }
+    .banner-carousel { height: 300px; border-radius: 14px; }
+    .banner-title { font-size: 28px; }
+    .banner-overlay { padding: 32px 22px 20px; }
+}
+@media (max-width: 640px) {
+    body.user-index { padding-top: 140px; }
+    body.user-index .header { height: auto; padding: 12px 0; }
+    body.user-index .header.shrink { height: auto; }
+    body.user-index .header-inner { padding: 0 12px; flex-direction: column-reverse; align-items: center; gap: 12px; }
+    .header-nav { flex-wrap: wrap; justify-content: center; }
+    .header-nav-left, .header-nav-right { flex: 1; justify-content: center; }
+    body.user-index .logo { margin-bottom: 4px; }
+    body.user-index .container { padding: 20px 14px; }
+    body.user-index .movies { gap: 12px; grid-template-columns: repeat(2, 1fr); }
+    body.user-index .poster { height: 200px; }
     body.user-index .page-title { font-size: 28px; letter-spacing: 2px; }
     .banner-carousel { height: 220px; border-radius: 10px; margin-bottom: 24px; }
     .banner-title { font-size: 20px; }
@@ -558,24 +753,29 @@ body.user-index .footer {
 @media (max-width: 420px) {
     body.user-index .page-title { font-size: 24px; }
     body.user-index { padding-top: 155px; }
-    .banner-prev { left: 8px; }
-    .banner-next { right: 8px; }
 }
 
-/* Notifications */
+/* PC Notifications (Synchronized) */
 .notif-link {
     position: relative;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 6px 10px;
-    border-radius: 10px;
-    border: 1px solid rgba(255,255,255,0.15);
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.1);
     background: rgba(255,255,255,0.05);
     color: #e2e8f0;
     text-decoration: none;
-    font-size: 12px;
-    font-weight: 700;
+    font-size: 18px;
+    transition: all .25s var(--ease-smooth);
+}
+.notif-link:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(255,255,255,0.2);
+    transform: translateY(-1px);
+    color: #fff;
 }
 .notif-badge {
     position: absolute;
@@ -586,10 +786,13 @@ body.user-index .footer {
     font-size: 10px;
     padding: 2px 6px;
     border-radius: 999px;
+    font-weight: 800;
+    box-shadow: 0 0 10px rgba(239,68,68,0.4);
 }
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
+/* â•â•â•â•â•â••
    MOBILE OPTIMIZATION (PREMIUM REDESIGN)  Â·  max-width 768px
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+   â•â•â•â•â•â•• */
 
 /* â”€â”€â”€ Keyframes â”€â”€â”€ */
 @keyframes navPop {
