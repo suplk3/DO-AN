@@ -302,7 +302,9 @@ $quick_stats = mysqli_fetch_assoc($quick_stats_result);
 
         @media (max-width: 768px) {
             body {
-                padding: 12px;
+                padding: 8px;
+                background: radial-gradient(circle at 10% 10%, rgba(99, 102, 241, 0.2), transparent 35%),
+                            linear-gradient(180deg, #0f172a 0%, #111827 100%);
             }
 
             .container {
@@ -313,41 +315,60 @@ $quick_stats = mysqli_fetch_assoc($quick_stats_result);
             .navbar {
                 border-radius: 12px;
                 padding: 10px 12px;
+                position: fixed;
+                top: 8px;
+                left: 8px;
+                right: 8px;
+                z-index: 1000;
+                background: rgba(15, 23, 42, 0.94);
+                border: 1px solid rgba(148, 163, 184, 0.3);
+                box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
             }
 
             .navbar .brand {
                 font-size: 16px;
+                color: #e2e8f0;
             }
 
             .navbar .nav-toggle {
-                display: block;
-                background: rgba(59,130,246,0.12);
-                border: 1px solid rgba(59,130,246,0.4);
-                border-radius: 10px;
-                width: 44px;
-                height: 44px;
                 display: inline-flex;
+                background: linear-gradient(135deg, rgba(59, 130, 246, 0.25), rgba(99, 102, 241, 0.35));
+                border: 1px solid rgba(99, 102, 241, 0.6);
+                border-radius: 12px;
+                width: 42px;
+                height: 42px;
                 align-items: center;
                 justify-content: center;
-                font-size: 22px;
-                color: #334155;
+                font-size: 24px;
+                color: #e2e8f0;
+                transition: transform 0.2s ease, background 0.3s ease;
+            }
+
+            .navbar .nav-toggle:active {
+                transform: scale(0.96);
             }
 
             .navbar .nav-links {
                 position: absolute;
-                left: 0;
-                right: 0;
-                top: 64px;
+                left: 8px;
+                right: 8px;
+                top: 60px;
                 display: none;
                 flex-direction: column;
-                width: calc(100% - 24px);
+                width: calc(100% - 16px);
                 margin: 0 auto;
                 border-radius: 14px;
                 padding: 10px;
-                background: rgba(15, 23, 42, 0.9);
-                backdrop-filter: blur(6px);
+                background: rgba(15, 23, 42, 0.95);
+                backdrop-filter: blur(10px);
                 border: 1px solid rgba(148,163,184,0.35);
-                box-shadow: 0 12px 25px rgba(0,0,0,0.3);
+                box-shadow: 0 20px 35px rgba(0,0,0,0.5);
+                animation: slideDown 0.25s ease;
+            }
+
+            @keyframes slideDown {
+                from { transform: translateY(-8px); opacity: 0; }
+                to { transform: translateY(0); opacity: 1; }
             }
 
             .navbar .nav-links.open {
@@ -357,12 +378,13 @@ $quick_stats = mysqli_fetch_assoc($quick_stats_result);
             .navbar .nav-links a {
                 width: 100%;
                 text-align: left;
-                padding: 10px 12px;
+                padding: 12px 14px;
                 margin-bottom: 8px;
-                border-radius: 10px;
-                font-size: 14px;
+                border-radius: 12px;
+                font-size: 15px;
                 color: #e2e8f0;
-                background: rgba(15, 23, 42, 0.65);
+                background: rgba(15, 23, 42, 0.5);
+                border: 1px solid rgba(148,163,184,0.25);
             }
 
             .navbar .nav-links a:last-child {
@@ -372,14 +394,15 @@ $quick_stats = mysqli_fetch_assoc($quick_stats_result);
             .navbar .nav-links a.active,
             .navbar .nav-links a:hover {
                 color: #fff;
-                background: linear-gradient(135deg, #2563eb, #7c3aed);
-                border-color: rgba(147,197,253,0.4);
-                box-shadow: 0 6px 16px rgba(59,130,246,0.25);
+                background: linear-gradient(135deg, #4f46e5, #3b82f6);
+                border-color: rgba(59,130,246,0.7);
+                box-shadow: 0 10px 20px rgba(59,130,246,0.35);
             }
 
             header {
                 flex-direction: column;
                 text-align: center;
+                margin-top: 76px;
             }
 
             .user-info {
@@ -388,12 +411,14 @@ $quick_stats = mysqli_fetch_assoc($quick_stats_result);
 
             .user-info p {
                 font-size: 13px;
+                color: #cbd5e1;
             }
 
             .logout-btn {
-                padding: 8px 16px;
-                margin-top: 8px;
+                background: #164e63;
+                padding: 8px 14px;
                 font-size: 13px;
+                border-radius: 10px;
             }
 
             .stats-grid {
@@ -402,40 +427,92 @@ $quick_stats = mysqli_fetch_assoc($quick_stats_result);
             }
 
             .stat-card {
-                padding: 18px;
+                padding: 16px;
+                background: rgba(15, 23, 42, 0.85);
+                border: 1px solid rgba(148,163,184,0.25);
+                color: #e2e8f0;
             }
 
             .stat-card .value {
-                font-size: 28px;
+                font-size: 26px;
+                color: #f8fafc;
+            }
+
+            .stat-card .label {
+                color: #94a3b8;
             }
 
             .menu-grid {
                 grid-template-columns: 1fr;
-                gap: 14px;
+                gap: 12px;
             }
 
             .menu-card {
-                border-radius: 14px;
+                background: rgba(15, 23, 42, 0.86);
+                border: 1px solid rgba(148,163,184,0.25);
+                box-shadow: 0 10px 20px rgba(0,0,0,0.45);
             }
 
             .menu-card-header {
-                padding: 24px 16px;
-                font-size: 26px;
+                padding: 20px;
+                font-size: 30px;
             }
 
             .menu-card-title {
                 font-size: 16px;
-                padding: 12px 16px;
+                color: #e2e8f0;
+                border-bottom: 1px solid rgba(148,163,184,0.2);
             }
 
             .menu-card-content {
-                font-size: 14px;
-                padding: 12px 16px;
+                color: #cbd5e1;
             }
 
             .menu-card-link {
-                padding: 10px 12px;
-                font-size: 14px;
+                background: linear-gradient(135deg, #0ea5e9, #6366f1);
+            }
+
+            .section-title {
+                color: #e2e8f0;
+                font-size: 18px;
+            }
+
+            .menu-grid, .stats-grid {
+                margin-bottom: 18px;
+            }
+
+            .toolbar { display: none; }
+
+            .mobile-action {
+                position: fixed;
+                bottom: 12px;
+                left: 12px;
+                right: 12px;
+                display: flex;
+                gap: 8px;
+                justify-content: center;
+                padding: 8px;
+                background: rgba(15,23,42,0.9);
+                border: 1px solid rgba(148,163,184,0.3);
+                border-radius: 14px;
+                z-index: 1000;
+                backdrop-filter: blur(10px);
+            }
+
+            .mobile-action a {
+                flex: 1;
+                text-align: center;
+                padding: 8px 6px;
+                border-radius: 10px;
+                color: #e2e8f0;
+                text-decoration: none;
+                font-size: 12px;
+                border: 1px solid rgba(148,163,184,0.3);
+                background: rgba(15,23,42,0.75);
+            }
+
+            .mobile-action a:hover {
+                background: rgba(59,130,246,0.35);
             }
         }
     </style>
@@ -544,6 +621,12 @@ $quick_stats = mysqli_fetch_assoc($quick_stats_result);
                 <a href="statistics_api.php?month=<?php echo date('m'); ?>&year=<?php echo date('Y'); ?>" class="menu-card-link">Xem Chi Tiết →</a>
             </div>
         </div>
+    </div>
+
+    <div class="mobile-action">
+        <a href="dashboard.php">🏠 Dashboard</a>
+        <a href="phim.php">🎥 Phim</a>
+        <a href="quan_ly_user.php">👥 User</a>
     </div>
 
     <script>
