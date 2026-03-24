@@ -569,29 +569,7 @@ body.success-page{
 <body class="success-page user-index">
 
 <!-- Header -->
-<header class="header">
-  <div class="header-inner">
-    <div class="logo">CGV</div>
-    <nav class="menu">
-      <a href="index.php" class="nav-link">🎬 PHIM</a>
-      <?php if (isset($_SESSION['vai_tro']) && $_SESSION['vai_tro'] === 'admin'): ?>
-        <a href="../admin/phim.php" class="nav-link admin">⚙️ QUẢN LÝ PHIM</a>
-        <a href="../admin/suat_chieu.php" class="nav-link admin">⚙️ SUẤT CHIẾU</a>
-        <a href="../admin/quan_ly_chat.php" class="nav-link admin">💬 TIN NHẮN</a>
-      <?php endif; ?>
-    </nav>
-    <div class="actions">
-      <?php if (isset($_SESSION['user_id'])): ?>
-        <span class="hello">👋 Xin chào</span>
-        <a href="ve_cua_toi.php" class="admin-btn">VÉ CỦA TÔI</a>
-        <a href="../auth/logout.php" onclick="return confirm('Bạn có chắc chắn muốn đăng xuất?');">🚪 ĐĂNG XUẤT</a>
-      <?php else: ?>
-        <a href="../auth/login.php" class="open-login-modal">🔐 ĐĂNG NHẬP</a>
-      <?php endif; ?>
-    </div>
-  </div>
-</header>
-
+<?php $active_page = ''; include 'components/header.php'; ?>
 <main class="success-wrap">
   <div class="ticket-card">
     <div class="ticket-top-bar"></div>

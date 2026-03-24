@@ -196,28 +196,7 @@ $ves = mysqli_fetch_all($result, MYSQLI_ASSOC);
 </head>
 <body class="user-index">
 
-<header class="header">
-  <div class="header-inner">
-    <a href="index.php" class="logo">TTVH</a>
-    <nav class="header-nav">
-      <div class="header-nav-left">
-        <a href="index.php" class="nav-link"><span class="icon">🎬</span><span class="text">PHIM</span></a>
-        <a href="sap_chieu.php" class="nav-link"><span class="icon">🗓️</span><span class="text">SẮP CHIẾU</span></a>
-      </div>
-      <div class="search-wrap" id="searchWrap">
-        <input type="text" id="searchInput" class="search-bar" placeholder="Tìm phim..." autocomplete="off">
-        <span class="search-icon">🔍</span>
-        <span class="search-spinner"></span>
-        <div class="search-dropdown" id="searchDropdown"></div>
-      </div>
-      <div class="header-nav-right">
-        <span class="hello"><span class="icon">👋</span><span class="text">Xin chào, <?= htmlspecialchars($_SESSION['ten_nguoi_dung'] ?? $_SESSION['ten'] ?? 'bạn') ?></span></span>
-        <a href="../auth/logout.php" class="btn btn-sm btn-outline" onclick="return confirm('Đăng xuất?')"><span class="icon">🚪</span><span class="text">ĐĂNG XUẤT</span></a>
-      </div>
-    </nav>
-  </div>
-</header>
-
+<?php $active_page = ''; include 'components/header.php'; ?>
 <main class="container">
   <h1 class="page-title">🎫 Vé của tôi</h1>
 

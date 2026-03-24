@@ -403,19 +403,7 @@ label { width: auto !important; }
 </style>
 </head>
 <body class="user-index">
-<header class="header">
-    <div class="header-inner">
-        <div class="logo">TTVH</div>
-        <nav class="menu">
-            <a href="index.php" class="nav-link">🎬 PHIM</a>
-        </nav>
-        <div class="actions">
-            <button class="theme-toggle-btn" id="themeToggle">🌓 Giao diện</button>
-            <a href="ve_cua_toi.php" class="link">🎟️ VÉ CỦA TÔI</a>
-        </div>
-    </div>
-</header>
-
+<?php $active_page = ''; include 'components/header.php'; ?>
 <main class="container">
     <div class="left">
         <div class="movie-summary">

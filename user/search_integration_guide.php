@@ -43,31 +43,5 @@
      ════════════════════════════════════════ -->
 
 <!--
-<header class="header">
-  <div class="header-inner">
-    <a href="index.php" class="logo">TTVH</a>
-    <nav class="header-nav">
-
-      <div class="header-nav-left">
-        <a href="index.php" class="nav-link active">...</a>
-        <a href="sap_chieu.php" class="nav-link">...</a>
-      </div>
-
-      ← THÊM VÀO ĐÂY →
-      <div class="search-wrap" id="searchWrap">
-        <input type="text" id="searchInput" class="search-bar"
-               placeholder="Tìm phim, thể loại..."
-               autocomplete="off" spellcheck="false">
-        <span class="search-icon">🔍</span>
-        <span class="search-spinner"></span>
-        <div class="search-dropdown" id="searchDropdown" role="listbox"></div>
-      </div>
-
-      <div class="header-nav-right">
-        ...buttons...
-      </div>
-
-    </nav>
-  </div>
-</header>
+<?php $active_page = ''; include 'components/header.php'; ?>
 -->

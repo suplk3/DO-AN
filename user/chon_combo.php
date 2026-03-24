@@ -423,27 +423,7 @@ body.combo-page {
 <body class="combo-page movie-detail-page">
 
 <!-- Header (giống các trang khác) -->
-<header class="header">
-  <div class="header-inner">
-    <a href="index.php" class="logo">CGV</a>
-    <nav class="menu">
-      <a href="index.php" class="nav-link">🎬 PHIM</a>
-      <?php if (isset($_SESSION['vai_tro']) && $_SESSION['vai_tro'] === 'admin'): ?>
-        <a href="../admin/phim.php" class="nav-link admin">⚙️ QUẢN LÝ PHIM</a>
-        <a href="../admin/suat_chieu.php" class="nav-link admin">⚙️ SUẤT CHIẾU</a>
-      <?php endif; ?>
-    </nav>
-    <div class="actions">
-      <?php if (isset($_SESSION['user_id'])): ?>
-        <a href="ve_cua_toi.php" class="admin-btn">VÉ CỦA TÔI</a>
-        <a href="../auth/logout.php" onclick="return confirm('Đăng xuất?')" style="color:#fff;text-decoration:none;">🚪</a>
-      <?php else: ?>
-        <a href="../auth/login.php" style="color:#fff;">🔐 ĐĂNG NHẬP</a>
-      <?php endif; ?>
-    </div>
-  </div>
-</header>
-
+<?php $active_page = ''; include 'components/header.php'; ?>
 <!-- Progress Steps -->
 <div class="progress-bar">
   <div class="progress-inner">
