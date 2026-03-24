@@ -43,8 +43,9 @@ $notShowingCount = max(0, $count - $showingCount);
         }
         .admin-shell {
             max-width: 1200px;
-            margin: 28px auto;
+            margin: 0 auto;
             padding: 0 16px 32px;
+            padding-top: calc(72px + 20px); /* Sync with fixed header */
             animation: pageEnter .45s ease both;
         }
         .admin-header {
@@ -473,8 +474,12 @@ $notShowingCount = max(0, $count - $showingCount);
 <div class="admin-shell">
     <div class="admin-header">
         <h1 class="page-title">🎬 Quản lý phim</h1>
-        <a href="index.php" style="color:#64748b; text-decoration:none;">⬅ Quay lại Dashboard</a>
     </div>
+
+    <?php 
+    $active_page = 'admin_phim';
+    include "../user/components/header.php"; 
+    ?>
 
     <!-- Thống kê nhanh -->
     <div class="quick-stats">

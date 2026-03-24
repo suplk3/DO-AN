@@ -59,17 +59,17 @@ $stats = mysqli_fetch_assoc($stats_result);
 <link rel="stylesheet" href="../assets/css/actions.css">
 <link rel="stylesheet" href="../assets/css/features.css">
 <style>
-    body { max-width: 1200px; margin: 0 auto; padding: 20px; background: linear-gradient(135deg, #0a0e17 0%, #0f1419 100%); color: #e2e8f0; }
+    body { max-width: 1200px; margin: 0 auto; padding: 20px; padding-top: calc(72px + 20px); background: linear-gradient(135deg, #0a0e17 0%, #0f1419 100%); color: #e2e8f0; }
 </style>
 </head>
 <body>
 
 <div id="notification"></div>
 
-    <div class="page-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-        <h1 style="margin:0;">🗓️ Quản lý suất chiếu</h1>
-        <a href="index.php" style="color:#64748b; text-decoration:none;">⬅ Dashboard</a>
-    </div>
+<?php 
+$active_page = 'admin_suat';
+include "../user/components/header.php"; 
+?>
 
 <!-- Stats Section -->
 <div class="stats-section">

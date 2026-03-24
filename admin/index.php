@@ -28,35 +28,45 @@ $quick_stats = mysqli_fetch_assoc($quick_stats_result);
             box-sizing: border-box;
         }
 
+        /* == PREMIUM PC SYNC == */
+        :root {
+            --header-height: 72px;
+            --container-max-w: 1400px;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #111827 100%);
             min-height: 100vh;
-            padding: 20px;
+            color: #f1f5f9;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: var(--container-max-w);
             margin: 0 auto;
+            padding: 20px;
+            padding-top: calc(var(--header-height) + 20px);
         }
 
-        header {
-            background: white;
-            padding: 25px 35px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        header.admin-title-wrap {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
+            margin-bottom: 30px;
+            background: rgba(30, 41, 59, 0.4);
+            padding: 24px 32px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.06);
+            backdrop-filter: blur(10px);
         }
 
-        header h1 {
-            font-size: 28px;
-            color: #333;
+        header.admin-title-wrap h1 {
+            font-size: 32px;
+            color: #fff;
             font-weight: 800;
+            background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .user-info {
@@ -238,14 +248,18 @@ $quick_stats = mysqli_fetch_assoc($quick_stats_result);
 </head>
 <body>
     <div class="container">
-        <header>
+        <?php 
+        $active_page = 'admin_index';
+        include "../user/components/header.php"; 
+        ?>
+
+        <header class="admin-title-wrap">
             <div>
-                <h1>Admin Panel</h1>
+                <h1>Admin Control Center</h1>
             </div>
             <div class="user-info">
-                <p>Xin chào,</p>
-                <p class="username"><?php echo htmlspecialchars($_SESSION['user_name'] ?? 'Admin'); ?></p>
-                <a href="../auth/logout.php" class="logout-btn">🚪 Đăng Xuất</a>
+                <p>Quản trị viên:</p>
+                <p class="username"><?php echo htmlspecialchars($_SESSION['user_name'] ?? 'Admin Panel'); ?></p>
             </div>
         </header>
 

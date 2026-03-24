@@ -177,10 +177,12 @@ $latest = admin_query($conn,
 </head>
 <body class="admin-dark">
   <div class="wrap">
-    <div class="dashboard-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-        <h2 style="margin:0;">✨ Admin Dashboard</h2>
-        <a href="index.php" style="color:#64748b; text-decoration:none;">⬅ Quay lại Admin Panel</a>
-    </div>
+  <?php 
+  $active_page = 'dashboard';
+  include "../user/components/header.php"; 
+  ?>
+
+    <div class="title">✨ Admin Dashboard</div>
 
     <div class="grid">
       <div class="card"><div class="label">Người dùng</div><div class="num"><?= $total_users ?></div></div>

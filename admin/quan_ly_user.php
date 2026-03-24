@@ -128,6 +128,10 @@ foreach ($ves as $v) {
   display: flex; align-items: center; gap: 12px;
   padding: 16px; border-bottom: 1px solid rgba(255,255,255,0.06);
 }
+.container {
+  max-width: 1200px; margin: 0 auto;
+  padding-top: calc(72px + 20px); /* Fixed Header Sync */
+}
 .user-avatar {
   width: 40px; height: 40px; border-radius: 50%;
   background: linear-gradient(135deg,rgba(124,58,237,.4),rgba(79,70,229,.3));
@@ -169,10 +173,10 @@ foreach ($ves as $v) {
 </head>
 <body class="user-index">
 
-  <div class="page-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-      <h1 style="margin:0;">👥 Quản lý người dùng</h1>
-      <a href="index.php" style="color:#64748b; text-decoration:none;">⬅ Dashboard</a>
-  </div>
+<?php 
+$active_page = 'admin_user';
+include "../user/components/header.php"; 
+?>
 
 <main class="container">
   <h1 class="page-title">👥 Quản lý người dùng</h1>
