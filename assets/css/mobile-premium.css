@@ -61,7 +61,7 @@
     .search-bar:focus { border-color: rgba(232,25,44,0.6) !important; box-shadow: 0 0 0 3px rgba(232,25,44,0.15), 0 0 20px rgba(232,25,44,0.08) !important; }
 
     .mobile-nav-bar {
-        display: flex; position: fixed; bottom: 0; left: 0; right: 0; height: 68px; padding-bottom: env(safe-area-inset-bottom, 8px);
+        display: flex !important; position: fixed; bottom: 0; left: 0; right: 0; height: 68px; padding-bottom: env(safe-area-inset-bottom, 8px);
         background: rgba(10,11,18,0.88); backdrop-filter: blur(30px) saturate(200%); -webkit-backdrop-filter: blur(30px) saturate(200%);
         border-top: 1px solid rgba(255,255,255,0.07); z-index: 3000; justify-content: space-around; align-items: center;
         box-shadow: 0 -1px 0 rgba(232,25,44,0.08), 0 -20px 60px rgba(0,0,0,0.4);
