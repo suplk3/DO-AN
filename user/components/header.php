@@ -63,7 +63,7 @@ if (!isset($active_page)) {
             </div>
             <div class="header-nav-right">
                 <button class="header-search-trigger" id="mobileSearchTrigger">&#128269;</button>
-                <button class="theme-toggle-btn" id="themeToggle" title="Đổi giao diện">&#127912;</button>
+                 <button class="theme-toggle-btn" id="themeToggle" title="Đổi giao diện">&#127916;</button>
                 <?php if (isset($_SESSION['user_id'])):
                     $is_admin = (isset($_SESSION['vai_tro']) && $_SESSION['vai_tro'] === 'admin');
                     $ten = htmlspecialchars($_SESSION['ten_nguoi_dung'] ?? ($_SESSION['ten'] ?? 'Tôi'));
@@ -126,7 +126,7 @@ if (!isset($active_page)) {
 <!-- ── Mobile Bottom Navigation ── -->
 <nav class="mobile-nav-bar">
     <a href="index.php" class="mobile-nav-item <?= $active_page === 'phim' ? 'active' : '' ?>">
-        <span class="m-icon">&#127912;</span>
+        <span class="m-icon">&#127916;</span>
         <span class="m-text">Phim</span>
     </a>
     <a href="sap_chieu.php" class="mobile-nav-item <?= $active_page === 'sap_chieu' ? 'active' : '' ?>">
