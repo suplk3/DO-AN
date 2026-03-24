@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require_once __DIR__ . '/../config/db.php';
 
@@ -169,29 +169,10 @@ foreach ($ves as $v) {
 </head>
 <body class="user-index">
 
-<header class="header">
-  <div class="header-inner">
-    <a href="index.php" class="logo">TTVH</a>
-    <nav class="header-nav">
-      <div class="header-nav-left">
-        <a href="../user/index.php" class="nav-link"><span class="icon">🎬</span><span class="text">TRANG CHỦ</span></a>
-        <?php if (isset($_SESSION['vai_tro']) && $_SESSION['vai_tro'] === 'admin'): ?>
-        <a href="../admin/phim.php" class="nav-link admin"><span class="icon">🎬</span><span class="text">QUẢN LÝ PHIM</span></a>
-        <?php endif; ?>
-      </div>
-      <div class="search-wrap" id="searchWrap">
-        <input type="text" id="searchInput" class="search-bar" placeholder="Tìm phim..." autocomplete="off">
-        <span class="search-icon">🔍</span>
-        <span class="search-spinner"></span>
-        <div class="search-dropdown" id="searchDropdown"></div>
-      </div>
-      <div class="header-nav-right">
-        <span class="hello"><span class="icon">🛡️</span><span class="text">Admin</span></span>
-        <a href="../auth/logout.php" class="btn btn-sm btn-outline" onclick="return confirm('Đăng xuất?')"><span class="icon">🚪</span><span class="text">ĐĂNG XUẤT</span></a>
-      </div>
-    </nav>
-  </div>
-</header>
+<?php 
+$active_page = 'admin_user';
+include "../user/components/header.php"; 
+?>
 
 <main class="container">
   <h1 class="page-title">👥 Quản lý người dùng</h1>

@@ -100,7 +100,7 @@ if (!isset($active_page)) {
                             <?php if ($is_admin): ?><span class="user-badge-admin">Admin</span><?php endif; ?>
                         </div>
                         <a href="profile.php?id=<?= (int)$_SESSION['user_id'] ?>" class="user-dropdown-item">&#128100; Trang cá nhân</a>
-                        <a href="../user/ve_cua_toi.php" class="user-dropdown-item">&#127903; Vé của tôi</a>
+                        <a href="../user/ve_cua_toi.php" class="user-dropdown-item">&#127915; Vé của tôi</a>
                         <?php if ($is_admin): ?>
                         <div class="user-dropdown-divider"></div>
                         <a href="../admin/dashboard.php" class="user-dropdown-item">&#128202; Dashboard</a>

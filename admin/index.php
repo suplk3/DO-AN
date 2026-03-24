@@ -525,17 +525,10 @@ $quick_stats = mysqli_fetch_assoc($quick_stats_result);
 </head>
 <body>
     <div class="container">
-        <nav class="navbar">
-            <div class="brand"><span>🎬</span> Admin Dashboard</div>
-            <button class="nav-toggle" aria-label="Mở menu">☰</button>
-            <div class="nav-links">
-                <a href="dashboard.php" class="active">📊 Tổng Quan</a>
-                <a href="phim.php">🎥 Phim</a>
-                <a href="suat_chieu.php">🗓️ Suất Chiếu</a>
-                <a href="quan_ly_user.php">👥 User</a>
-                <a href="quan_ly_voucher.php">🎟️ Voucher</a>
-            </div>
-        </nav>
+        <?php 
+        $active_page = 'admin_index';
+        include "../user/components/header.php"; 
+        ?>
 
         <header>
             <div class="user-info">
