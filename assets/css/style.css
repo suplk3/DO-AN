@@ -26,6 +26,9 @@
     --glass-blur:    blur(20px);
     --shadow-card:   0 8px 32px rgba(0,0,0,0.5);
     --shadow-glow:   0 0 40px rgba(232,25,44,0.15);
+    /* Header Heights */
+    --header-default-h: 66px;
+    --header-shrink-h: 50px;
     --radius-sm:     8px;
     --radius-md:     12px;
     --radius-lg:     18px;
@@ -200,84 +203,123 @@ button { font-family: inherit; cursor: pointer; }
 }
 .checkout button:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(232,25,44,0.55); }
 
-/* â”€â”€ Movie Detail Page â”€â”€ */
-.movie-detail-page {
-    font-family: var(--font-body);
-    background: var(--brand-dark);
-    color: var(--text-primary);
-    -webkit-font-smoothing: antialiased;
+/* Premium Global Header (PC) */
+.header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: var(--header-default-h);
+    background: rgba(8, 9, 15, 0.85);
+    backdrop-filter: blur(28px) saturate(200%);
+    -webkit-backdrop-filter: blur(28px) saturate(200%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    z-index: 1100;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.movie-detail-page .header {
-    background: var(--glass-bg);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-    border-bottom: 1px solid var(--border-subtle);
-    padding: 14px 20px;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
+
+.header.shrink {
+    height: var(--header-shrink-h);
+    background: rgba(6, 8, 14, 0.95);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
-.movie-detail-page .header-inner {
-    max-width: 1200px; margin: 0 auto; display: flex; gap: 16px; align-items: center;
+
+.header-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+    gap: 30px;
 }
-.movie-detail-page .logo {
-    color: var(--accent-red);
-    font-family: var(--font-display);
+
+.logo {
+    font-family: 'Be Vietnam Pro', system-ui, sans-serif;
     font-size: 26px;
-    letter-spacing: 1px;
+    font-weight: 900;
+    color: var(--accent-red);
     text-decoration: none;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    text-shadow: 0 0 20px rgba(232, 25, 44, 0.4);
+    flex-shrink: 0;
 }
-.movie-detail-page .menu { display: flex; gap: 8px; align-items: center; }
-/* Minimal PC Nav Links */
+
+.logo:hover {
+    color: #ff4d6d;
+    text-shadow: 0 0 30px rgba(255, 77, 109, 0.5);
+}
+
+.header-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex: 1;
+    gap: 20px;
+}
+
+.header-nav-left {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.header-nav-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    justify-content: flex-end;
+}
+
+/* Premium Global PC Navigation Links */
 .nav-link {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 8px 16px;
-    color: var(--text-secondary);
+    padding: 8px 18px;
+    color: rgba(255, 255, 255, 0.7);
     font-weight: 700;
     font-size: 13px;
     letter-spacing: 0.5px;
     text-decoration: none;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    border-radius: 8px;
+    white-space: nowrap;
 }
 
 .nav-link .icon {
     font-size: 16px;
-    opacity: 0.7;
-    transition: transform 0.3s var(--ease-spring), opacity 0.3s ease;
 }
 
 .nav-link:hover {
-    color: var(--text-primary);
-    background: rgba(255, 255, 255, 0.05);
-}
-
-.nav-link:hover .icon {
-    opacity: 1;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.2);
     transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
 }
 
 .nav-link.active {
-    color: var(--accent-red);
-    background: rgba(232, 25, 44, 0.08);
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.3), rgba(79, 70, 229, 0.25));
+    border-color: rgba(124, 58, 237, 0.4);
+    color: #fff;
+    box-shadow: 0 8px 25px rgba(124, 58, 237, 0.3);
 }
 
-.nav-link.active .icon {
-    opacity: 1;
+.nav-link.admin {
+    background: linear-gradient(135deg, rgba(232, 25, 44, 0.2), rgba(192, 16, 32, 0.15));
+    border-color: rgba(232, 25, 44, 0.3);
+    color: #fca5a5;
 }
 
-/* Specific overrides for Movie Detail and Index to ensure synchronization */
-.movie-detail-page .nav-link,
-body.user-index .nav-link {
-    background: transparent;
+/* Page Specific Cleanup */
+.movie-detail-page, .ve-page, .selection-page {
+    /* Use global header/nav */
 }
-.movie-detail-page .nav-link:hover,
-body.user-index .nav-link:hover {
-    background: rgba(255, 255, 255, 0.05);
-}
+/* Minimal PC Nav Links (Removed - Now using Premium Global styles above) */
 
 .movie-detail-page .actions { margin-left: auto; display: flex; gap: 10px; align-items: center; }
 .movie-detail-page .footer { margin-top: 48px; padding: 20px; text-align: center; color: var(--text-muted); font-size: 13px; border-top: 1px solid var(--border-subtle); }
