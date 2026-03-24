@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th3 15, 2026 lúc 03:31 PM
--- Phiên bản máy phục vụ: 10.4.32-MariaDB
--- Phiên bản PHP: 8.0.30
+-- Host: 127.0.0.1
+-- Generation Time: Mar 18, 2026 at 12:15 PM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,13 +18,13 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Cơ sở dữ liệu: `cinema`
+-- Database: `cinema`
 --
 
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `comments`
+-- Table structure for table `comments`
 --
 
 CREATE TABLE `comments` (
@@ -37,10 +37,40 @@ CREATE TABLE `comments` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `comments`
+--
+
+INSERT INTO `comments` (`id`, `user_id`, `target_type`, `target_id`, `parent_id`, `noi_dung`, `created_at`) VALUES
+(1, 5, 'phim', 1, NULL, 'bình thường kkk', '2026-03-15 14:36:44'),
+(2, 5, 'phim', 1, 1, 'kk', '2026-03-15 15:20:20'),
+(3, 4, 'phim', 6, NULL, 'ok', '2026-03-15 17:01:04'),
+(4, 4, 'phim', 6, 3, 'ok', '2026-03-15 17:01:15'),
+(5, 4, 'phim', 6, NULL, 'ok', '2026-03-15 17:01:29'),
+(6, 4, 'phim', 7, NULL, 'gớm', '2026-03-15 17:02:39'),
+(7, 4, 'phim', 7, 6, 'sao gớm', '2026-03-15 17:02:48'),
+(8, 4, 'phim', 7, 6, 'sao gớm', '2026-03-15 17:03:13');
+
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `follows`
+-- Table structure for table `feed_scores`
+--
+
+CREATE TABLE `feed_scores` (
+  `user_id` int(11) NOT NULL,
+  `post_id` int(11) NOT NULL,
+  `relevance_score` decimal(8,4) DEFAULT 0.0000,
+  `sig_relationship` decimal(5,2) DEFAULT 0.00,
+  `sig_recency` decimal(5,4) DEFAULT 0.0000,
+  `sig_engagement` decimal(5,2) DEFAULT 0.00,
+  `computed_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `follows`
 --
 
 CREATE TABLE `follows` (
@@ -52,7 +82,7 @@ CREATE TABLE `follows` (
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `ghe`
+-- Table structure for table `ghe`
 --
 
 CREATE TABLE `ghe` (
@@ -62,7 +92,7 @@ CREATE TABLE `ghe` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `ghe`
+-- Dumping data for table `ghe`
 --
 
 INSERT INTO `ghe` (`id`, `phong_id`, `ten_ghe`) VALUES
@@ -230,7 +260,7 @@ INSERT INTO `ghe` (`id`, `phong_id`, `ten_ghe`) VALUES
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `phim`
+-- Table structure for table `phim`
 --
 
 CREATE TABLE `phim` (
@@ -245,7 +275,7 @@ CREATE TABLE `phim` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `phim`
+-- Dumping data for table `phim`
 --
 
 INSERT INTO `phim` (`id`, `ten_phim`, `the_loai`, `thoi_luong`, `mo_ta`, `poster`, `banner`, `ngay_khoi_chieu`) VALUES
@@ -261,7 +291,7 @@ INSERT INTO `phim` (`id`, `ten_phim`, `the_loai`, `thoi_luong`, `mo_ta`, `poster
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `phong_chieu`
+-- Table structure for table `phong_chieu`
 --
 
 CREATE TABLE `phong_chieu` (
@@ -271,7 +301,7 @@ CREATE TABLE `phong_chieu` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `phong_chieu`
+-- Dumping data for table `phong_chieu`
 --
 
 INSERT INTO `phong_chieu` (`id`, `rap_id`, `ten_phong`) VALUES
@@ -283,7 +313,7 @@ INSERT INTO `phong_chieu` (`id`, `rap_id`, `ten_phong`) VALUES
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `posts`
+-- Table structure for table `posts`
 --
 
 CREATE TABLE `posts` (
@@ -292,14 +322,38 @@ CREATE TABLE `posts` (
   `phim_id` int(11) DEFAULT NULL,
   `noi_dung` text NOT NULL,
   `hinh_anh` varchar(255) DEFAULT NULL,
+  `engagement_score` decimal(8,2) DEFAULT 0.00,
+  `view_count` int(11) DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `posts`
+--
+
+INSERT INTO `posts` (`id`, `user_id`, `phim_id`, `noi_dung`, `hinh_anh`, `engagement_score`, `view_count`, `created_at`, `updated_at`) VALUES
+(1, 4, 8, 'Bộ phim TÀI - TÌNH nhất mùa xuân 2026 ❤️\r\n🎬 TÀI | ĐANG CHIẾU TẠI RẠP', 'post_69b6c46ba570e.jpg', 0.00, 0, '2026-03-15 14:38:35', '2026-03-15 14:38:35');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `post_impressions`
+--
+
+CREATE TABLE `post_impressions` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `post_id` int(11) NOT NULL,
+  `dwell_ms` int(11) DEFAULT 0,
+  `action` enum('view','like','reply','share','hide','report') DEFAULT 'view',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `rap`
+-- Table structure for table `rap`
 --
 
 CREATE TABLE `rap` (
@@ -311,7 +365,7 @@ CREATE TABLE `rap` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `rap`
+-- Dumping data for table `rap`
 --
 
 INSERT INTO `rap` (`id`, `ten_rap`, `dia_chi`, `thanh_pho`, `so_dien_thoai`) VALUES
@@ -321,7 +375,7 @@ INSERT INTO `rap` (`id`, `ten_rap`, `dia_chi`, `thanh_pho`, `so_dien_thoai`) VAL
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `reactions`
+-- Table structure for table `reactions`
 --
 
 CREATE TABLE `reactions` (
@@ -333,10 +387,25 @@ CREATE TABLE `reactions` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `reactions`
+--
+
+INSERT INTO `reactions` (`id`, `user_id`, `target_type`, `target_id`, `loai`, `created_at`) VALUES
+(1, 4, '', 5, 'love', '2026-03-15 14:36:09'),
+(2, 5, '', 1, 'love', '2026-03-15 14:36:30'),
+(3, 4, '', 1, 'love', '2026-03-15 14:36:56'),
+(6, 13, '', 1, 'like', '2026-03-15 14:52:19'),
+(17, 13, 'phim', 1, 'like', '2026-03-15 15:00:54'),
+(25, 5, 'phim', 1, 'like', '2026-03-15 15:27:37'),
+(27, 4, 'phim', 1, 'like', '2026-03-15 16:14:40'),
+(28, 4, 'phim', 5, 'like', '2026-03-15 16:43:01'),
+(51, 4, 'phim', 7, 'like', '2026-03-15 17:56:23');
+
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `suat_chieu`
+-- Table structure for table `suat_chieu`
 --
 
 CREATE TABLE `suat_chieu` (
@@ -349,18 +418,17 @@ CREATE TABLE `suat_chieu` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `suat_chieu`
+-- Dumping data for table `suat_chieu`
 --
 
 INSERT INTO `suat_chieu` (`id`, `phim_id`, `phong_id`, `ngay`, `gio`, `gia`) VALUES
 (10, 1, 1, '2026-03-20', '14:22:00', 22222),
-(11, 1, 4, '2026-03-13', '02:11:00', 125000),
 (14, 8, 1, '2026-05-01', '00:30:00', 75000);
 
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `users`
+-- Table structure for table `users`
 --
 
 CREATE TABLE `users` (
@@ -375,7 +443,7 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `users`
+-- Dumping data for table `users`
 --
 
 INSERT INTO `users` (`id`, `ten`, `email`, `mat_khau`, `vai_tro`, `avatar`, `bio`, `created_at`) VALUES
@@ -387,12 +455,26 @@ INSERT INTO `users` (`id`, `ten`, `email`, `mat_khau`, `vai_tro`, `avatar`, `bio
 (9, 'Admin Fake', 'admin_fake@example.com', '$2y$10$zgjl/ObIHyXDY3nc86XLtuyqbcUZToGvQG7rWqDE8Lq8Lye6PE.zq', 'user', NULL, NULL, '2026-03-15 14:12:46'),
 (10, 'van', 'vanngu@gmail.com', '$2y$10$3ivmcYkverBEVR93ZRqse.hgxGlfGLOWDx9U1Jm1A2POM/okYm2..', 'user', NULL, NULL, '2026-03-15 14:12:46'),
 (11, 'van', 'vanbingu@gmail.com', '$2y$10$v5VQ0gaID3zRA46FDlAH2OfyR89gctibb9Y5uJg3S/kVpHyprzypq', 'user', NULL, NULL, '2026-03-15 14:12:46'),
-(12, 'Tuấn', 'tuan0suy@gmail.com', '$2y$10$DczP0NUMpHRL1gch6qz2Me6wXWFQhBYiMLHIzQVCBqUSjjEoKVS9i', 'user', NULL, NULL, '2026-03-15 14:12:46');
+(12, 'Tuấn', 'tuan0suy@gmail.com', '$2y$10$DczP0NUMpHRL1gch6qz2Me6wXWFQhBYiMLHIzQVCBqUSjjEoKVS9i', 'user', NULL, NULL, '2026-03-15 14:12:46'),
+(13, 'van', 'vanngu123@gmail.com', '$2y$10$Pt64.8.E9i91CFuo70LG1OAfEFMZRzXVxUj92msfDC5QctFeqSF2y', 'user', NULL, NULL, '2026-03-15 14:51:41');
 
 -- --------------------------------------------------------
 
 --
--- Cấu trúc bảng cho bảng `ve`
+-- Table structure for table `user_interests`
+--
+
+CREATE TABLE `user_interests` (
+  `user_id` int(11) NOT NULL,
+  `topic` varchar(100) NOT NULL,
+  `score` decimal(6,3) DEFAULT 1.000,
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `ve`
 --
 
 CREATE TABLE `ve` (
@@ -403,15 +485,13 @@ CREATE TABLE `ve` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `ve`
+-- Dumping data for table `ve`
 --
 
 INSERT INTO `ve` (`id`, `user_id`, `suat_chieu_id`, `ghe_id`) VALUES
 (37, 5, 10, 15),
 (40, 4, 10, 8),
 (42, 4, 10, 16),
-(43, 5, 11, 156),
-(44, 5, 11, 157),
 (45, 4, 10, 7),
 (46, 4, 10, 6),
 (47, 4, 10, 5),
@@ -420,30 +500,22 @@ INSERT INTO `ve` (`id`, `user_id`, `suat_chieu_id`, `ghe_id`) VALUES
 (50, 4, 10, 2),
 (51, 4, 10, 1),
 (52, 4, 10, 9),
-(53, 5, 11, 123),
-(54, 5, 11, 124),
-(55, 5, 11, 125),
-(56, 5, 11, 126),
-(57, 5, 11, 127),
-(58, 5, 11, 128),
-(59, 5, 11, 129),
-(60, 5, 11, 130),
-(61, 5, 11, 122),
-(62, 5, 11, 121),
 (63, 4, 10, 21),
 (64, 4, 10, 12),
 (65, 4, 10, 13),
 (66, 4, 10, 14),
 (67, 4, 10, 22),
 (68, 4, 10, 10),
-(69, 4, 10, 11);
+(69, 4, 10, 11),
+(70, 4, 10, 19),
+(71, 4, 10, 20);
 
 --
--- Chỉ mục cho các bảng đã đổ
+-- Indexes for dumped tables
 --
 
 --
--- Chỉ mục cho bảng `comments`
+-- Indexes for table `comments`
 --
 ALTER TABLE `comments`
   ADD PRIMARY KEY (`id`),
@@ -452,32 +524,39 @@ ALTER TABLE `comments`
   ADD KEY `idx_user` (`user_id`);
 
 --
--- Chỉ mục cho bảng `follows`
+-- Indexes for table `feed_scores`
+--
+ALTER TABLE `feed_scores`
+  ADD PRIMARY KEY (`user_id`,`post_id`),
+  ADD KEY `idx_score` (`user_id`,`relevance_score`);
+
+--
+-- Indexes for table `follows`
 --
 ALTER TABLE `follows`
   ADD PRIMARY KEY (`follower_id`,`following_id`),
   ADD KEY `idx_following` (`following_id`);
 
 --
--- Chỉ mục cho bảng `ghe`
+-- Indexes for table `ghe`
 --
 ALTER TABLE `ghe`
   ADD PRIMARY KEY (`id`);
 
 --
--- Chỉ mục cho bảng `phim`
+-- Indexes for table `phim`
 --
 ALTER TABLE `phim`
   ADD PRIMARY KEY (`id`);
 
 --
--- Chỉ mục cho bảng `phong_chieu`
+-- Indexes for table `phong_chieu`
 --
 ALTER TABLE `phong_chieu`
   ADD PRIMARY KEY (`id`);
 
 --
--- Chỉ mục cho bảng `posts`
+-- Indexes for table `posts`
 --
 ALTER TABLE `posts`
   ADD PRIMARY KEY (`id`),
@@ -486,13 +565,21 @@ ALTER TABLE `posts`
   ADD KEY `idx_time` (`created_at`);
 
 --
--- Chỉ mục cho bảng `rap`
+-- Indexes for table `post_impressions`
+--
+ALTER TABLE `post_impressions`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_user_post` (`user_id`,`post_id`),
+  ADD KEY `idx_time` (`created_at`);
+
+--
+-- Indexes for table `rap`
 --
 ALTER TABLE `rap`
   ADD PRIMARY KEY (`id`);
 
 --
--- Chỉ mục cho bảng `reactions`
+-- Indexes for table `reactions`
 --
 ALTER TABLE `reactions`
   ADD PRIMARY KEY (`id`),
@@ -500,19 +587,25 @@ ALTER TABLE `reactions`
   ADD KEY `idx_target` (`target_type`,`target_id`);
 
 --
--- Chỉ mục cho bảng `suat_chieu`
+-- Indexes for table `suat_chieu`
 --
 ALTER TABLE `suat_chieu`
   ADD PRIMARY KEY (`id`);
 
 --
--- Chỉ mục cho bảng `users`
+-- Indexes for table `users`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`);
 
 --
--- Chỉ mục cho bảng `ve`
+-- Indexes for table `user_interests`
+--
+ALTER TABLE `user_interests`
+  ADD PRIMARY KEY (`user_id`,`topic`);
+
+--
+-- Indexes for table `ve`
 --
 ALTER TABLE `ve`
   ADD PRIMARY KEY (`id`),
@@ -520,69 +613,136 @@ ALTER TABLE `ve`
   ADD UNIQUE KEY `suat_chieu_id_2` (`suat_chieu_id`,`ghe_id`);
 
 --
--- AUTO_INCREMENT cho các bảng đã đổ
+-- AUTO_INCREMENT for dumped tables
 --
 
 --
--- AUTO_INCREMENT cho bảng `comments`
+-- AUTO_INCREMENT for table `comments`
 --
 ALTER TABLE `comments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
--- AUTO_INCREMENT cho bảng `ghe`
+-- AUTO_INCREMENT for table `ghe`
 --
 ALTER TABLE `ghe`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=161;
 
 --
--- AUTO_INCREMENT cho bảng `phim`
+-- AUTO_INCREMENT for table `phim`
 --
 ALTER TABLE `phim`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
--- AUTO_INCREMENT cho bảng `phong_chieu`
+-- AUTO_INCREMENT for table `phong_chieu`
 --
 ALTER TABLE `phong_chieu`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
--- AUTO_INCREMENT cho bảng `posts`
+-- AUTO_INCREMENT for table `posts`
 --
 ALTER TABLE `posts`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `post_impressions`
+--
+ALTER TABLE `post_impressions`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT cho bảng `rap`
+-- AUTO_INCREMENT for table `rap`
 --
 ALTER TABLE `rap`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
--- AUTO_INCREMENT cho bảng `reactions`
+-- AUTO_INCREMENT for table `reactions`
 --
 ALTER TABLE `reactions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
 
 --
--- AUTO_INCREMENT cho bảng `suat_chieu`
+-- AUTO_INCREMENT for table `suat_chieu`
 --
 ALTER TABLE `suat_chieu`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
--- AUTO_INCREMENT cho bảng `users`
+-- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
--- AUTO_INCREMENT cho bảng `ve`
+-- AUTO_INCREMENT for table `ve`
 --
 ALTER TABLE `ve`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=70;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=72;
 COMMIT;
+
+--
+-- Table structure for table `combos`
+--
+CREATE TABLE `combos` (
+  `id` int(11) NOT NULL,
+  `ten` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `mo_ta` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `gia` int(11) NOT NULL DEFAULT 0,
+  `active` tinyint(1) NOT NULL DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `combos`
+--
+INSERT INTO `combos` (`id`, `ten`, `mo_ta`, `gia`, `active`) VALUES
+(1, 'Combo 1 Bắp 1 Nước', '1 Bắp tự chọn + 1 Nước tự chọn', 75000, 1),
+(2, 'Combo 2 Bắp 2 Nước', '2 Bắp tự chọn + 2 Nước tự chọn', 140000, 1),
+(3, '🍿 Bắp Phô Mai (Lớn)', 'Bắp rang bơ vị phô mai đậm đà', 55000, 1),
+(4, '🍿 Bắp Caramel (Lớn)', 'Bắp rang bơ vị caramel ngọt ngào', 50000, 1),
+(5, '🍿 Bắp Truyền Thống', 'Bắp rang bơ vị mặn truyền thống', 45000, 1),
+(6, '🥤 Nước Ngọt Pepsi (Lớn)', 'Ly nước ngọt Pepsi tươi mát', 32000, 1),
+(7, '🥤 Nước Ngọt 7Up (Lớn)', 'Ly nước ngọt 7Up tươi mát', 32000, 1),
+(8, '🥤 Nước Ngọt Mirinda (Lớn)', 'Ly nước ngọt Mirinda Cam', 32000, 1);
+
+--
+-- Table structure for table `combo_orders`
+--
+CREATE TABLE `combo_orders` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `suat_chieu_id` int(11) NOT NULL,
+  `combo_id` int(11) NOT NULL,
+  `so_luong` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+--
+-- Indexes for table `combos`
+--
+ALTER TABLE `combos`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `combo_orders`
+--
+ALTER TABLE `combo_orders`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- AUTO_INCREMENT for table `combos`
+--
+ALTER TABLE `combos`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT for table `combo_orders`
+--
+ALTER TABLE `combo_orders`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

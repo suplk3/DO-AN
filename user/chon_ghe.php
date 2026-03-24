@@ -25,10 +25,7 @@ SELECT
     ) AS da_dat
 FROM ghe
 WHERE ghe.phong_id = (SELECT phong_id FROM suat_chieu WHERE id = $suat_chieu_id LIMIT 1)
--- order by row letter then seat number for natural ordering
-ORDER BY
-    LEFT(ghe.ten_ghe, 1),
-    CAST(SUBSTRING(ghe.ten_ghe, 2) AS UNSIGNED)
+ORDER BY ghe.ten_ghe
 ";
 $result = mysqli_query($conn, $sql);
 if (!$result) {
@@ -407,36 +404,28 @@ $pct_trong = $tong_ghe > 0 ? round($ghe_trong / $tong_ghe * 100) : 0;
 
     <div class="seat-wrapper">
 <?php
-// build nested array of seats grouped by row letter
-$rows = [];
+$currentRow = '';
 while ($row = mysqli_fetch_assoc($result)) {
     $rowChar = substr($row['ten_ghe'], 0, 1);
-    $rows[$rowChar][] = $row;
+
+    if ($currentRow != $rowChar) {
+        if ($currentRow != '') echo '</div>';
+        echo "<div class='seat-row'>";
+        $currentRow = $rowChar;
+    }
+
+    $class = $row['da_dat'] ? 'seat booked' : 'seat';
+
+    echo "<button 
+            class='$class' 
+            data-seat='{$row['ten_ghe']}'
+            ".($row['da_dat'] ? 'disabled' : '').">
+            {$row['ten_ghe']}
+          </button>";
 }
 
-$maxCount = 0;
-foreach ($rows as $r) {
-    $maxCount = max($maxCount, count($r));
-}
 
-foreach ($rows as $rowChar => $rowSeats) {
-    echo "<div class='seat-row-wrap'>";
-    echo "<div class='row-label'>" . htmlspecialchars($rowChar) . "</div>";
-    echo "<div class='seat-row'>";
-    foreach ($rowSeats as $r) {
-        $class = $r['da_dat'] ? 'seat booked' : 'seat';
-        $disabled = $r['da_dat'] ? 'disabled' : '';
-        echo "<button class='$class' data-seat='{$r['ten_ghe']}' $disabled>
-                {$r['ten_ghe']}
-              </button>";
-    }
-    $pad = $maxCount - count($rowSeats);
-    for ($i = 0; $i < $pad; $i++) {
-        echo "<div class='seat empty'></div>";
-    }
-    echo "</div>";
-    echo "</div>";
-}
+if ($currentRow != '') echo '</div>';
 ?>
         </div>
     </div><!-- end seat-wrapper -->

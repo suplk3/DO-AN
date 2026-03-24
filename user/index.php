@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 include "../config/db.php";
 $force_show_login = (isset($_GET['show_login']) && !isset($_SESSION['user_id']));
@@ -95,6 +95,7 @@ if (isset($_SESSION['user_id'])) {
                         <a href="../admin/phim.php" class="user-dropdown-item">🎬 Quản lý phim</a>
                         <a href="../admin/suat_chieu.php" class="user-dropdown-item">🗓️ Quản lý suất chiếu</a>
                         <a href="../admin/quan_ly_user.php" class="user-dropdown-item">👥 Quản lý user</a>
+                        <a href="../admin/quan_ly_chat.php" class="user-dropdown-item">💬 Quản lý tin nhắn</a>
                         <?php endif; ?>
                         <div class="user-dropdown-divider"></div>
                         <a href="../auth/logout.php" class="user-dropdown-item danger"
