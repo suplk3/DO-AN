@@ -32,165 +32,186 @@ $quick_stats = mysqli_fetch_assoc($quick_stats_result);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 20px;
+            padding: 0;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 100%;
             margin: 0 auto;
         }
 
-        header {
-            background: white;
-            padding: 25px 35px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        header h1 {
-            font-size: 28px;
-            color: #333;
-            font-weight: 800;
-        }
-
         .navbar {
-            position: sticky;
+            position: fixed;
             top: 0;
-            z-index: 999;
-            background: rgba(255,255,255,0.92);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(102, 126, 234, 0.25);
-            border-radius: 14px;
-            margin-bottom: 20px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(15, 23, 42, 0.92);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(148, 163, 184, 0.2);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 10px 16px;
+            padding: 12px 32px;
+            gap: 20px;
         }
 
         .navbar .brand {
             display: flex;
             align-items: center;
             gap: 10px;
-            color: #334155;
+            color: #ef4444;
             font-weight: 900;
-            font-size: 18px;
+            font-size: 22px;
         }
 
         .navbar .brand span {
-            font-size: 24px;
+            font-size: 28px;
         }
 
-        @media (max-width: 768px) {
-            .navbar .brand span {
-                font-size: 24px;
-            }
-        }
-
-        .navbar .nav-links {
+        .navbar .nav-center {
             display: flex;
             align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-            transition: max-height 0.25s ease, opacity 0.25s ease;
+            gap: 8px;
+            flex: 1;
+            justify-content: center;
         }
 
-        .navbar .nav-links.open {
-            display: flex;
-            max-height: 420px;
-            opacity: 1;
-        }
-
-        .navbar .nav-links.closed {
-            max-height: 0;
-            opacity: 0;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .navbar .nav-links a {
-            color: #1e293b;
+        .navbar .nav-center a {
+            color: #e2e8f0;
             text-decoration: none;
-            background: linear-gradient(120deg, rgba(99,179,237,0.15), rgba(129,148,244,0.2));
-            padding: 10px 14px;
-            border-radius: 12px;
-            font-weight: 700;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            border: 1px solid rgba(99,179,237,0.25);
-            box-shadow: inset 0 0 0 0 rgba(99,179,237,0.3);
-            transition: all 0.25s ease;
-        }
-
-        .navbar .nav-links a:hover,
-        .navbar .nav-links a.active {
-            color: #fff;
-            background: linear-gradient(120deg, #4f46e5, #3b82f6);
-            border-color: rgba(59,130,246,0.6);
-            box-shadow: 0 8px 18px rgba(59,130,246,0.25);
-            transform: translateY(-1px);
-        }
-
-        .navbar .nav-links a.active {
-            font-weight: 800;
-        }
-
-        .navbar .nav-links a:hover {
-            background: rgba(102, 126, 234, 0.25);
-            transform: translateY(-1px);
-        }
-
-        .navbar .nav-toggle {
-            display: none;
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 22px;
-            color: #334155;
-        }
-
-        .user-info {
-            text-align: right;
-        }
-
-        .user-info p {
-            color: #666;
-            font-size: 14px;
-            margin-bottom: 8px;
-        }
-
-        .user-info .username {
-            font-weight: 700;
-            color: #333;
-            font-size: 15px;
-        }
-
-        .logout-btn {
-            padding: 8px 16px;
-            background: #ef4444;
-            color: white;
-            border: none;
-            border-radius: 6px;
+            padding: 8px 18px;
+            border-radius: 10px;
             font-weight: 600;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-            margin-top: 10px;
+            font-size: 14px;
+            background: transparent;
+            border: 1px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .navbar .nav-center a:hover {
+            background: rgba(99, 102, 241, 0.25);
+            border-color: rgba(99, 102, 241, 0.5);
+            color: #fff;
+        }
+
+        .navbar .search-box {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            border-radius: 12px;
+            padding: 8px 16px;
+            color: #94a3b8;
+            width: 280px;
+            font-size: 14px;
             transition: all 0.3s;
         }
 
-        .logout-btn:hover {
-            background: #dc2626;
-            transform: translateY(-2px);
+        .navbar .search-box:focus {
+            outline: none;
+            background: rgba(30, 41, 59, 0.8);
+            border-color: rgba(99, 102, 241, 0.6);
+            color: #e2e8f0;
+            box-shadow: 0 0 12px rgba(99, 102, 241, 0.25);
+        }
+
+        .navbar .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .navbar .notification-icon,
+        .navbar .admin-profile {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .navbar .notification-icon {
+            position: relative;
+            font-size: 20px;
+        }
+
+        .navbar .notification-icon:hover,
+        .navbar .admin-profile:hover {
+            transform: scale(1.1);
+        }
+
+        .navbar .admin-profile {
+            background: rgba(99, 102, 241, 0.3);
+            border: 1px solid rgba(99, 102, 241, 0.5);
+            padding: 6px 12px;
+            border-radius: 12px;
+            color: #e2e8f0;
+            font-weight: 600;
+            font-size: 14px;
+            position: relative;
+        }
+
+        .navbar .admin-profile:hover {
+            background: rgba(99, 102, 241, 0.5);
+            border-color: rgba(99, 102, 241, 0.8);
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: rgba(15, 23, 42, 0.96);
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            border-radius: 12px;
+            margin-top: 8px;
+            min-width: 200px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-menu a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            color: #cbd5e1;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+            transition: all 0.2s;
+        }
+
+        .dropdown-menu a:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-menu a:hover {
+            background: rgba(99, 102, 241, 0.3);
+            color: #fff;
+        }
+
+        header {
+            margin-top: 70px;
+            background: transparent;
+            padding: 0;
+            border-radius: 0;
+            margin-bottom: 30px;
+            box-shadow: none;
+            border: none;
+        }
+
+        @media (max-width: 1200px) {
+            .navbar .search-box {
+                width: 200px;
+            }
+
+            .navbar .nav-center a {
+                font-size: 13px;
+                padding: 8px 14px;
+            }
         }
 
         .stats-grid {
@@ -308,128 +329,90 @@ $quick_stats = mysqli_fetch_assoc($quick_stats_result);
 
         @media (max-width: 768px) {
             body {
-                padding: 8px;
-                background: radial-gradient(circle at 10% 10%, rgba(99, 102, 241, 0.2), transparent 35%),
-                            linear-gradient(180deg, #0f172a 0%, #111827 100%);
+                padding: 0;
             }
 
             .container {
                 max-width: 100%;
-                padding: 0;
+                padding: 0 12px 70px;
+                margin-top: 64px;
             }
 
             .navbar {
-                border-radius: 12px;
-                padding: 10px 12px;
                 position: fixed;
-                top: 8px;
-                left: 8px;
-                right: 8px;
-                z-index: 1000;
-                background: rgba(15, 23, 42, 0.94);
-                border: 1px solid rgba(148, 163, 184, 0.3);
-                box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+                top: 0;
+                left: 0;
+                right: 0;
+                border-radius: 0;
+                padding: 10px 12px;
+                background: rgba(15, 23, 42, 0.95);
+                border: none;
+                border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+                flex-wrap: wrap;
+                gap: 0;
             }
 
             .navbar .brand {
                 font-size: 16px;
-                color: #e2e8f0;
+                color: #ef4444;
+                flex: 0 0 auto;
             }
 
-            .navbar .nav-toggle {
-                display: inline-flex;
-                background: linear-gradient(135deg, rgba(59, 130, 246, 0.25), rgba(99, 102, 241, 0.35));
-                border: 1px solid rgba(99, 102, 241, 0.6);
-                border-radius: 12px;
-                width: 42px;
-                height: 42px;
-                align-items: center;
-                justify-content: center;
-                font-size: 24px;
-                color: #e2e8f0;
-                transition: transform 0.2s ease, background 0.3s ease;
-            }
-
-            .navbar .nav-toggle:active {
-                transform: scale(0.96);
-            }
-
-            .navbar .nav-links {
-                position: absolute;
-                left: 8px;
-                right: 8px;
-                top: 60px;
+            .navbar .nav-center {
                 display: none;
+                flex: 1;
+                width: 100%;
                 flex-direction: column;
-                width: calc(100% - 16px);
-                margin: 0 auto;
-                border-radius: 14px;
-                padding: 10px;
-                background: rgba(15, 23, 42, 0.95);
-                backdrop-filter: blur(10px);
-                border: 1px solid rgba(148,163,184,0.35);
-                box-shadow: 0 20px 35px rgba(0,0,0,0.5);
-                animation: slideDown 0.25s ease;
+                margin-top: 8px;
+                gap: 4px;
             }
 
-            @keyframes slideDown {
-                from { transform: translateY(-8px); opacity: 0; }
-                to { transform: translateY(0); opacity: 1; }
-            }
-
-            .navbar .nav-links.open {
+            .navbar .nav-center.mobile-open {
                 display: flex;
             }
 
-            .navbar .nav-links a {
+            .navbar .nav-center a {
                 width: 100%;
                 text-align: left;
-                padding: 12px 14px;
-                margin-bottom: 8px;
-                border-radius: 12px;
-                font-size: 15px;
-                color: #e2e8f0;
-                background: rgba(15, 23, 42, 0.5);
-                border: 1px solid rgba(148,163,184,0.25);
+                padding: 10px 12px;
+                font-size: 14px;
             }
 
-            .navbar .nav-links a:last-child {
-                margin-bottom: 0;
+            .navbar .search-box {
+                display: none;
             }
 
-            .navbar .nav-links a.active,
-            .navbar .nav-links a:hover {
-                color: #fff;
-                background: linear-gradient(135deg, #4f46e5, #3b82f6);
-                border-color: rgba(59,130,246,0.7);
-                box-shadow: 0 10px 20px rgba(59,130,246,0.35);
+            .navbar .nav-right {
+                flex: 1;
+                justify-content: flex-end;
             }
 
-            header {
-                flex-direction: column;
-                text-align: center;
-                margin-top: 76px;
+            .navbar .notification-icon {
+                font-size: 18px;
             }
 
-            .user-info {
-                text-align: center;
-            }
-
-            .user-info p {
+            .navbar .admin-profile {
+                padding: 6px 10px;
                 font-size: 13px;
-                color: #cbd5e1;
             }
 
-            .logout-btn {
-                background: #164e63;
-                padding: 8px 14px;
-                font-size: 13px;
-                border-radius: 10px;
+            .navbar .admin-profile span:last-child {
+                display: none;
+            }
+
+            .dropdown-menu {
+                width: 160px;
+            }
+
+            .dropdown-menu a {
+                font-size: 12px;
+                padding: 10px 12px;
             }
 
             .stats-grid {
                 grid-template-columns: 1fr;
                 gap: 12px;
+                margin-top: 12px;
             }
 
             .stat-card {
@@ -456,53 +439,52 @@ $quick_stats = mysqli_fetch_assoc($quick_stats_result);
             .menu-card {
                 background: rgba(15, 23, 42, 0.86);
                 border: 1px solid rgba(148,163,184,0.25);
-                box-shadow: 0 10px 20px rgba(0,0,0,0.45);
+                box-shadow: 0 8px 16px rgba(0,0,0,0.35);
             }
 
             .menu-card-header {
                 padding: 20px;
-                font-size: 30px;
+                font-size: 28px;
             }
 
             .menu-card-title {
                 font-size: 16px;
                 color: #e2e8f0;
                 border-bottom: 1px solid rgba(148,163,184,0.2);
+                padding: 12px 16px;
             }
 
             .menu-card-content {
                 color: #cbd5e1;
+                padding: 12px 16px;
+                font-size: 13px;
             }
 
             .menu-card-link {
                 background: linear-gradient(135deg, #0ea5e9, #6366f1);
+                padding: 10px 12px;
+                font-size: 13px;
             }
 
             .section-title {
                 color: #e2e8f0;
                 font-size: 18px;
+                margin-top: 16px;
+                margin-bottom: 12px;
             }
-
-            .menu-grid, .stats-grid {
-                margin-bottom: 18px;
-            }
-
-            .toolbar { display: none; }
 
             .mobile-action {
                 position: fixed;
-                bottom: 12px;
-                left: 12px;
-                right: 12px;
+                bottom: 0;
+                left: 0;
+                right: 0;
                 display: flex;
-                gap: 8px;
-                justify-content: center;
-                padding: 8px;
-                background: rgba(15,23,42,0.9);
-                border: 1px solid rgba(148,163,184,0.3);
-                border-radius: 14px;
-                z-index: 1000;
-                backdrop-filter: blur(10px);
+                gap: 6px;
+                justify-content: space-around;
+                padding: 10px 12px;
+                background: rgba(15,23,42,0.95);
+                border-top: 1px solid rgba(148,163,184,0.2);
+                z-index: 999;
             }
 
             .mobile-action a {
@@ -513,30 +495,45 @@ $quick_stats = mysqli_fetch_assoc($quick_stats_result);
                 color: #e2e8f0;
                 text-decoration: none;
                 font-size: 12px;
-                border: 1px solid rgba(148,163,184,0.3);
-                background: rgba(15,23,42,0.75);
+                border: 1px solid rgba(148,163,184,0.2);
+                background: rgba(99, 102, 241, 0.2);
             }
 
             .mobile-action a:hover {
-                background: rgba(59,130,246,0.35);
+                background: rgba(99,102,241,0.35);
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <?php 
-        $active_page = 'admin_index';
-        include "../user/components/header.php"; 
-        ?>
-
-        <header>
-            <div class="user-info">
-                <p>Xin chào,</p>
-                <p class="username"><?php echo htmlspecialchars($_SESSION['user_name'] ?? 'Admin'); ?></p>
-                <a href="../auth/logout.php" class="logout-btn">🚪 Đăng Xuất</a>
+    <!-- Admin Navbar Desktop -->
+    <nav class="navbar">
+        <div class="brand"><span>🎞️</span>TTVH</div>
+        <div class="nav-center">
+            <a href="phim.php">🎬 PHIM</a>
+            <a href="suat_chieu.php">📅 SẮP CHIẾU</a>
+            <a href="../user/social.php">👥 CỘNG ĐỒNG</a>
+        </div>
+        <input type="text" class="search-box" placeholder="Tìm phim, thể loại..." id="globalSearch">
+        <div class="nav-right">
+            <span class="notification-icon" title="Thông báo">🔔</span>
+            <div class="admin-profile" id="adminMenuBtn">
+                <span>⚙️ Admin</span>
+                <span>▼</span>
+                <div class="dropdown-menu" id="adminDropdown">
+                    <a href="dashboard.php">📊 Dashboard</a>
+                    <a href="phim.php">🎬 Quản lý phim</a>
+                    <a href="suat_chieu.php">⏰ Quản lý suất chiếu</a>
+                    <a href="quan_ly_user.php">👥 Quản lý user</a>
+                    <a href="quan_ly_voucher.php">🎟️ Quản lý voucher</a>
+                    <a href="../auth/logout.php">🚪 Đăng xuất</a>
+                </div>
             </div>
-        </header>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div style="padding: 20px;"></div>
 
         <!-- Quick Stats -->
         <div class="stats-grid">
@@ -629,42 +626,70 @@ $quick_stats = mysqli_fetch_assoc($quick_stats_result);
     </div>
 
     <script>
-        // Show success banner if redirected with success message
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('success')) {
-            const banner = document.querySelector('.success-banner');
-            if (banner) {
-                banner.classList.add('show');
-                setTimeout(() => {
-                    banner.classList.remove('show');
-                }, 5000);
-            }
-        }
+        // Admin profile dropdown
+        const adminMenuBtn = document.getElementById('adminMenuBtn');
+        const adminDropdown = document.getElementById('adminDropdown');
 
-        // Responsive nav toggle
-        const navToggle = document.querySelector('.nav-toggle');
-        const navLinksContainer = document.querySelector('.nav-links');
+        if (adminMenuBtn && adminDropdown) {
+            adminMenuBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                adminDropdown.classList.toggle('show');
+            });
 
-        if (navToggle && navLinksContainer) {
-            navToggle.addEventListener('click', () => {
-                navLinksContainer.classList.toggle('open');
-                navLinksContainer.classList.toggle('closed');
+            document.addEventListener('click', () => {
+                adminDropdown.classList.remove('show');
             });
         }
 
-        // Thay đổi icon logo ở mobile thành icon cuộn phim
-        const brandIcon = document.querySelector('.navbar .brand span');
-        function updateBrandIcon() {
-            if (!brandIcon) return;
-            if (window.innerWidth <= 768) {
-                brandIcon.textContent = '🎞️';
-            } else {
-                brandIcon.textContent = '🎬';
-            }
+        // Search functionality
+        const searchBox = document.getElementById('globalSearch');
+        if (searchBox) {
+            searchBox.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    const query = searchBox.value.trim();
+                    if (query) {
+                        // Redirect to search page or execute search
+                        console.log('Search for:', query);
+                    }
+                }
+            });
         }
 
-        updateBrandIcon();
-        window.addEventListener('resize', updateBrandIcon);
+        // Mobile menu toggle button for nav-center
+        const brandElement = document.querySelector('.navbar .brand');
+        const navCenter = document.querySelector('.navbar .nav-center');
+
+        if (navCenter && window.innerWidth <= 768) {
+            const toggleBtn = document.createElement('button');
+            toggleBtn.className = 'mobile-menu-toggle';
+            toggleBtn.innerHTML = '☰';
+            toggleBtn.style.cssText = `
+                background: none;
+                border: none;
+                color: #e2e8f0;
+                font-size: 22px;
+                cursor: pointer;
+                padding: 4px 8px;
+                display: flex;
+                align-items: center;
+            `;
+            
+            brandElement.parentNode.insertBefore(toggleBtn, brandElement.nextSibling);
+
+            toggleBtn.addEventListener('click', () => {
+                navCenter.classList.toggle('mobile-open');
+            });
+        }
+
+        // Close dropdown when clicking on menu items
+        const dropdownLinks = document.querySelectorAll('.dropdown-menu a');
+        if (adminDropdown) {
+            dropdownLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    adminDropdown.classList.remove('show');
+                });
+            });
+        }
     </script>
 </body>
 </html>
