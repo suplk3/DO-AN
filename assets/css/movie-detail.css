@@ -421,7 +421,7 @@ body.movie-detail-page > * { position: relative; z-index: 1; }
    MOBILE RESPONSIVE
    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
-@media (max-width: 991px) {
+@media (max-width: 768px) {
   .movie-detail-page .header-nav-left .nav-link .text { display: none; }
   .movie-detail-page .header-nav-left .nav-link.admin { display: none; }
   .movie-detail-page .header-nav-left .nav-link { padding: 8px 10px; }
@@ -752,7 +752,7 @@ body.movie-detail-page > * { position: relative; z-index: 1; }
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    PREMIUM MOBILE REDESIGN (MATCHING HOME PAGE)
    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
-@media (max-width: 991px) {
+@media (max-width: 768px) {
   .md-container { padding: 10px 10px 80px; }
   
   /* Hero Card Glassmorphism */

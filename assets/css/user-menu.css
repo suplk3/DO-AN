@@ -82,7 +82,7 @@
   margin: 4px 0;
 }
 
-@media (max-width: 991px) {
+@media (max-width: 768px) {
   .user-menu-btn {
     padding: 4px;
     width: 38px;

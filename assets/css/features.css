@@ -234,7 +234,7 @@
 }
 
 /* Responsive */
-@media (max-width: 991px) {
+@media (max-width: 768px) {
     .search-section {
         flex-direction: column;
     }
