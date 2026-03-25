@@ -2,6 +2,25 @@
 session_start();
 include "../config/db.php";
 header('Content-Type: application/json');
+
+if (isset($_GET['action']) && $_GET['action'] === 'breakdown') {
+    $type = in_array($_GET['target_type']??'', ['post','phim']) ? $_GET['target_type'] : null;
+    $tid  = (int)($_GET['target_id'] ?? 0);
+    if (!$type || !$tid) { echo json_encode(['success'=>false, 'error'=>'Thieu du lieu']); exit; }
+    $breakdown = [];
+    $total = 0;
+    
+    $rc = mysqli_query($conn, "SELECT loai, COUNT(*) AS c FROM reactions WHERE target_type='$type' AND target_id=$tid GROUP BY loai");
+    if ($rc) {
+        while ($r = mysqli_fetch_assoc($rc)) {
+            $breakdown[$r['loai']] = (int)$r['c'];
+            $total += (int)$r['c'];
+        }
+    }
+    echo json_encode(['success' => true, 'total' => $total, 'breakdown' => $breakdown]);
+    exit;
+}
+
 if (!isset($_SESSION['user_id'])) { echo json_encode(['error'=>'Chưa đăng nhập']); exit; }
 
 $me   = (int)$_SESSION['user_id'];
@@ -29,6 +48,35 @@ if ($exist) {
     mysqli_stmt_bind_param($s, 'isis', $me, $type, $tid, $loai);
     mysqli_stmt_execute($s);
     $action = 'added';
+    
+    // Notify the post owner if an external user reacts
+    if ($type === 'post') {
+        $owner_row = mysqli_fetch_assoc(mysqli_query($conn, "SELECT user_id FROM posts WHERE id=$tid"));
+        if ($owner_row) {
+            $owner_id = (int)$owner_row['user_id'];
+            if ($owner_id !== $me) {
+                $me_row = mysqli_fetch_assoc(mysqli_query($conn, "SELECT ten FROM users WHERE id=$me"));
+                $me_name = $me_row ? $me_row['ten'] : 'Ai đó';
+                
+                $react_str = 'cảm xúc';
+                if ($loai === 'like') $react_str = '👍 Thích';
+                if ($loai === 'love') $react_str = '❤️ Yêu thích';
+                if ($loai === 'haha') $react_str = '😂 Haha';
+                if ($loai === 'wow')  $react_str = '😮 Woa';
+                if ($loai === 'sad')  $react_str = '😢 Buồn';
+                if ($loai === 'angry') $react_str = '😡 Phẫn nộ';
+
+                $title = "Cảm xúc mới";
+                $body = "$me_name vừa bày tỏ $react_str về bài viết của bạn.";
+                $link = "social.php#post_$tid";
+                
+                $n_stmt = mysqli_prepare($conn, "INSERT INTO notifications (user_id, actor_id, type, target_id, title, body, link) VALUES (?, ?, 'new_reaction', ?, ?, ?, ?)");
+                mysqli_stmt_bind_param($n_stmt, 'iiisss', $owner_id, $me, $tid, $title, $body, $link);
+                mysqli_stmt_execute($n_stmt);
+                mysqli_stmt_close($n_stmt);
+            }
+        }
+    }
 }
 
 $total = 0;

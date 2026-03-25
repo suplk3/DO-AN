@@ -66,6 +66,8 @@ function time_ago($datetime) {
 <link rel="stylesheet" href="../assets/css/user-index.css">
 <link rel="stylesheet" href="../assets/css/login-modal.css">
 <link rel="stylesheet" href="../assets/css/search.css">
+<link rel="stylesheet" href="../assets/css/user-menu.css">
+<link rel="stylesheet" href="../assets/css/theme-toggle.css">
 <link rel="stylesheet" href="../assets/css/social.css">
 <link rel="stylesheet" href="../assets/css/mobile-premium.css?v=<?php echo time(); ?>">
 </head>
@@ -164,86 +166,7 @@ function time_ago($datetime) {
     <?php else: ?>
     <div class="social-feed" style="max-width:680px;">
       <?php while ($post = mysqli_fetch_assoc($posts)): ?>
-      <article class="post-card" id="post-<?= $post['id'] ?>">
-        <div class="post-header">
-          <div class="post-user-link" style="cursor:default;">
-            <?php if ($post['avatar']): ?>
-              <img src="../assets/images/avatars/<?= htmlspecialchars($post['avatar']) ?>" class="avatar-sm" alt="">
-            <?php else: ?>
-              <div class="avatar-placeholder-sm"><?= mb_substr($post['ten_user'],0,1) ?></div>
-            <?php endif; ?>
-            <div>
-              <div class="post-username"><?= htmlspecialchars($post['ten_user']) ?></div>
-              <div class="post-time"><?= time_ago($post['created_at']) ?></div>
-            </div>
-          </div>
-          <?php if ($post['user_id'] == $me): ?>
-          <div class="post-menu">
-            <button class="post-menu-btn" onclick="toggleMenu(<?= $post['id'] ?>)">⋯</button>
-            <div class="post-menu-dropdown" id="menu-<?= $post['id'] ?>" style="display:none">
-              <a href="post_action.php?action=delete&id=<?= $post['id'] ?>"
-                 onclick="return confirm('Xoá?')" class="menu-item danger">🗑️ Xoá</a>
-            </div>
-          </div>
-          <?php endif; ?>
-        </div>
-
-        <?php if ($post['phim_id']): ?>
-        <a href="chi_tiet_phim.php?id=<?= $post['phim_id'] ?>" class="post-movie-tag">
-          <img src="../assets/images/<?= htmlspecialchars($post['phim_poster']) ?>" alt="">
-          <span>🎬 <?= htmlspecialchars($post['ten_phim']) ?></span>
-        </a>
-        <?php endif; ?>
-
-        <p class="post-content"><?= nl2br(htmlspecialchars($post['noi_dung'])) ?></p>
-
-        <?php if ($post['hinh_anh']): ?>
-        <div class="post-image-wrap">
-          <img src="../assets/images/posts/<?= htmlspecialchars($post['hinh_anh']) ?>"
-               class="post-image" alt="" loading="lazy">
-        </div>
-        <?php endif; ?>
-
-        <div class="post-stats">
-          <span id="stat-react-<?= $post['id'] ?>">
-            <?= $post['tong_reaction'] > 0 ? '👍 ' . $post['tong_reaction'] : '' ?>
-          </span>
-          <span id="stat-cmt-<?= $post['id'] ?>" onclick="toggleComments(<?= $post['id'] ?>)"
-                style="cursor:pointer;"><?= $post['tong_comment'] ?> bình luận</span>
-        </div>
-
-        <div class="post-actions">
-          <div class="reaction-wrap" id="rw-<?= $post['id'] ?>">
-            <button class="action-btn <?= $post['my_reaction'] ? 'reacted' : '' ?>"
-                    id="rbtn-<?= $post['id'] ?>"
-                    onclick="quickReact(<?= $post['id'] ?>, 'post', 'like')"
-                    onmouseenter="showReactions(<?= $post['id'] ?>)">
-              <?= $post['my_reaction'] ? ($REACTIONS[$post['my_reaction']] . ' ' . ucfirst($post['my_reaction'])) : '👍 Thích' ?>
-            </button>
-            <div class="reaction-picker" id="rpicker-<?= $post['id'] ?>" style="display:none"
-                 onmouseleave="hideReactions(<?= $post['id'] ?>)">
-              <?php foreach ($REACTIONS as $key => $emoji): ?>
-              <button class="reaction-emoji" onclick="doReact(<?= $post['id'] ?>, 'post', '<?= $key ?>')"
-                      title="<?= ucfirst($key) ?>"><?= $emoji ?></button>
-              <?php endforeach; ?>
-            </div>
-          </div>
-          <button class="action-btn" onclick="toggleComments(<?= $post['id'] ?>)">💬 Bình luận</button>
-        </div>
-
-        <div class="comment-section" id="comments-<?= $post['id'] ?>" style="display:none">
-          <div class="comment-list" id="clist-<?= $post['id'] ?>"></div>
-          <div class="comment-compose">
-            <div class="avatar-placeholder-xs"><?= mb_substr($_SESSION['ten'] ?? 'U',0,1) ?></div>
-            <div class="comment-input-wrap">
-              <input type="text" class="comment-input" id="ci-<?= $post['id'] ?>"
-                     placeholder="Viết bình luận..."
-                     onkeydown="if(event.key==='Enter')submitComment(<?= $post['id'] ?>,'post')">
-              <button class="comment-send" onclick="submitComment(<?= $post['id'] ?>,'post')">➤</button>
-            </div>
-          </div>
-        </div>
-      </article>
+        <?php include 'components/post_card.php'; ?>
       <?php endwhile; ?>
     </div>
     <?php endif; ?>
@@ -275,20 +198,93 @@ async function doReact(id,type,loai){
     const btn=document.getElementById('rbtn-'+id);
     const stat=document.getElementById('stat-react-'+id);
     if(btn){if(data.action==='removed'){btn.textContent='👍 Thích';btn.classList.remove('reacted');}else{btn.textContent=(REACTIONS[loai]||'👍')+' '+(loai.charAt(0).toUpperCase()+loai.slice(1));btn.classList.add('reacted');}}
-    if(stat)stat.textContent=data.total>0?'👍 '+data.total:'';
+    if(stat)stat.textContent=data.total>0?'👍❤️ '+data.total:'';
 }
+async function loadReactionBreakdown(id, type) {
+    const tooltip = document.getElementById('react-tooltip-' + id);
+    if (!tooltip) return;
+    tooltip.innerHTML = '<div style="color:#94a3b8; font-size:12px; padding:4px 8px;">Đang tải...</div>';
+    try {
+        const res = await fetch(`reaction_api.php?action=breakdown&target_type=${type}&target_id=${id}`);
+        const data = await res.json();
+        if (data.success) {
+            if (data.total === 0) {
+                tooltip.innerHTML = '<div style="color:#64748b; font-size:12px; padding:4px 8px;">Chưa có cảm xúc nào</div>';
+                return;
+            }
+            let html = '';
+            for (const [loai, count] of Object.entries(data.breakdown)) {
+                let emoji = REACTIONS[loai] || '👍';
+                const names = {like:'Thích', love:'Yêu thích', haha:'Haha', wow:'Woa', sad:'Buồn', angry:'Phẫn nộ'};
+                const vnName = names[loai] || loai;
+                html += `<div class="react-detail-row"><span>${emoji}</span><span style="text-transform: capitalize; padding-left:8px;">${vnName}</span><span class="react-detail-count">${count}</span></div>`;
+            }
+            tooltip.innerHTML = html;
+        }
+    } catch(e) { tooltip.innerHTML = '<div style="color:#ef4444; font-size:12px; padding:4px 8px;">Lỗi tải</div>'; }
+}
+
 const loadedComments={};
-async function toggleComments(id){const sec=document.getElementById('comments-'+id);if(sec.style.display==='none'){sec.style.display='block';if(!loadedComments[id])await loadComments(id,'post');}else{sec.style.display='none';}}
-async function loadComments(id,type){
-    const list=document.getElementById('clist-'+id);
-    list.innerHTML='<div style="text-align:center;padding:12px;color:#64748b;font-size:12px;">Đang tải...</div>';
-    const res=await fetch(`comment_api.php?target_type=${type}&target_id=${id}`);
-    const data=await res.json();
-    loadedComments[id]=true;
-    if(!data.comments.length){list.innerHTML='<div style="text-align:center;padding:8px;color:#64748b;font-size:12px;">Chưa có bình luận</div>';return;}
-    list.innerHTML=data.comments.map(c=>`<div class="comment-item"><div class="comment-avatar">${c.avatar?`<img src="../assets/images/avatars/${c.avatar}" class="avatar-xs" alt="">`:`<div class="avatar-placeholder-xs">${c.ten.charAt(0)}</div>`}</div><div class="comment-bubble"><a href="profile.php?id=${c.user_id}" class="comment-name">${escHtml(c.ten)}</a><span class="comment-text">${escHtml(c.noi_dung)}</span><div class="comment-meta">${c.time_ago}</div></div></div>`).join('');
+const commentCountCache = {};
+
+function getDisplayedCommentCount(id) { const stat = document.getElementById('stat-cmt-' + id); return stat ? (parseInt(stat.textContent, 10) || 0) : 0; }
+function setDisplayedCommentCount(id, count) { commentCountCache[id] = count; const stat = document.getElementById('stat-cmt-' + id);  if (stat) stat.textContent = count + ' bình luận'; }
+function isCommentsOpen(id) { const sec = document.getElementById('comments-' + id); return !!sec && sec.style.display !== 'none'; }
+function countCommentsTree(comments) { return comments.reduce((total, comment) => { const replies = Array.isArray(comment.replies) ? countCommentsTree(comment.replies) : 0; return total + 1 + replies; }, 0); }
+
+async function toggleComments(id) { const sec = document.getElementById('comments-' + id); if (sec.style.display === 'none') { sec.style.display = 'block'; if (!loadedComments[id]) await loadComments(id, 'post'); } else { sec.style.display = 'none'; } }
+function renderCommentTree(comments, postId, type, depth = 0) {
+    if (!comments || !comments.length) return '';
+    let html = '';
+    comments.forEach(c => {
+        let repliesHtml = '';
+        if (c.replies && c.replies.length > 0) { repliesHtml = `<div class="comment-replies" style="margin-left: ${depth === 0 ? 34 : 0}px; border-left: 2px solid rgba(255,255,255,0.05); padding-left: 12px; margin-top: 8px;">${renderCommentTree(c.replies, postId, type, depth + 1)}</div>`; }
+        const parentId = depth === 0 ? c.id : c.parent_id;
+        html += `<div class="comment-item" id="cmt-${c.id}" style="${depth > 0 ? 'margin-top: 10px; padding:0;' : ''}">
+            <div class="comment-avatar">${c.avatar ? `<img src="../assets/images/avatars/${c.avatar}" class="avatar-xs" alt="" style="${depth > 0 ? 'width:24px;height:24px;' : ''}">` : `<div class="avatar-placeholder-xs" style="${depth > 0 ? 'width:24px;height:24px;font-size:10px;' : ''}">${c.ten.charAt(0)}</div>`}</div>
+            <div class="comment-bubble-wrap" style="flex:1;">
+                <div class="comment-bubble" style="${depth > 0 ? 'padding:8px 10px;' : ''}"><a href="profile.php?id=${c.user_id}" class="comment-name">${escHtml(c.ten)}</a><span class="comment-text">${escHtml(c.noi_dung)}</span><div class="comment-meta">${c.time_ago}<button class="btn-reply-text" style="background:none;border:none;color:#94a3b8;font-size:11px;cursor:pointer;padding:0 5px; margin-left:8px;" onclick="showReplyBox(${postId}, '${type}', ${parentId})">Trả lời</button></div></div>
+                <div id="reply-box-${postId}-${parentId}" class="reply-box-container" style="display:none; margin-top: 6px;"></div>
+                ${repliesHtml}
+            </div></div>`;
+    });
+    return html;
 }
-async function submitComment(id,type){const inp=document.getElementById('ci-'+id);const text=inp.value.trim();if(!text)return;inp.value='';const res=await fetch('comment_api.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({target_type:type,target_id:id,noi_dung:text})});const data=await res.json();if(data.ok){loadedComments[id]=false;await loadComments(id,type);const stat=document.getElementById('stat-cmt-'+id);if(stat){const cur=parseInt(stat.textContent)||0;stat.textContent=(cur+1)+' bình luận';}}}
+function showReplyBox(postId, type, parentId) {
+    document.querySelectorAll(`.reply-box-container[id^="reply-box-${postId}-"]`).forEach(el => { el.style.display = 'none'; el.innerHTML = ''; });
+    const box = document.getElementById(`reply-box-${postId}-${parentId}`);
+    if (!box) return;
+    box.style.display = 'block';
+    box.innerHTML = `<div class="comment-compose" style="padding: 0; background: transparent; border: none; margin-top: 8px;">
+        <div class="comment-input-wrap" style="background: rgba(255,255,255,0.03);">
+            <input type="text" class="comment-input" id="ci-reply-${postId}-${parentId}" placeholder="Viết phản hồi..." onkeydown="if(event.key==='Enter')submitComment(${postId}, '${type}', ${parentId})">
+            <button class="comment-send" onclick="submitComment(${postId}, '${type}', ${parentId})">➤</button>
+        </div></div>`;
+    setTimeout(() => document.getElementById(`ci-reply-${postId}-${parentId}`).focus(), 50);
+}
+async function loadComments(id, type, options = {}) {
+    const list = document.getElementById('clist-' + id);
+    if (!options.background) { list.innerHTML = '<div style="text-align:center;padding:12px;color:#64748b;font-size:12px;">Đang tải...</div>';  }
+    const res = await fetch(`comment_api.php?target_type=${type}&target_id=${id}`);
+    const data = await res.json();
+    loadedComments[id] = true;
+    if (!data.comments.length) { setDisplayedCommentCount(id, 0); list.innerHTML = '<div style="text-align:center;padding:8px;color:#64748b;font-size:12px;">Chưa có bình luận nào</div>'; return; }
+    setDisplayedCommentCount(id, countCommentsTree(data.comments));
+    list.innerHTML = renderCommentTree(data.comments, id, type);
+}
+async function submitComment(id, type, parentId = null) {
+    const inpId = parentId ? `ci-reply-${id}-${parentId}` : `ci-${id}`;
+    const inp = document.getElementById(inpId);
+    if (!inp) return;
+    const text = inp.value.trim();
+    if (!text) return;
+    inp.value = '';
+    const payload = { target_type: type, target_id: id, noi_dung: text };
+    if (parentId) payload.parent_id = parentId;
+    const res = await fetch('comment_api.php', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+    const data = await res.json();
+    if (data.ok) { loadedComments[id] = false; await loadComments(id, type); }
+}
 async function doFollow(userId,btn){const res=await fetch('follow_api.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({following_id:userId})});const data=await res.json();btn.textContent=data.action==='followed'?'✓ Đang theo dõi':'+ Theo dõi';btn.classList.toggle('following',data.action==='followed');}
 function toggleMenu(id){const el=document.getElementById('menu-'+id);el.style.display=el.style.display==='none'?'block':'none';}
 document.addEventListener('click',e=>{if(!e.target.classList.contains('post-menu-btn'))document.querySelectorAll('.post-menu-dropdown').forEach(el=>el.style.display='none');});
