@@ -170,17 +170,20 @@ $latest = admin_query($conn,
       height: 350px;
       width: 100%;
     }
-    @media (max-width: 900px) {
-      .main-grid { grid-template-columns: 1fr; }
-    }
   </style>
 </head>
 <body class="admin-dark">
   <div class="wrap">
-  <?php 
-  $active_page = 'dashboard';
-  include "../user/components/header.php"; 
-  ?>
+    <div class="toolbar">
+      <a class="btn" href="phim.php">🎬 Quản lý phim</a>
+      <a class="btn" href="suat_chieu.php">🗓️ Quản lý suất chiếu</a>
+      <a class="btn" href="quan_ly_user.php">👥 Quản lý user</a>
+      <a class="btn" href="quan_ly_combo.php">🍿 Quản lý Combo</a>
+      <a class="btn" href="quan_ly_voucher.php">🎟️ Quản lý Voucher</a>
+      <a class="btn" href="quan_ly_the.php">💎 Thẻ &amp; Điểm</a>
+      <a class="btn" href="quan_ly_chat.php" style="background: rgba(234,179,8,0.2); border-color: rgba(234,179,8,0.5); color: #fef08a;">💬 Quản lý Tin nhắn</a>
+      <a class="btn" href="../user/index.php">🏠 Trang người dùng</a>
+    </div>
 
     <div class="title">✨ Admin Dashboard</div>
 

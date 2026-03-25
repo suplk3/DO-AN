@@ -59,17 +59,27 @@ $stats = mysqli_fetch_assoc($stats_result);
 <link rel="stylesheet" href="../assets/css/actions.css">
 <link rel="stylesheet" href="../assets/css/features.css">
 <style>
-    body { max-width: 1200px; margin: 0 auto; padding: 20px; padding-top: calc(72px + 20px); background: linear-gradient(135deg, #0a0e17 0%, #0f1419 100%); color: #e2e8f0; }
+    body { max-width: 1200px; margin: 0 auto; padding: 20px; background: linear-gradient(135deg, #0a0e17 0%, #0f1419 100%); color: #e2e8f0; }
 </style>
 </head>
 <body>
 
 <div id="notification"></div>
 
-<?php 
-$active_page = 'admin_suat';
-include "../user/components/header.php"; 
-?>
+<h2 style="background: linear-gradient(135deg, #1a1f2e 0%, #0f172a 100%); color: #ffffff; margin-bottom: 24px; padding: 20px 24px; border-radius: 12px; font-size: 24px; letter-spacing: 1px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.15);">🎞️ QUẢN LÝ SUẤT CHIẾU</h2>
+
+<div style="display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: nowrap; align-items: stretch;">
+    <a href="them_suat.php" class="btn" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; padding: 12px 20px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 14px; border: 1px solid #f87171; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3); transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 8px; letter-spacing: 0.5px; white-space: nowrap;">➕ Thêm suất chiếu</a>
+    <a href="quan_ly_phong.php" class="btn" style="background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: white; padding: 12px 20px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 14px; border: 1px solid #4ade80; box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3); transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 8px; letter-spacing: 0.5px; white-space: nowrap;">🏛️ Quản lý phòng</a>
+    <a href="../user/index.php" class="btn" style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0.08) 100%); color: #3b82f6; padding: 12px 20px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 14px; border: 1.5px solid #3b82f6; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2); transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 8px; letter-spacing: 0.5px; white-space: nowrap;">🏠 Về trang chính</a>
+    
+    <div style="flex: 1; display: flex; align-items: stretch;">
+        <div class="search-box" style="display: flex; align-items: center;">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="Tìm tên phim, ngày, giờ...">
+        </div>
+    </div>
+</div>
 
 <!-- Stats Section -->
 <div class="stats-section">

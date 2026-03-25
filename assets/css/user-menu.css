@@ -1,24 +1,21 @@
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+﻿/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    User menu dropdown (header)
    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .user-menu-wrap {
   position: relative;
 }
 .user-menu-btn {
-  display: flex; align-items: center; gap: 10px;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.08);
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.1);
   border-radius: 999px;
-  padding: 4px 14px 4px 4px;
+  padding: 5px 12px 5px 6px;
   cursor: pointer;
-  transition: all .25s var(--ease-smooth);
+  transition: background .18s;
+  font-family: 'Be Vietnam Pro', sans-serif;
   color: #f1f5f9;
 }
-.user-menu-btn:hover { 
-  background: rgba(255,255,255,0.1); 
-  border-color: rgba(255,255,255,0.15);
-  transform: translateY(-1px);
-}
+.user-menu-btn:hover { background: rgba(255,255,255,.1); }
 
 .user-menu-avatar {
   width: 28px; height: 28px; border-radius: 50%; object-fit: cover;
@@ -43,19 +40,17 @@
 
 /* Dropdown panel */
 .user-dropdown {
-  position: absolute; top: calc(100% + 15px); right: 0;
-  width: 240px;
-  background: rgba(10, 15, 28, 0.98);
-  backdrop-filter: blur(30px) saturate(200%);
-  -webkit-backdrop-filter: blur(30px) saturate(200%);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 20px;
-  padding: 12px;
-  box-shadow: 0 30px 70px rgba(0,0,0,0.9);
+  position: absolute; top: calc(100% + 10px); right: 0;
+  width: 200px;
+  background: #1e293b;
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 14px;
+  padding: 6px;
+  box-shadow: 0 12px 32px rgba(0,0,0,.6);
   z-index: 1000;
   opacity: 0; pointer-events: none;
-  transform: translateY(-15px);
-  transition: all .4s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateY(-8px);
+  transition: opacity .18s, transform .18s;
 }
 .user-dropdown.open {
   opacity: 1; pointer-events: auto;
@@ -63,38 +58,25 @@
 }
 .user-dropdown-header {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 12px 14px 16px;
-  font-size: 15px; font-weight: 800; color: #fff;
-  border-bottom: 1px solid rgba(255,255,255,.08);
-  margin-bottom: 8px;
+  padding: 8px 10px 10px;
+  font-size: 13px; font-weight: 800; color: #f1f5f9;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+  margin-bottom: 4px;
 }
 .user-badge-admin {
-  font-size: 10px; font-weight: 700; padding: 3px 10px;
-  border-radius: 20px;
-  background: rgba(232,25,44,.2); border: 1px solid rgba(232,25,44,.4);
-  color: #ff8a8a;
-  text-transform: uppercase; letter-spacing: 0.5px;
+  font-size: 10px; font-weight: 700; padding: 2px 7px;
+  border-radius: 999px;
+  background: rgba(232,25,44,.15); border: 1px solid rgba(232,25,44,.3);
+  color: #fca5a5;
 }
 .user-dropdown-item {
-  display: flex; align-items: center; gap: 12px;
-  padding: 15px 16px; border-radius: 12px;
-  font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.7);
-  text-decoration: none; transition: all .25s ease;
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 10px; border-radius: 9px;
+  font-size: 13px; font-weight: 600; color: #94a3b8;
+  text-decoration: none; transition: all .15s;
 }
-.user-dropdown-item:hover,
-.user-dropdown-item.active { 
-  background: rgba(255,255,255,.08); 
-  color: #fff;
-  transform: translateX(4px);
-}
-.user-dropdown-item.danger {
-  border-left: 4px solid #f97316;
-  margin-left: -12px;
-  padding-left: 24px;
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
-}
-.user-dropdown-item.danger:hover { background: rgba(249,115,22,0.1); color: #fdba74; }
+.user-dropdown-item:hover { background: rgba(255,255,255,.06); color: #f1f5f9; }
+.user-dropdown-item.danger:hover { background: rgba(232,25,44,.1); color: #fca5a5; }
 .user-dropdown-divider {
   height: 1px; background: rgba(255,255,255,.06);
   margin: 4px 0;

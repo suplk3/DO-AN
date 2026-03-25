@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   --light-bg: #f6f7fb;
   --light-surface: #ffffff;
   --light-text: #0f172a;
@@ -11,22 +11,15 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 38px;
+  height: 38px;
   padding: 0;
   border-radius: 12px;
-  border: 1px solid rgba(255,255,255,0.1);
-  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.06);
   color: #e2e8f0;
-  font-size: 18px;
+  font-size: 16px;
   cursor: pointer;
-  transition: all .25s var(--ease-smooth);
-}
-.theme-toggle-btn:hover {
-  background: rgba(255,255,255,0.1);
-  border-color: rgba(255,255,255,0.2);
-  transform: translateY(-1px);
-  color: #fff;
 }
 @media (max-width: 768px) {
   .theme-toggle-btn {

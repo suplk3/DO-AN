@@ -43,9 +43,8 @@ $notShowingCount = max(0, $count - $showingCount);
         }
         .admin-shell {
             max-width: 1200px;
-            margin: 0 auto;
+            margin: 28px auto;
             padding: 0 16px 32px;
-            padding-top: calc(72px + 20px); /* Sync with fixed header */
             animation: pageEnter .45s ease both;
         }
         .admin-header {
@@ -476,10 +475,25 @@ $notShowingCount = max(0, $count - $showingCount);
         <h1 class="page-title">🎬 Quản lý phim</h1>
     </div>
 
-    <?php 
-    $active_page = 'admin_phim';
-    include "../user/components/header.php"; 
-    ?>
+    <div class="top-bar">
+        <div class="toolbar-actions">
+            <a href="them_phim.php" class="btn toolbar-btn primary">
+                <span>➕</span> Thêm phim mới
+            </a>
+            <a href="../user/index.php" class="btn toolbar-btn outline">
+                <span>🏠</span> Về trang chính
+            </a>
+            <a href="reset_id.php" class="btn toolbar-btn neutral">
+                <span>🔄</span> Reset ID
+            </a>
+        </div>
+        <div class="toolbar-search">
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInput" placeholder="Tìm tên phim, thể loại..." onkeyup="filterMovies()">
+            </div>
+        </div>
+    </div>
 
     <!-- Thống kê nhanh -->
     <div class="quick-stats">
