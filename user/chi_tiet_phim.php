@@ -122,7 +122,7 @@ if ($me_id) {
 <title><?= htmlspecialchars($phim['ten_phim']) ?> — TTVH Cinemas</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 <link rel="stylesheet" href="../assets/css/style.css">
-<link rel="stylesheet" href="../assets/css/movie-detail.css">
+<link rel="stylesheet" href="../assets/css/movie-detail.css?v=<?= time() ?>">
 <link rel="stylesheet" href="../assets/css/login-modal.css">
 <link rel="stylesheet" href="../assets/css/search.css">
     <link rel="stylesheet" href="../assets/css/user-menu.css">

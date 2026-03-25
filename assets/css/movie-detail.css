@@ -677,7 +677,7 @@ body.movie-detail-page > * { position: relative; z-index: 1; }
 .rating-login-hint a:hover { text-decoration: underline; }
 
 /* Trailer modal */
-.trailer-modal {
+#trailerModal {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.7);
@@ -692,7 +692,7 @@ body.movie-detail-page > * { position: relative; z-index: 1; }
   padding: 20px;
   transition: opacity 0.3s ease, visibility 0.3s;
 }
-.trailer-modal.open {
+#trailerModal.open {
   visibility: visible;
   opacity: 1;
 }
@@ -704,7 +704,7 @@ body.movie-detail-page > * { position: relative; z-index: 1; }
   transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   opacity: 0;
 }
-.trailer-modal.open .trailer-box {
+#trailerModal.open .trailer-box {
   transform: scale(1) translateY(0);
   opacity: 1;
 }
