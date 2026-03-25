@@ -283,20 +283,6 @@ if (userMenuBtn && userDropdown) {
     document.addEventListener('click', () => userDropdown.classList.remove('open'));
 }
 </script>
-<script>
-// Theme toggle
-(function(){
-  var body = document.body;
-  var btn = document.getElementById('themeToggle');
-  var stored = localStorage.getItem('theme') || 'dark';
-  body.setAttribute('data-theme', stored);
-  if (!btn) return;
-  btn.addEventListener('click', function(){
-    var cur = body.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
-    body.setAttribute('data-theme', cur);
-    localStorage.setItem('theme', cur);
-  });
-})();
-</script>
+
 </body>
 </html>
