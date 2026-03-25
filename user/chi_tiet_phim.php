@@ -1180,26 +1180,17 @@ document.addEventListener('DOMContentLoaded', () => {
     trailerBtn.addEventListener('click', () => {
       let url = trailerBtn.dataset.trailer;
       if (url) {
-          if (url.includes('watch?v=')) {
-              url = url.replace('watch?v=', 'embed/');
-              const ampersandPos = url.indexOf('&');
-              if(ampersandPos !== -1) {
-                  url = url.substring(0, ampersandPos);
-              }
-          } else if (url.includes('youtu.be/')) {
-              url = url.replace('youtu.be/', 'youtube.com/embed/');
-              const qPos = url.indexOf('?');
-              if(qPos !== -1) {
-                  url = url.substring(0, qPos);
-              }
+          let videoId = null;
+          let match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^&?]+)/);
+          if (match && match[1]) {
+              videoId = match[1];
           }
-          if (url.includes('?')) {
-              url += '&autoplay=1';
+          if (videoId) {
+              trailerIframe.src = 'https://www.youtube.com/embed/' + videoId + '?autoplay=1';
+              trailerModal.classList.add('open');
           } else {
-              url += '?autoplay=1';
+              alert("Lỗi: Link Trailer không hợp lệ. Vui lòng cập nhật lại link Youtube chuẩn trong trang quản trị.");
           }
-          trailerIframe.src = url;
-          trailerModal.classList.add('open');
       }
     });
 
