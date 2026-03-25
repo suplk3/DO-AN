@@ -122,7 +122,7 @@ if ($me_id) {
 <title><?= htmlspecialchars($phim['ten_phim']) ?> — TTVH Cinemas</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 <link rel="stylesheet" href="../assets/css/style.css">
-<link rel="stylesheet" href="../assets/css/movie-detail.css">
+<link rel="stylesheet" href="../assets/css/movie-detail.css?v=<?= time() ?>">
 <link rel="stylesheet" href="../assets/css/login-modal.css">
 <link rel="stylesheet" href="../assets/css/search.css">
     <link rel="stylesheet" href="../assets/css/user-menu.css">
@@ -1154,6 +1154,46 @@ function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(
     });
   });
 })();
+</script>
+<script>
+/* Trailer Modal Logic */
+document.addEventListener('DOMContentLoaded', () => {
+  const trailerBtn = document.querySelector('.trailer-btn');
+  const trailerModal = document.getElementById('trailerModal');
+  const trailerClose = document.getElementById('trailerClose');
+  const trailerIframe = document.getElementById('trailerIframe');
+
+  if (trailerBtn && trailerModal && trailerIframe) {
+    trailerBtn.addEventListener('click', () => {
+      let url = trailerBtn.dataset.trailer;
+      if (url) {
+          let videoId = null;
+          let match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^&?]+)/);
+          if (match && match[1]) {
+              videoId = match[1];
+          }
+          if (videoId) {
+              trailerIframe.src = 'https://www.youtube.com/embed/' + videoId + '?autoplay=1';
+              trailerModal.classList.add('open');
+          } else {
+              alert("Lỗi: Link Trailer không hợp lệ. Vui lòng cập nhật lại link Youtube chuẩn trong trang quản trị.");
+          }
+      }
+    });
+
+    const closeTrailer = () => {
+      trailerModal.classList.remove('open');
+      trailerIframe.src = ''; // Stop video
+    };
+
+    if (trailerClose) trailerClose.addEventListener('click', closeTrailer);
+    trailerModal.addEventListener('click', (e) => {
+      if (e.target === trailerModal || e.target.classList.contains('trailer-box')) {
+          closeTrailer();
+      }
+    });
+  }
+});
 </script>
 </body>
 </html>
