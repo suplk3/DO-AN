@@ -357,6 +357,32 @@ if ($action === 'send') {
     $ok = $stmt->execute();
     $stmt->close();
 
+    if ($ok && $senderIsAdmin === 0 && table_exists($conn, 'notifications')) {
+        $v_res = $conn->query("SELECT id FROM ve WHERE user_id = $chatUserId LIMIT 1");
+        $has_booked = ($v_res && $v_res->num_rows > 0);
+        
+        $u_res = $conn->query("SELECT ten FROM users WHERE id = $chatUserId LIMIT 1");
+        $u_name = ($u_res && $u_row = $u_res->fetch_assoc()) ? $u_row['ten'] : "User #$chatUserId";
+        
+        $note = $has_booked ? " (đã từng đặt vé)" : "";
+        $title = "Tin nhắn mới từ $u_name";
+        $body = "Thành viên này$note vừa nhắn tin cho bạn ở khung chat hỗ trợ.";
+        $link = "chat.php?user_id=" . $chatUserId;
+        
+        $admin_q = $conn->query("SELECT id FROM users WHERE vai_tro='admin'");
+        if ($admin_q) {
+            $a_stmt = $conn->prepare("INSERT INTO notifications (user_id, type, target_id, title, body, link) VALUES (?, 'new_chat', ?, ?, ?, ?)");
+            if ($a_stmt) {
+                while ($adm = $admin_q->fetch_assoc()) {
+                    $aid = (int)$adm['id'];
+                    $a_stmt->bind_param("iisss", $aid, $chatUserId, $title, $body, $link);
+                    $a_stmt->execute();
+                }
+                $a_stmt->close();
+            }
+        }
+    }
+
     respond(['success' => $ok]);
 }
 

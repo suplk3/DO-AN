@@ -28,11 +28,16 @@ $REACTIONS = ['like'=>'👍','love'=>'❤️','haha'=>'😂','wow'=>'😮','sad'
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Cộng đồng — TTVH Cinemas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="../assets/css/style.css">
 <link rel="stylesheet" href="../assets/css/user-index.css">
 <link rel="stylesheet" href="../assets/css/login-modal.css">
 <link rel="stylesheet" href="../assets/css/search.css">
+<link rel="stylesheet" href="../assets/css/user-menu.css">
+<link rel="stylesheet" href="../assets/css/theme-toggle.css">
 <link rel="stylesheet" href="../assets/css/social.css">
 <link rel="stylesheet" href="../assets/css/mobile-premium.css?v=<?php echo time(); ?>">
 </head>
@@ -386,6 +391,71 @@ async function toggleComments(id) {
         sec.style.display = 'none';
     }
 }
+function renderCommentTree(comments, postId, type, depth = 0) {
+    if (!comments || !comments.length) return '';
+    let html = '';
+    
+    comments.forEach(c => {
+        let repliesHtml = '';
+        if (c.replies && c.replies.length > 0) {
+            repliesHtml = `<div class="comment-replies" style="margin-left: ${depth === 0 ? 34 : 0}px; border-left: 2px solid rgba(255,255,255,0.05); padding-left: 12px; margin-top: 8px;">
+                ${renderCommentTree(c.replies, postId, type, depth + 1)}
+            </div>`;
+        }
+        
+        const avatarSize = depth === 0 ? 'avatar-xs' : 'avatar-xxs';
+        const parentId = depth === 0 ? c.id : c.parent_id;
+        
+        html += `
+            <div class="comment-item" id="cmt-${c.id}" style="${depth > 0 ? 'margin-top: 10px; padding:0;' : ''}">
+                <div class="comment-avatar">
+                    ${c.avatar
+                        ? `<img src="../assets/images/avatars/${c.avatar}" class="avatar-xs" alt="" style="${depth > 0 ? 'width:24px;height:24px;' : ''}">`
+                        : `<div class="avatar-placeholder-xs" style="${depth > 0 ? 'width:24px;height:24px;font-size:10px;' : ''}">${c.ten.charAt(0)}</div>`}
+                </div>
+                <div class="comment-bubble-wrap" style="flex:1;">
+                    <div class="comment-bubble" style="${depth > 0 ? 'padding:8px 10px;' : ''}">
+                        <a href="profile.php?id=${c.user_id}" class="comment-name">${escHtml(c.ten)}</a>
+                        <span class="comment-text">${escHtml(c.noi_dung)}</span>
+                        <div class="comment-meta">
+                            ${c.time_ago}
+                            <button class="btn-reply-text" style="background:none;border:none;color:#94a3b8;font-size:11px;cursor:pointer;padding:0 5px; margin-left:8px;" onclick="showReplyBox(${postId}, '${type}', ${parentId})">Trả lời</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Inline Reply Box placeholder -->
+                    <div id="reply-box-${postId}-${parentId}" class="reply-box-container" style="display:none; margin-top: 6px;"></div>
+                    
+                    ${repliesHtml}
+                </div>
+            </div>
+        `;
+    });
+    
+    return html;
+}
+
+function showReplyBox(postId, type, parentId) {
+    document.querySelectorAll(`.reply-box-container[id^="reply-box-${postId}-"]`).forEach(el => {
+        el.style.display = 'none';
+        el.innerHTML = '';
+    });
+    
+    const box = document.getElementById(`reply-box-${postId}-${parentId}`);
+    if (!box) return;
+    
+    box.style.display = 'block';
+    box.innerHTML = `
+        <div class="comment-compose" style="padding: 0; background: transparent; border: none; margin-top: 8px;">
+            <div class="comment-input-wrap" style="background: rgba(255,255,255,0.03);">
+                <input type="text" class="comment-input" id="ci-reply-${postId}-${parentId}" placeholder="Viết phản hồi..." onkeydown="if(event.key==='Enter')submitComment(${postId}, '${type}', ${parentId})">
+                <button class="comment-send" onclick="submitComment(${postId}, '${type}', ${parentId})">➤</button>
+            </div>
+        </div>
+    `;
+    setTimeout(() => document.getElementById(`ci-reply-${postId}-${parentId}`).focus(), 50);
+}
+
 async function loadComments(id, type, options = {}) {
     const list = document.getElementById('clist-' + id);
     if (!options.background) {
@@ -400,30 +470,24 @@ async function loadComments(id, type, options = {}) {
         return;
     }
     setDisplayedCommentCount(id, countCommentsTree(data.comments));
-    list.innerHTML = data.comments.map(c => `
-        <div class="comment-item" id="cmt-${c.id}">
-            <div class="comment-avatar">
-                ${c.avatar
-                    ? `<img src="../assets/images/avatars/${c.avatar}" class="avatar-xs" alt="">`
-                    : `<div class="avatar-placeholder-xs">${c.ten.charAt(0)}</div>`}
-            </div>
-            <div class="comment-bubble">
-                <a href="profile.php?id=${c.user_id}" class="comment-name">${escHtml(c.ten)}</a>
-                <span class="comment-text">${escHtml(c.noi_dung)}</span>
-                <div class="comment-meta">${c.time_ago}</div>
-            </div>
-        </div>
-    `).join('');
+    list.innerHTML = renderCommentTree(data.comments, id, type);
 }
-async function submitComment(id, type) {
-    const inp = document.getElementById('ci-' + id);
+
+async function submitComment(id, type, parentId = null) {
+    const inpId = parentId ? `ci-reply-${id}-${parentId}` : `ci-${id}`;
+    const inp = document.getElementById(inpId);
+    if (!inp) return;
     const text = inp.value.trim();
     if (!text) return;
     inp.value = '';
+    
+    const payload = { target_type: type, target_id: id, noi_dung: text };
+    if (parentId) payload.parent_id = parentId;
+    
     const res = await fetch('comment_api.php', {
         method: 'POST',
         headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({target_type: type, target_id: id, noi_dung: text})
+        body: JSON.stringify(payload)
     });
     const data = await res.json();
     if (data.ok) {
@@ -980,5 +1044,18 @@ document.getElementById('chatMobileTrigger')?.addEventListener('click', () => {
 <script src="../assets/js/search.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="../assets/js/login-modal.js"></script>
+<script>
+// User dropdown toggle
+const userMenuBtn = document.getElementById('userMenuBtn');
+const userDropdown = document.getElementById('userDropdown');
+if (userMenuBtn && userDropdown) {
+    userMenuBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        userDropdown.classList.toggle('open');
+    });
+    document.addEventListener('click', () => userDropdown.classList.remove('open'));
+}
+</script>
+
 </body>
 </html>
