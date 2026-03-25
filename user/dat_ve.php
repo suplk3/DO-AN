@@ -259,7 +259,23 @@ if ($info && table_exists($conn, 'notifications')) {
     mysqli_stmt_bind_param($stmt, "isss", $user_id, $title, $body, $link);
     mysqli_stmt_execute($stmt);
     mysqli_stmt_close($stmt);
+
+    // Notify Admins
+    $admin_q = mysqli_query($conn, "SELECT id FROM users WHERE vai_tro='admin'");
+    if ($admin_q) {
+        $admin_title = "Có người đặt vé mới";
+        $admin_body = "User ID: $user_id vừa đặt vé phim " . ($info['ten_phim'] ?? '') . " (" . $seat_count . " ghế)";
+        $admin_link = "../admin/movies.php"; // Or dashboard
+        $a_stmt = mysqli_prepare($conn, "INSERT INTO notifications (user_id, type, title, body, link) VALUES (?, 'ticket_booked', ?, ?, ?)");
+        while ($adm = mysqli_fetch_assoc($admin_q)) {
+            $aid = (int)$adm['id'];
+            mysqli_stmt_bind_param($a_stmt, "isss", $aid, $admin_title, $admin_body, $admin_link);
+            mysqli_stmt_execute($a_stmt);
+        }
+        if ($a_stmt) mysqli_stmt_close($a_stmt);
+    }
 }
+
 
 $movie_name = $info['ten_phim'] ?? 'N/A';
 $poster_path = (!empty($info['poster'])) ? "../assets/images/" . htmlspecialchars($info['poster']) : "https://via.placeholder.com/560x315.png?text=Movie+Poster";

@@ -305,21 +305,7 @@ function fmt_date($d) {
 <script src="../assets/js/search.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 <script src="../assets/js/login-modal.js"></script>
-<script>
-// Theme toggle
-(function(){
-  var body = document.body;
-  var btn = document.getElementById('themeToggle');
-  var stored = localStorage.getItem('theme') || 'dark';
-  body.setAttribute('data-theme', stored);
-  if (!btn) return;
-  btn.addEventListener('click', function(){
-    var cur = body.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
-    body.setAttribute('data-theme', cur);
-    localStorage.setItem('theme', cur);
-  });
-})();
-</script>
+
 
 <script>
 // User dropdown toggle
