@@ -367,7 +367,7 @@ if ($action === 'send') {
         $note = $has_booked ? " (đã từng đặt vé)" : "";
         $title = "Tin nhắn mới từ $u_name";
         $body = "Thành viên này$note vừa nhắn tin cho bạn ở khung chat hỗ trợ.";
-        $link = "chat.php?user_id=" . $chatUserId;
+        $link = "../admin/quan_ly_chat.php?user_id=" . $chatUserId;
         
         $admin_q = $conn->query("SELECT id FROM users WHERE vai_tro='admin'");
         if ($admin_q) {

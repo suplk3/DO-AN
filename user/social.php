@@ -351,7 +351,39 @@ async function doReact(id, type, loai) {
             btn.classList.add('reacted');
         }
     }
-    if (stat) stat.textContent = data.total > 0 ? '👍 ' + data.total : '';
+    if (stat) stat.textContent = data.total > 0 ? '👍❤️ ' + data.total : '';
+}
+
+async function loadReactionBreakdown(id, type) {
+    const tooltip = document.getElementById('react-tooltip-' + id);
+    if (!tooltip) return;
+    tooltip.innerHTML = '<div style="color:#94a3b8; font-size:12px; padding:4px 8px;">Đang tải...</div>';
+    
+    try {
+        const res = await fetch(`reaction_api.php?action=breakdown&target_type=${type}&target_id=${id}`);
+        const data = await res.json();
+        if (data.success) {
+            if (data.total === 0) {
+                tooltip.innerHTML = '<div style="color:#64748b; font-size:12px; padding:4px 8px;">Chưa có cảm xúc nào</div>';
+                return;
+            }
+            let html = '';
+            for (const [loai, count] of Object.entries(data.breakdown)) {
+                let emoji = REACTIONS[loai] || '👍';
+                const names = {like:'Thích', love:'Yêu thích', haha:'Haha', wow:'Woa', sad:'Buồn', angry:'Phẫn nộ'};
+                const vnName = names[loai] || loai;
+                html += `
+                <div class="react-detail-row">
+                    <span>${emoji}</span>
+                    <span style="text-transform: capitalize; padding-left:8px;">${vnName}</span>
+                    <span class="react-detail-count">${count}</span>
+                </div>`;
+            }
+            tooltip.innerHTML = html;
+        }
+    } catch(e) {
+        tooltip.innerHTML = '<div style="color:#ef4444; font-size:12px; padding:4px 8px;">Lỗi tải</div>';
+    }
 }
 
 // ── Comments ──

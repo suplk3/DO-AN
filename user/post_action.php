@@ -40,11 +40,11 @@ if ($action === 'create' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         $body = $actor_name . " vừa đăng một bài viết mới.";
         $link = "social.php#post_" . $post_id;
         
-        $f_q = mysqli_query($conn, "SELECT follower_id FROM follows WHERE following_id=$me");
+        $f_q = mysqli_query($conn, "SELECT id FROM users WHERE id != $me");
         if ($f_q) {
             $n_stmt = mysqli_prepare($conn, "INSERT INTO notifications (user_id, actor_id, type, target_id, title, body, link) VALUES (?, ?, 'new_post', ?, ?, ?, ?)");
             while($f = mysqli_fetch_assoc($f_q)) {
-                $fid = (int)$f['follower_id'];
+                $fid = (int)$f['id'];
                 mysqli_stmt_bind_param($n_stmt, 'iiisss', $fid, $me, $post_id, $title, $body, $link);
                 mysqli_stmt_execute($n_stmt);
             }

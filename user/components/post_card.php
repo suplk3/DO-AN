@@ -68,13 +68,16 @@ if (!function_exists('time_ago_post_card')) {
 
   <!-- Stats -->
   <div class="post-stats">
-    <?php if (($post['tong_reaction'] ?? 0) > 0): ?>
-    <span class="post-stat-reactions" id="stat-react-<?= $post['id'] ?>">
-      👍❤️ <?= $post['tong_reaction'] ?>
-    </span>
-    <?php else: ?>
-    <span class="post-stat-reactions" id="stat-react-<?= $post['id'] ?>"></span>
-    <?php endif; ?>
+    <div class="react-summary" id="react-summary-<?= $post['id'] ?>" onmouseenter="loadReactionBreakdown(<?= $post['id'] ?>, 'post')">
+      <span class="post-stat-reactions" id="stat-react-<?= $post['id'] ?>">
+        <?php if (($post['tong_reaction'] ?? 0) > 0): ?>
+          👍❤️ <?= $post['tong_reaction'] ?>
+        <?php endif; ?>
+      </span>
+      <div class="react-detail-tooltip" id="react-tooltip-<?= $post['id'] ?>">
+        <div style="color:#94a3b8; font-size:12px; padding:4px 8px;">Đang tải...</div>
+      </div>
+    </div>
     <span class="post-stat-comments" id="stat-cmt-<?= $post['id'] ?>"
           onclick="toggleComments(<?= $post['id'] ?>)" style="cursor:pointer;">
       <?= $post['tong_comment'] ?? 0 ?> bình luận
