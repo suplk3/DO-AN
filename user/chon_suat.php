@@ -91,37 +91,11 @@ $q_suat = mysqli_query($conn, $sql_suat);
   .showtime-grid { grid-template-columns: 1fr; gap: 12px; }
 }
 </style>
+<link rel="stylesheet" href="../assets/css/mobile-premium.css?v=<?php echo time(); ?>">
 </head>
 <body class="user-index">
 
-<header class="header">
-  <div class="header-inner">
-    <a href="index.php" class="logo">TTVH</a>
-    <nav class="header-nav">
-      <div class="header-nav-left">
-        <a href="index.php" class="nav-link"><span class="icon">🎬</span><span class="text">PHIM</span></a>
-        <a href="sap_chieu.php" class="nav-link"><span class="icon">🗓️</span><span class="text">SẮP CHIẾU</span></a>
-      </div>
-      <div class="search-wrap" id="searchWrap">
-        <input type="text" id="searchInput" class="search-bar" placeholder="Tìm phim..." autocomplete="off">
-        <span class="search-icon">🔍</span>
-        <span class="search-spinner"></span>
-        <div class="search-dropdown" id="searchDropdown"></div>
-      </div>
-      <div class="header-nav-right">
-        <?php if (isset($_SESSION['user_id'])):
-          $is_admin = ($_SESSION['vai_tro'] ?? '') === 'admin'; ?>
-          <span class="hello"><span class="icon">👋</span><span class="text">Xin chào, <?= htmlspecialchars($_SESSION['ten_nguoi_dung'] ?? $_SESSION['ten'] ?? 'bạn') ?></span></span>
-          <a href="../user/ve_cua_toi.php" class="btn btn-sm"><span class="icon">🎟️</span><span class="text">VÉ CỦA TÔI</span></a>
-          <a href="../auth/logout.php" class="btn btn-sm btn-outline" onclick="return confirm('Đăng xuất?')"><span class="icon">🚪</span><span class="text">ĐĂNG XUẤT</span></a>
-        <?php else: ?>
-          <a href="../auth/login.php" class="btn btn-sm open-login-modal"><span class="icon">🔐</span><span class="text">ĐĂNG NHẬP</span></a>
-        <?php endif; ?>
-      </div>
-    </nav>
-  </div>
-</header>
-
+<?php $active_page = ''; include 'components/header.php'; ?>
 <main class="container">
   <a href="chi_tiet_phim.php?id=<?= $phim_id ?>" style="display:inline-flex;align-items:center;gap:6px;color:#64748b;text-decoration:none;font-size:13px;font-weight:600;margin-bottom:20px;">← Quay lại chi tiết phim</a>
 

@@ -23,6 +23,17 @@ while ($r = mysqli_fetch_assoc($suat_result)) $suats[] = $r;
 function fmt_date($d){ return $d ? date('d/m/Y', strtotime($d)) : ''; }
 function fmt_time($t){ return $t ? date('H:i', strtotime($t)) : ''; }
 function fmt_money($n){ return $n !== null ? number_format($n,0,',','.') . '₫' : '—'; }
+function fmt_rating_value($n){
+    $n = (float)$n;
+    if ($n <= 0) return '0';
+    $rounded = round($n * 2) / 2;
+    if (abs($rounded - round($rounded)) < 0.001) return number_format($rounded, 0, '.', '');
+    return number_format($rounded, 1, '.', '');
+}
+function rating_fill_percent($current, $starIndex){
+    $fill = max(0, min(1, (float)$current - ((int)$starIndex - 1)));
+    return (int)round($fill * 100);
+}
 
 // ── Social: reactions + comments cho phim ──
 $me_id = (int)($_SESSION['user_id'] ?? 0);
@@ -50,7 +61,32 @@ if ($tc) $tong_cmt = (int)$tc['c'];
 // ── Rating (1-5) ──
 $rating_avg = 0;
 $rating_total = 0;
-$my_rating = 0;
+$my_rating = 0.0;
+$can_rate_movie = false;
+$rating_permission_message = 'Đăng nhập để chấm điểm và lưu đánh giá của bạn.';
+$is_rating_admin = (($_SESSION['vai_tro'] ?? '') === 'admin');
+$has_ticket_for_rating = false;
+
+if ($me_id) {
+    if ($is_rating_admin) {
+        $can_rate_movie = true;
+        $rating_permission_message = 'Admin có thể đánh giá mà không cần mua vé.';
+    } else {
+        $ticket_check = mysqli_fetch_assoc(mysqli_query($conn,
+            "SELECT 1 AS ok
+             FROM ve v
+             INNER JOIN suat_chieu sc ON sc.id = v.suat_chieu_id
+             WHERE v.user_id = $me_id AND sc.phim_id = $id
+             LIMIT 1"
+        ));
+        $has_ticket_for_rating = (bool)$ticket_check;
+        $can_rate_movie = $has_ticket_for_rating;
+        $rating_permission_message = $can_rate_movie
+            ? 'Bạn đã mua vé cho phim này và có thể đánh giá.'
+            : 'Bạn cần mua vé phim này trước khi đánh giá.';
+    }
+}
+
 if (table_exists($conn, 'ratings')) {
     $rating_row = mysqli_fetch_assoc(mysqli_query($conn,
         "SELECT AVG(rating) AS avg_rating, COUNT(*) AS total FROM ratings WHERE phim_id=$id"
@@ -63,7 +99,7 @@ if (table_exists($conn, 'ratings')) {
         $mr = mysqli_fetch_assoc(mysqli_query($conn,
             "SELECT rating FROM ratings WHERE user_id=$me_id AND phim_id=$id LIMIT 1"
         ));
-        if ($mr) $my_rating = (int)$mr['rating'];
+        if ($mr) $my_rating = (float)$mr['rating'];
     }
 }
 
@@ -93,76 +129,12 @@ if ($me_id) {
 <link rel="stylesheet" href="../assets/css/social.css">
 <link rel="stylesheet" href="../assets/css/theme-toggle.css">
 
+<link rel="stylesheet" href="../assets/css/mobile-premium.css?v=<?php echo time(); ?>">
 </head>
 <body class="movie-detail-page">
 
 <!-- ── Header ── -->
-<header class="header">
-  <div class="header-inner">
-    <a href="index.php" class="logo">TTVH</a>
-    <nav class="header-nav">
-      <div class="header-nav-left">
-        <a href="index.php" class="nav-link"><span class="icon">🎬</span><span class="text">PHIM</span></a>
-        <a href="sap_chieu.php" class="nav-link"><span class="icon">🗓️</span><span class="text">SẮP CHIẾU</span></a>
-        <?php if (isset($_SESSION['user_id'])): ?>
-        <a href="social.php" class="nav-link"><span class="icon">👥</span><span class="text">CỘNG ĐỒNG</span></a>
-        <?php endif; ?>
-      </div>
-      <div class="search-wrap" id="searchWrap">
-        <input type="text" id="searchInput" class="search-bar" placeholder="Tìm phim..." autocomplete="off">
-        <span class="search-icon">🔍</span><span class="search-spinner"></span>
-        <div class="search-dropdown" id="searchDropdown"></div>
-      </div>
-      <div class="header-nav-right">
-        <button class="theme-toggle-btn" id="themeToggle">🌓 Giao diện</button>
-        <?php if (isset($_SESSION['user_id'])):
-          $is_admin = (isset($_SESSION['vai_tro']) && $_SESSION['vai_tro'] === 'admin');
-          $ten = htmlspecialchars($_SESSION['ten_nguoi_dung'] ?? ($_SESSION['ten'] ?? 'Tôi'));
-          $av  = mysqli_fetch_assoc(mysqli_query($conn,"SELECT avatar FROM users WHERE id=".(int)$_SESSION['user_id']));
-          $avatar = $av['avatar'] ?? null;
-        ?>
-        <a href="notifications.php" class="notif-link">🔔
-          <?php if ($notif_unread > 0): ?><span class="notif-badge"><?= $notif_unread ?></span><?php endif; ?>
-        </a>
-        <div class="user-menu-wrap">
-          <button class="user-menu-btn" id="userMenuBtn">
-            <?php if ($avatar): ?>
-              <img src="../assets/images/avatars/<?= htmlspecialchars($avatar) ?>" class="user-menu-avatar" alt="">
-            <?php else: ?>
-              <div class="user-menu-initial"><?= mb_substr($_SESSION['ten_nguoi_dung'] ?? ($_SESSION['ten'] ?? 'U'),0,1) ?></div>
-            <?php endif; ?>
-            <span class="user-menu-name"><?= $ten ?></span>
-            <span class="user-menu-arrow">▾</span>
-          </button>
-          <div class="user-dropdown" id="userDropdown">
-            <div class="user-dropdown-header">
-              <span><?= $ten ?></span>
-              <?php if ($is_admin): ?><span class="user-badge-admin">Admin</span><?php endif; ?>
-            </div>
-            <a href="profile.php?id=<?= (int)$_SESSION['user_id'] ?>" class="user-dropdown-item">👤 Trang cá nhân</a>
-            <a href="../user/ve_cua_toi.php" class="user-dropdown-item">🎟️ Vé của tôi</a>
-            <?php if ($is_admin): ?>
-            <div class="user-dropdown-divider"></div>
-            <a href="../admin/dashboard.php" class="user-dropdown-item">📊 Dashboard</a>
-            <a href="../admin/phim.php" class="user-dropdown-item">🎬 Quản lý phim</a>
-            <a href="../admin/suat_chieu.php" class="user-dropdown-item">🗓️ Quản lý suất chiếu</a>
-            <a href="../admin/quan_ly_user.php" class="user-dropdown-item">👥 Quản lý user</a>
-            <?php endif; ?>
-            <div class="user-dropdown-divider"></div>
-            <a href="../auth/logout.php" class="user-dropdown-item danger"
-               onclick="return confirm('Đăng xuất?')">🚪 Đăng xuất</a>
-          </div>
-        </div>
-        <?php else: ?>
-          <a href="../auth/login.php" class="btn btn-sm open-login-modal">
-            <span class="icon">🔐</span><span class="text">ĐĂNG NHẬP</span>
-          </a>
-        <?php endif; ?>
-      </div>
-    </nav>
-  </div>
-</header>
-
+<?php $active_page = ''; include 'components/header.php'; ?>
 <!-- ── Main ── -->
 <main class="md-container">
   <a class="back" href="index.php">← Quay lại trang chủ</a>
@@ -255,16 +227,62 @@ if ($me_id) {
       </div>
 
       <div class="rating-block">
-        <div class="rating-stars" id="ratingStars" data-current="<?= (int)$my_rating ?>">
-          <?php for ($i=1; $i<=5; $i++): ?>
-            <button class="star <?= $i <= $my_rating ? 'active' : '' ?>" data-value="<?= $i ?>">★</button>
-          <?php endfor; ?>
+        <div class="rating-overview">
+          <div class="rating-overview-badge">
+            <span class="rating-overview-icon">★</span>
+            <div class="rating-overview-copy">
+              <div class="rating-overview-value" id="avgRating"><?= $rating_total > 0 ? fmt_rating_value($rating_avg) : 'Chưa có' ?></div>
+              <div class="rating-overview-label">Điểm cộng đồng</div>
+            </div>
+          </div>
+          <div class="rating-overview-meta">
+            <strong id="ratingCount"><?= $rating_total ?></strong>
+            <span>lượt đánh giá</span>
+          </div>
         </div>
-        <div class="rating-summary">
-          Điểm trung bình: <strong id="avgRating"><?= $rating_total > 0 ? $rating_avg : 'Chưa có' ?></strong>
-          ( <span id="ratingCount"><?= $rating_total ?></span> đánh giá )
+
+        <div class="rating-action-card">
+          <div class="rating-action-head">
+            <div>
+              <div class="rating-action-title">Bạn thấy phim này thế nào?</div>
+              <div class="rating-action-subtitle" id="ratingHelper">
+                <?php if ($me_id): ?>
+                  <?= htmlspecialchars($rating_permission_message) ?>
+                <?php else: ?>
+                  Đăng nhập để chấm điểm và lưu đánh giá của bạn.
+                <?php endif; ?>
+              </div>
+            </div>
+            <div class="rating-user-note" id="myRatingText">
+              <?= $my_rating > 0 ? ('Bạn đã chấm ' . fmt_rating_value($my_rating) . '/5 sao') : 'Bạn chưa chấm phim này' ?>
+            </div>
+          </div>
+
+          <div class="rating-stars <?= (!$me_id || !$can_rate_movie) ? 'is-disabled' : '' ?>" id="ratingStars" data-current="<?= number_format((float)$my_rating, 1, '.', '') ?>" data-film-id="<?= (int)$id ?>" data-can-rate="<?= ($me_id && $can_rate_movie) ? '1' : '0' ?>">
+            <?php for ($i=1; $i<=5; $i++): ?>
+              <button
+                type="button"
+                class="rating-star <?= rating_fill_percent($my_rating, $i) > 0 ? 'active' : '' ?>"
+                data-value="<?= $i ?>"
+                aria-label="Chấm <?= $i ?> sao"
+                aria-pressed="<?= rating_fill_percent($my_rating, $i) > 0 ? 'true' : 'false' ?>"
+                style="--fill-percent: <?= rating_fill_percent($my_rating, $i) ?>%;"
+              ><span class="rating-star-icon">★</span></button>
+            <?php endfor; ?>
+          </div>
+
+          <div class="rating-scale-note">
+            Bấm nửa trái để chấm <strong>x.5</strong>, bấm nửa phải để chấm <strong>x.0</strong>.
+          </div>
+
           <?php if (!$me_id): ?>
-            — <a href="../auth/login.php" style="color:#a78bfa;font-weight:700;">Đăng nhập</a> để chấm điểm
+          <div class="rating-login-hint">
+            <a href="../auth/login.php">Đăng nhập</a> để chấm điểm và đồng bộ đánh giá của bạn.
+          </div>
+          <?php elseif (!$can_rate_movie): ?>
+          <div class="rating-login-hint">
+            Chỉ user đã mua vé phim này mới được đánh giá.
+          </div>
           <?php endif; ?>
         </div>
       </div>
@@ -983,47 +1001,168 @@ function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(
 (function(){
   var starsWrap = document.getElementById('ratingStars');
   if (!starsWrap) return;
-  var stars = starsWrap.querySelectorAll('.star');
-  var current = parseInt(starsWrap.dataset.current || '0');
+  var stars = Array.prototype.slice.call(starsWrap.querySelectorAll('.rating-star'));
+  var current = normalizeRating(parseFloat(starsWrap.dataset.current || '0'));
+  var filmId = parseInt(starsWrap.dataset.filmId || '0');
+  var canRate = starsWrap.dataset.canRate === '1';
   var avgEl = document.getElementById('avgRating');
   var countEl = document.getElementById('ratingCount');
+  var helperEl = document.getElementById('ratingHelper');
+  var myRatingEl = document.getElementById('myRatingText');
   var isLogged = <?= $me_id ? 'true' : 'false' ?>;
+  var isSaving = false;
+  var permissionMessage = helperEl ? helperEl.textContent.trim() : '';
+
+  function normalizeRating(value) {
+    var num = parseFloat(value || '0');
+    if (!Number.isFinite(num)) return 0;
+    num = Math.max(0, Math.min(5, num));
+    return Math.round(num * 2) / 2;
+  }
+
+  function formatRatingValue(value) {
+    var num = normalizeRating(value);
+    if (num <= 0) return '0';
+    return Number.isInteger(num) ? String(num) : num.toFixed(1);
+  }
+
+  function formatAvg(avg, total) {
+    if (!total || !avg) return 'Chưa có';
+    return Number(avg).toFixed(1);
+  }
+
+  function setHelper(message) {
+    if (helperEl) helperEl.textContent = message;
+  }
+
+  function getRestingHelperMessage() {
+    if (!isLogged) return 'Đăng nhập để chấm điểm và lưu đánh giá của bạn.';
+    if (!canRate) return permissionMessage || 'Bạn cần mua vé phim này trước khi đánh giá.';
+    if (current > 0) return 'Bấm nửa trái hoặc phải để đổi đánh giá của bạn.';
+    return 'Bấm nửa trái hoặc phải của ngôi sao để chấm 0.5 sao.';
+  }
+
+  function setMyRatingText(val) {
+    if (!myRatingEl) return;
+    myRatingEl.textContent = val > 0
+      ? ('Bạn đã chấm ' + formatRatingValue(val) + '/5 sao')
+      : 'Bạn chưa chấm phim này';
+  }
+
+  function setSummary(avg, total) {
+    if (avgEl) avgEl.textContent = formatAvg(Number(avg || 0), Number(total || 0));
+    if (countEl) countEl.textContent = Number(total || 0);
+  }
+
+  function setSavingState(saving) {
+    isSaving = saving;
+    starsWrap.classList.toggle('is-loading', saving);
+  }
+
+  function setCanRate(value) {
+    canRate = !!value;
+    starsWrap.dataset.canRate = canRate ? '1' : '0';
+    starsWrap.classList.toggle('is-disabled', !canRate);
+  }
 
   function render(val) {
+    var normalized = normalizeRating(val);
     stars.forEach(function(s){
       var v = parseInt(s.dataset.value || '0');
-      if (v <= val) s.classList.add('active');
-      else s.classList.remove('active');
+      var fill = Math.max(0, Math.min(1, normalized - (v - 1)));
+      var fillPercent = Math.round(fill * 100);
+      s.classList.toggle('active', fillPercent > 0);
+      s.style.setProperty('--fill-percent', fillPercent + '%');
+      s.setAttribute('aria-pressed', fillPercent > 0 ? 'true' : 'false');
     });
   }
+
+  function getValueFromPointer(star, event) {
+    var starValue = parseInt(star.dataset.value || '0');
+    if (!starValue) return 0;
+    var rect = star.getBoundingClientRect();
+    var offset = event.clientX - rect.left;
+    var value = offset <= rect.width / 2 ? starValue - 0.5 : starValue;
+    return normalizeRating(value);
+  }
+
   render(current);
+  setMyRatingText(current);
+  setHelper(getRestingHelperMessage());
+
+  async function syncRatingSummary() {
+    if (!filmId) return;
+    try {
+      const res = await fetch('rating_api.php?phim_id=' + filmId);
+      const data = await res.json();
+      if (!data.ok) return;
+      current = normalizeRating(parseFloat(data.my || 0));
+      permissionMessage = typeof data.permission_message === 'string' ? data.permission_message : permissionMessage;
+      setCanRate(!!data.can_rate);
+      starsWrap.dataset.current = current.toFixed(1);
+      render(current);
+      setSummary(data.avg, data.total);
+      setMyRatingText(current);
+      setHelper(getRestingHelperMessage());
+    } catch (err) {
+      console.error('Rating sync failed', err);
+    }
+  }
+
+  syncRatingSummary();
 
   stars.forEach(function(s){
-    s.addEventListener('mouseenter', function(){
-      render(parseInt(s.dataset.value || '0'));
+    s.addEventListener('mousemove', function(event){
+      if (isSaving || !canRate) return;
+      var preview = getValueFromPointer(s, event);
+      render(preview);
+      if (isLogged) setHelper('Chấm ' + formatRatingValue(preview) + '/5 sao');
     });
     s.addEventListener('mouseleave', function(){
+      if (isSaving || !canRate) return;
       render(current);
+      setHelper(getRestingHelperMessage());
     });
-    s.addEventListener('click', async function(){
-      var val = parseInt(s.dataset.value || '0');
+    s.addEventListener('click', async function(e){
+      e.preventDefault();
+      if (isSaving) return;
+      var val = getValueFromPointer(s, e);
       if (!isLogged) {
         alert('Bạn cần đăng nhập để đánh giá.');
         return;
       }
-      const res = await fetch('rating_api.php', {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({phim_id: <?= (int)$id ?>, rating: val})
-      });
-      const data = await res.json();
-      if (data.ok) {
-        current = data.my || val;
+      if (!canRate) {
+        alert('Bạn cần mua vé phim này trước khi đánh giá.');
+        return;
+      }
+      try {
+        setSavingState(true);
+        setHelper('Đang lưu đánh giá của bạn...');
+        const res = await fetch('rating_api.php', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({phim_id: <?= (int)$id ?>, rating: val})
+        });
+        const data = await res.json();
+        if (data.ok) {
+          current = normalizeRating(parseFloat(data.my || val));
+          setCanRate(true);
+          starsWrap.dataset.current = current.toFixed(1);
+          render(current);
+          setSummary(data.avg, data.total);
+          setMyRatingText(current);
+          setHelper('Đã ghi nhận ' + formatRatingValue(current) + '/5 sao của bạn.');
+        } else {
+          permissionMessage = data.message || permissionMessage;
+          setHelper(data.message || 'Không thể lưu đánh giá lúc này.');
+          alert(data.message || 'Không thể đánh giá.');
+        }
+      } catch (err) {
+        setHelper('Có lỗi xảy ra khi gửi đánh giá.');
+        alert('Có lỗi khi gửi đánh giá. Vui lòng thử lại.');
+      } finally {
+        setSavingState(false);
         render(current);
-        if (avgEl) avgEl.textContent = data.avg > 0 ? data.avg : 'Chưa có';
-        if (countEl) countEl.textContent = data.total || 0;
-      } else {
-        alert(data.message || 'Không thể đánh giá.');
       }
     });
   });

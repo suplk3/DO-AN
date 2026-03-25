@@ -141,6 +141,7 @@ $qr_code_url = "https://chart.googleapis.com/chart?chs=250x250&cht=qr&chl=" . ur
             );
         }
     </style>
+<link rel="stylesheet" href="../assets/css/mobile-premium.css?v=<?php echo time(); ?>">
 </head>
 <body onload="window.print()">
     <div class="ticket-container">
