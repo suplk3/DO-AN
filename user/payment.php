@@ -53,6 +53,7 @@ if (table_exists($conn, 'combos')) {
 <link rel="stylesheet" href="../assets/css/style.css">
 <link rel="stylesheet" href="../assets/css/user-index.css">
 <link rel="stylesheet" href="../assets/css/theme-toggle.css">
+<link rel="stylesheet" href="../assets/css/user-menu.css">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap');
 
@@ -725,6 +726,20 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     const timer = setInterval(updateTimer, 1000);
     updateTimer();
+
+    const userMenuBtn = document.getElementById('userMenuBtn');
+    const userDropdown = document.getElementById('userDropdown');
+    if (userMenuBtn && userDropdown) {
+        userMenuBtn.addEventListener('click', e => {
+            e.stopPropagation();
+            userDropdown.classList.toggle('show');
+        });
+        document.addEventListener('click', e => {
+            if (!userMenuBtn.contains(e.target) && !userDropdown.contains(e.target)) {
+                userDropdown.classList.remove('show');
+            }
+        });
+    }
 
     const paymentDetailsContainer = document.getElementById('payment-details');
     const qrPayment = document.getElementById('qr-payment');
