@@ -291,8 +291,67 @@ function time_ago($datetime) {
 
 const REACTIONS = <?= json_encode($REACTIONS) ?>;
 
+let IS_BANNED = <?= !empty($me_info['is_banned']) ? 'true' : 'false' ?>;
+
+function checkBanned(e) {
+    if (IS_BANNED) {
+        if (e && typeof e.preventDefault === 'function') { e.preventDefault(); e.stopPropagation(); }
+        showBannedWidget();
+        return true;
+    }
+    return false;
+}
+
+function showBannedWidget() {
+    let w = document.getElementById('banned-widget');
+    if (!w) {
+        w = document.createElement('div');
+        w.id = 'banned-widget';
+        w.style.cssText = 'position:fixed; bottom:20px; right:20px; background:linear-gradient(135deg, #ef4444, #b91c1c); color:#fff; padding:15px 20px; border-radius:10px; font-weight:bold; box-shadow:0 10px 25px rgba(239,68,68,0.5); z-index:9999; animation:slideIn 0.3s forwards; pointer-events:none; font-family:"Be Vietnam Pro", sans-serif; font-size:14px;';
+        w.innerHTML = '🚫 Bạn hiện tại đang bị cấm tương tác!';
+        document.body.appendChild(w);
+        
+        if (!document.getElementById('widget-keyframes')) {
+            const style = document.createElement('style');
+            style.id = 'widget-keyframes';
+            style.innerHTML = '@keyframes slideIn { from { transform: translateX(120%); opacity:0; } to { transform: translateX(0); opacity:1; } } @keyframes slideOut { from { transform: translateX(0); opacity:1; } to { transform: translateX(120%); opacity:0; } }';
+            document.head.appendChild(style);
+        }
+    }
+    
+    w.style.animation = 'none';
+    w.offsetHeight; // force reflow
+    w.style.animation = 'slideIn 0.3s forwards';
+    
+    if (w.timeoutId) clearTimeout(w.timeoutId);
+    w.timeoutId = setTimeout(() => {
+        if (w) w.style.animation = 'slideOut 0.3s forwards';
+    }, 4000);
+}
+
+function showUnbannedWidget() {
+    let w = document.getElementById('unbanned-widget');
+    if (!w) {
+        w = document.createElement('div');
+        w.id = 'unbanned-widget';
+        w.style.cssText = 'position:fixed; bottom:20px; right:20px; background:linear-gradient(135deg, #10b981, #059669); color:#fff; padding:15px 20px; border-radius:10px; font-weight:bold; box-shadow:0 10px 25px rgba(16,185,129,0.5); z-index:9999; animation:slideIn 0.3s forwards; pointer-events:none; font-family:"Be Vietnam Pro", sans-serif; font-size:14px;';
+        w.innerHTML = '✅ Bạn đã được gỡ cấm. Mọi tính năng hoạt động lại bình thường!';
+        document.body.appendChild(w);
+    }
+    
+    w.style.animation = 'none';
+    w.offsetHeight; // force reflow
+    w.style.animation = 'slideIn 0.3s forwards';
+    
+    if (w.timeoutId) clearTimeout(w.timeoutId);
+    w.timeoutId = setTimeout(() => {
+        if (w) w.style.animation = 'slideOut 0.3s forwards';
+    }, 5000);
+}
+
 // ── Toggle compose box ──
-document.getElementById('composeToggle').addEventListener('click', () => {
+document.getElementById('composeToggle').addEventListener('click', (e) => {
+    if (checkBanned(e)) return;
     document.getElementById('composeForm').style.display = 'block';
     document.getElementById('composeToggle').style.display = 'none';
     document.querySelector('.compose-form textarea').focus();
@@ -329,10 +388,12 @@ function hideReactions(postId) {
     }, 300);
 }
 function quickReact(id, type, loai) {
+    if (checkBanned()) return;
     hideReactions(id);
     doReact(id, type, loai);
 }
 async function doReact(id, type, loai) {
+    if (checkBanned()) return;
     hideReactions(id);
     const res = await fetch('reaction_api.php', {
         method: 'POST',
@@ -480,12 +541,14 @@ function showReplyBox(postId, type, parentId) {
     box.innerHTML = `
         <div class="comment-compose" style="padding: 0; background: transparent; border: none; margin-top: 8px;">
             <div class="comment-input-wrap" style="background: rgba(255,255,255,0.03);">
-                <input type="text" class="comment-input" id="ci-reply-${postId}-${parentId}" placeholder="Viết phản hồi..." onkeydown="if(event.key==='Enter')submitComment(${postId}, '${type}', ${parentId})">
+                <input type="text" class="comment-input" id="ci-reply-${postId}-${parentId}" placeholder="Viết phản hồi..." onfocus="if(typeof checkBanned === 'function' && checkBanned(event)) this.blur();" onkeydown="if(event.key==='Enter')submitComment(${postId}, '${type}', ${parentId})">
                 <button class="comment-send" onclick="submitComment(${postId}, '${type}', ${parentId})">➤</button>
             </div>
         </div>
     `;
-    setTimeout(() => document.getElementById(`ci-reply-${postId}-${parentId}`).focus(), 50);
+    if (typeof checkBanned === 'function' && !IS_BANNED) {
+        setTimeout(() => document.getElementById(`ci-reply-${postId}-${parentId}`).focus(), 50);
+    }
 }
 
 async function loadComments(id, type, options = {}) {
@@ -506,6 +569,7 @@ async function loadComments(id, type, options = {}) {
 }
 
 async function submitComment(id, type, parentId = null) {
+    if (checkBanned()) return;
     const inpId = parentId ? `ci-reply-${id}-${parentId}` : `ci-${id}`;
     const inp = document.getElementById(inpId);
     if (!inp) return;
@@ -584,6 +648,15 @@ async function pollFeed() {
             const data = await res.json();
             const commentRefreshTasks = [];
 
+            if (typeof data.is_banned !== 'undefined') {
+                if (IS_BANNED && !data.is_banned) {
+                    showUnbannedWidget();
+                } else if (!IS_BANNED && data.is_banned) {
+                    showBannedWidget();
+                }
+                IS_BANNED = data.is_banned;
+            }
+
             if (data.updates) {
                 for (const [id, stats] of Object.entries(data.updates)) {
                     const reactEl = document.getElementById('stat-react-' + id);
@@ -601,6 +674,18 @@ async function pollFeed() {
                 }
             }
             if (commentRefreshTasks.length) await Promise.allSettled(commentRefreshTasks);
+
+            if (data.deleted_posts && data.deleted_posts.length > 0) {
+                data.deleted_posts.forEach(del_id => {
+                    const postEl = document.getElementById('post-' + del_id);
+                    if (postEl) {
+                        postEl.style.transition = "all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1)";
+                        postEl.style.opacity = "0";
+                        postEl.style.transform = "scale(0.9) translateY(20px)";
+                        setTimeout(() => postEl.remove(), 400);
+                    }
+                });
+            }
 
             if (data.new_posts_html) {
                 const feedContainer = document.querySelector('.social-feed');
