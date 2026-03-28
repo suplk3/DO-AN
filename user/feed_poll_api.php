@@ -25,6 +25,10 @@ $res = [
     'new_posts_html' => ''
 ];
 
+// 0. Cập nhật trạng thái Ban/Unban thời gian thực.
+$me_status = mysqli_fetch_assoc(mysqli_query($conn, "SELECT is_banned FROM users WHERE id=$me"));
+$res['is_banned'] = !empty($me_status['is_banned']);
+
 // 1. Cap nhat so like/comment cho cac bai dang dang hien co.
 if (!empty($ids)) {
     $ids_str = implode(',', $ids);
@@ -42,6 +46,10 @@ if (!empty($ids)) {
             ];
         }
     }
+    
+    // Tìm ra những bài viết không còn tồn tại trong DB (bị xóa)
+    $found_ids = array_keys($res['updates']);
+    $res['deleted_posts'] = array_values(array_diff($ids, $found_ids));
 }
 
 // 2. Lay bai moi hon bai gan nhat dang co tren DOM.

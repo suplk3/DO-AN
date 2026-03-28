@@ -36,7 +36,7 @@ if (!function_exists('time_ago_post_card')) {
         </div>
       </div>
     </a>
-    <?php if ($post['user_id'] == $me): ?>
+    <?php if ($post['user_id'] == $me || ($_SESSION['vai_tro'] ?? '') === 'admin'): ?>
     <div class="post-menu">
       <button class="post-menu-btn" onclick="toggleMenu(<?= $post['id'] ?>)">⋯</button>
       <div class="post-menu-dropdown" id="menu-<?= $post['id'] ?>" style="display:none">
@@ -119,6 +119,7 @@ if (!function_exists('time_ago_post_card')) {
       <div class="comment-input-wrap">
         <input type="text" class="comment-input" id="ci-<?= $post['id'] ?>"
                placeholder="Viết bình luận..." 
+               onfocus="if(typeof checkBanned === 'function' && checkBanned(event)) this.blur();"
                onkeydown="if(event.key==='Enter')submitComment(<?= $post['id'] ?>,'post')">
         <button class="comment-send" onclick="submitComment(<?= $post['id'] ?>,'post')">➤</button>
       </div>
