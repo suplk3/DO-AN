@@ -168,6 +168,10 @@ document.addEventListener('DOMContentLoaded', function() {
         <span class="m-icon">&#128276;<?php if (($notif_unread ?? 0) > 0): ?><em class="m-badge"></em><?php endif; ?></span>
         <span class="m-text">Thông báo</span>
     </a>
+    <a href="ve_cua_toi.php" class="mobile-nav-item <?= $active_page === 've_cua_toi' ? 'active' : '' ?>">
+        <span class="m-icon">&#127903;</span>
+        <span class="m-text">Vé</span>
+    </a>
     <a href="profile.php?id=<?= (int)$_SESSION['user_id'] ?>" class="mobile-nav-item <?= $active_page === 'profile' ? 'active' : '' ?>">
         <span class="m-icon">&#128100;</span>
         <span class="m-text">Tôi</span>

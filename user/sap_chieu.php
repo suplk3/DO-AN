@@ -205,6 +205,9 @@ function fmt_date($d) {
 
             <div class="card-body">
                 <h3 class="movie-title" title="<?= htmlspecialchars($row['ten_phim']) ?>">
+                    <span style="display:inline-block; padding:1px 5px; background:rgba(232, 25, 44, 0.85); color:#fff; border-radius:3px; font-size:10px; margin-right:6px; vertical-align:middle; font-weight:900; font-family:'Inter', sans-serif;">
+                        <?= htmlspecialchars($row['do_tuoi'] ?? 'P') ?>
+                    </span>
                     <?= htmlspecialchars($row['ten_phim']) ?>
                 </h3>
 

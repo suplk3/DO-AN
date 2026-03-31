@@ -591,8 +591,12 @@ $notShowingCount = max(0, $count - $showingCount);
                     data-genres="<?= htmlspecialchars(str_replace(',', '|', $row['the_loai'])) ?>"
                     data-title="<?= htmlspecialchars(strtolower($row['ten_phim'])) ?>"
                     data-showing="<?= $isShowing ? '1' : '0' ?>">
-                    <td><strong>#<?= $row['id'] ?></strong></td>
-                    <td class="movie-title"><?= htmlspecialchars($row['ten_phim']) ?></td>
+                    <td class="movie-title">
+                        <?= htmlspecialchars($row['ten_phim']) ?>
+                        <span style="display:inline-block; padding:2px 6px; background:rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.5); color:#fca5a5; border-radius:4px; font-size:10px; margin-left:6px; vertical-align:middle; font-weight:bold;">
+                            <?= htmlspecialchars($row['do_tuoi'] ?? 'P') ?>
+                        </span>
+                    </td>
                     <td>
                         <div class="genre-list">
                         <?php 

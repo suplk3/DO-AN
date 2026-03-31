@@ -31,6 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $noi_dung = trim($_POST['noi_dung'] ?? '');
     $trailer_url = trim($_POST['trailer_url'] ?? ($phim['trailer_url'] ?? ''));
     $ngay_khoi_chieu = !empty($_POST['ngay_khoi_chieu']) ? $_POST['ngay_khoi_chieu'] : null;
+    $do_tuoi = trim($_POST['do_tuoi'] ?? ($phim['do_tuoi'] ?? 'P'));
 
     if ($ten === '') {
         $errors[] = 'Tên phim là bắt buộc.';
@@ -90,13 +91,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($errors)) {
         if (column_exists($conn, 'phim', 'trailer_url')) {
-            $sql = "UPDATE phim SET ten_phim = ?, the_loai = ?, thoi_luong = ?, mo_ta = ?, poster = ?, banner = ?, trailer_url = ?, ngay_khoi_chieu = ? WHERE id = ?";
+            $sql = "UPDATE phim SET ten_phim = ?, the_loai = ?, thoi_luong = ?, mo_ta = ?, poster = ?, banner = ?, trailer_url = ?, ngay_khoi_chieu = ?, do_tuoi = ? WHERE id = ?";
             $stmt = mysqli_prepare($conn, $sql);
-            mysqli_stmt_bind_param($stmt, 'ssssssssi', $ten, $the_loai, $thoi_luong, $noi_dung, $poster, $banner, $trailer_url, $ngay_khoi_chieu, $id);
+            mysqli_stmt_bind_param($stmt, 'sssssssssi', $ten, $the_loai, $thoi_luong, $noi_dung, $poster, $banner, $trailer_url, $ngay_khoi_chieu, $do_tuoi, $id);
         } else {
-            $sql = "UPDATE phim SET ten_phim = ?, the_loai = ?, thoi_luong = ?, mo_ta = ?, poster = ?, banner = ?, ngay_khoi_chieu = ? WHERE id = ?";
+            $sql = "UPDATE phim SET ten_phim = ?, the_loai = ?, thoi_luong = ?, mo_ta = ?, poster = ?, banner = ?, ngay_khoi_chieu = ?, do_tuoi = ? WHERE id = ?";
             $stmt = mysqli_prepare($conn, $sql);
-            mysqli_stmt_bind_param($stmt, 'sssssssi', $ten, $the_loai, $thoi_luong, $noi_dung, $poster, $banner, $ngay_khoi_chieu, $id);
+            mysqli_stmt_bind_param($stmt, 'ssssssssi', $ten, $the_loai, $thoi_luong, $noi_dung, $poster, $banner, $ngay_khoi_chieu, $do_tuoi, $id);
         }
         $ok = mysqli_stmt_execute($stmt);
         mysqli_stmt_close($stmt);
@@ -165,6 +166,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="form-row">
             <label for="the_loai">Thể loại</label>
             <input id="the_loai" name="the_loai" type="text" value="<?= htmlspecialchars($phim['the_loai']) ?>" placeholder="Ví dụ: Hành động, Tình cảm">
+        </div>
+
+        <div class="form-row">
+            <label for="do_tuoi">Độ tuổi</label>
+            <select id="do_tuoi" name="do_tuoi">
+                <?php $curr_age = $phim['do_tuoi'] ?? 'P'; ?>
+                <option value="P" <?= $curr_age === 'P' ? 'selected' : '' ?>>P - Phổ biến mọi độ tuổi</option>
+                <option value="K" <?= $curr_age === 'K' ? 'selected' : '' ?>>K - Dưới 13 tuổi (Kèm người lớn)</option>
+                <option value="T13" <?= $curr_age === 'T13' ? 'selected' : '' ?>>T13 - Từ 13 tuổi trở lên</option>
+                <option value="T16" <?= $curr_age === 'T16' ? 'selected' : '' ?>>T16 - Từ 16 tuổi trở lên</option>
+                <option value="T18" <?= $curr_age === 'T18' ? 'selected' : '' ?>>T18 - Từ 18 tuổi trở lên</option>
+            </select>
         </div>
 
         <div class="form-row">

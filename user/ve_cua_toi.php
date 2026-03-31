@@ -49,6 +49,8 @@ $ves = mysqli_fetch_all($result, MYSQLI_ASSOC);
 <link rel="stylesheet" href="../assets/css/user-index.css">
 <link rel="stylesheet" href="../assets/css/login-modal.css">
 <link rel="stylesheet" href="../assets/css/search.css">
+<link rel="stylesheet" href="../assets/css/user-menu.css">
+<link rel="stylesheet" href="../assets/css/theme-toggle.css">
 <style>
 /* ── Ticket cards ── */
 .ticket-grid {
@@ -133,6 +135,29 @@ $ves = mysqli_fetch_all($result, MYSQLI_ASSOC);
 .btn-cancel { background: rgba(232,25,44,.1); border: 1px solid rgba(232,25,44,.2); color: #fca5a5; }
 .btn-cancel:hover { background: rgba(232,25,44,.2); }
 
+/* --- Light Theme Overrides --- */
+body[data-theme="light"] .ticket-card {
+  background: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 10px 25px rgba(0,0,0,.04);
+}
+body[data-theme="light"] .ticket-card:hover { border-color: #cbd5e1 !important; box-shadow: 0 16px 40px rgba(0,0,0,.08); }
+body[data-theme="light"] .ticket-header,
+body[data-theme="light"] .ticket-detail-row,
+body[data-theme="light"] .ticket-actions { border-color: #f1f5f9 !important; }
+body[data-theme="light"] .ticket-title { color: #0f172a !important; }
+body[data-theme="light"] .ticket-meta span, 
+body[data-theme="light"] .ticket-detail-row .label { color: #64748b !important; }
+body[data-theme="light"] .ticket-meta strong,
+body[data-theme="light"] .ticket-detail-row .val { color: #1e293b !important; }
+body[data-theme="light"] .ticket-price { color: #e8192c !important; }
+body[data-theme="light"] .btn-print { background: #f8fafc; border-color: #e2e8f0; color: #475569; }
+body[data-theme="light"] .btn-print:hover { background: #f1f5f9; color: #0f172a; }
+body[data-theme="light"] .btn-save { background: rgba(34,197,94,.1); border-color: rgba(34,197,94,.2); color: #15803d; }
+body[data-theme="light"] .btn-save:hover { background: rgba(34,197,94,.15); }
+body[data-theme="light"] .btn-cancel { background: rgba(232,25,44,.08); border-color: rgba(232,25,44,.15); color: #b91c1c; }
+body[data-theme="light"] .btn-cancel:hover { background: rgba(232,25,44,.12); }
+
 /* Toast message */
 .toast-msg {
   padding: 12px 16px; border-radius: 12px; margin-bottom: 20px;
@@ -197,7 +222,7 @@ $ves = mysqli_fetch_all($result, MYSQLI_ASSOC);
 </head>
 <body class="user-index">
 
-<?php $active_page = ''; include 'components/header.php'; ?>
+<?php $active_page = 've_cua_toi'; include 'components/header.php'; ?>
 <main class="container">
   <h1 class="page-title">🎫 Vé của tôi</h1>
 
@@ -326,5 +351,17 @@ function closePrintModal(){document.getElementById('printOverlay').classList.rem
 </script>
 <script src="../assets/js/search.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// User dropdown toggle
+const userMenuBtn = document.getElementById('userMenuBtn');
+const userDropdown = document.getElementById('userDropdown');
+if (userMenuBtn && userDropdown) {
+    userMenuBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        userDropdown.classList.toggle('open');
+    });
+    document.addEventListener('click', () => userDropdown.classList.remove('open'));
+}
+</script>
 </body>
 </html>

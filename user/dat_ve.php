@@ -318,6 +318,9 @@ if (!function_exists('fmt_m')) {
 <link rel="stylesheet" href="../assets/css/style.css">
 <link rel="stylesheet" href="../assets/css/user-index.css">
 <link rel="stylesheet" href="../assets/css/login-modal.css">
+<link rel="stylesheet" href="../assets/css/search.css">
+<link rel="stylesheet" href="../assets/css/user-menu.css">
+<link rel="stylesheet" href="../assets/css/theme-toggle.css">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -708,7 +711,6 @@ body.success-page{
         <img src="../assets/images/<?= htmlspecialchars($info['poster'] ?? '') ?>"
              alt="poster"
              onerror="this.src='../assets/images/avengers.jpg'">
-        <img class="qr-code" style="width:100px; height: 100px; margin-top:20px" src="<?= $qr_code_url ?>" alt="Ticket QR Code">
       </div>
 
       <!-- Info -->
@@ -817,6 +819,19 @@ body.success-page{
     setTimeout(() => el.remove(), 6000);
   }
 })();
+</script>
+<script src="../assets/js/search.js"></script>
+<script>
+// User dropdown toggle
+const userMenuBtn = document.getElementById('userMenuBtn');
+const userDropdown = document.getElementById('userDropdown');
+if (userMenuBtn && userDropdown) {
+    userMenuBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        userDropdown.classList.toggle('open');
+    });
+    document.addEventListener('click', () => userDropdown.classList.remove('open'));
+}
 </script>
 <script src="../assets/js/login-modal.js"></script>
 </body>

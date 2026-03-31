@@ -56,7 +56,12 @@ if (isset($_SESSION['user_id'])) {
                     <img src="../assets/images/<?= htmlspecialchars($banner['banner']) ?>" 
                          alt="<?= htmlspecialchars($banner['ten_phim']) ?>">
                     <div class="banner-overlay">
-                        <h2 class="banner-title"><?= htmlspecialchars($banner['ten_phim']) ?></h2>
+                        <h2 class="banner-title">
+                            <span style="display:inline-block; padding:2px 8px; background:rgba(232, 25, 44, 0.85); color:#fff; border-radius:4px; font-size:12px; margin-right:8px; vertical-align:middle; font-weight:900; letter-spacing:1px;">
+                                <?= htmlspecialchars($banner['do_tuoi'] ?? 'P') ?>
+                            </span>
+                            <?= htmlspecialchars($banner['ten_phim']) ?>
+                        </h2>
                         <span class="banner-cta">Xem chi tiết</span>
                     </div>
                 </a>
@@ -94,6 +99,9 @@ if (isset($_SESSION['user_id'])) {
 
             <div class="card-body">
                 <h3 class="movie-title" title="<?= htmlspecialchars($row['ten_phim']) ?>">
+                    <span style="display:inline-block; padding:1px 5px; background:rgba(232, 25, 44, 0.85); color:#fff; border-radius:3px; font-size:10px; margin-right:6px; vertical-align:middle; font-weight:900; font-family:'Inter', sans-serif;">
+                        <?= htmlspecialchars($row['do_tuoi'] ?? 'P') ?>
+                    </span>
                     <?= htmlspecialchars($row['ten_phim']) ?>
                 </h3>
 

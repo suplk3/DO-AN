@@ -11,6 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $noi_dung = trim($_POST['mo_ta'] ?? '');
     $trailer_url = trim($_POST['trailer_url'] ?? '');
     $ngay_khoi_chieu = !empty($_POST['ngay_khoi_chieu']) ? $_POST['ngay_khoi_chieu'] : null;
+    $do_tuoi = trim($_POST['do_tuoi'] ?? 'P');
 
     if ($ten === '') {
         $errors[] = 'Tên phim là bắt buộc.';
@@ -65,13 +66,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($errors)) {
         if (column_exists($conn, 'phim', 'trailer_url')) {
-            $sql = "INSERT INTO phim (ten_phim, the_loai, thoi_luong, mo_ta, poster, banner, trailer_url, ngay_khoi_chieu) VALUES (?,?,?,?,?,?,?,?)";
+            $sql = "INSERT INTO phim (ten_phim, the_loai, thoi_luong, mo_ta, poster, banner, trailer_url, ngay_khoi_chieu, do_tuoi) VALUES (?,?,?,?,?,?,?,?,?)";
             $stmt = mysqli_prepare($conn, $sql);
-            mysqli_stmt_bind_param($stmt, 'ssssssss', $ten, $the_loai, $thoi_luong, $noi_dung, $posterName, $bannerName, $trailer_url, $ngay_khoi_chieu);
+            mysqli_stmt_bind_param($stmt, 'sssssssss', $ten, $the_loai, $thoi_luong, $noi_dung, $posterName, $bannerName, $trailer_url, $ngay_khoi_chieu, $do_tuoi);
         } else {
-            $sql = "INSERT INTO phim (ten_phim, the_loai, thoi_luong, mo_ta, poster, banner, ngay_khoi_chieu) VALUES (?,?,?,?,?,?,?)";
+            $sql = "INSERT INTO phim (ten_phim, the_loai, thoi_luong, mo_ta, poster, banner, ngay_khoi_chieu, do_tuoi) VALUES (?,?,?,?,?,?,?,?)";
             $stmt = mysqli_prepare($conn, $sql);
-            mysqli_stmt_bind_param($stmt, 'sssssss', $ten, $the_loai, $thoi_luong, $noi_dung, $posterName, $bannerName, $ngay_khoi_chieu);
+            mysqli_stmt_bind_param($stmt, 'ssssssss', $ten, $the_loai, $thoi_luong, $noi_dung, $posterName, $bannerName, $ngay_khoi_chieu, $do_tuoi);
         }
         $ok = mysqli_stmt_execute($stmt);
         mysqli_stmt_close($stmt);
@@ -121,6 +122,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="form-row">
             <label for="the_loai">Thể loại</label>
             <input id="the_loai" name="the_loai" type="text" value="<?= isset($the_loai) ? htmlspecialchars($the_loai) : '' ?>" placeholder="Ví dụ: Hành động, Tình cảm">
+        </div>
+
+        <div class="form-row">
+            <label for="do_tuoi">Độ tuổi</label>
+            <select id="do_tuoi" name="do_tuoi">
+                <option value="P" <?= (isset($do_tuoi) && $do_tuoi === 'P') ? 'selected' : '' ?>>P - Phổ biến mọi độ tuổi</option>
+                <option value="K" <?= (isset($do_tuoi) && $do_tuoi === 'K') ? 'selected' : '' ?>>K - Dưới 13 tuổi (Kèm người lớn)</option>
+                <option value="T13" <?= (isset($do_tuoi) && $do_tuoi === 'T13') ? 'selected' : '' ?>>T13 - Từ 13 tuổi trở lên</option>
+                <option value="T16" <?= (isset($do_tuoi) && $do_tuoi === 'T16') ? 'selected' : '' ?>>T16 - Từ 16 tuổi trở lên</option>
+                <option value="T18" <?= (isset($do_tuoi) && $do_tuoi === 'T18') ? 'selected' : '' ?>>T18 - Từ 18 tuổi trở lên</option>
+            </select>
         </div>
 
         <div class="form-row">
