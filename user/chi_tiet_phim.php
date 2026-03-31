@@ -147,7 +147,12 @@ if ($me_id) {
     </div>
 
     <div class="md-info">
-      <h1 class="md-title"><?= htmlspecialchars($phim['ten_phim']) ?></h1>
+      <h1 class="md-title">
+        <span style="display:inline-block; padding:2px 8px; background:rgba(232, 25, 44, 0.85); color:#fff; border-radius:4px; font-size:16px; margin-right:8px; vertical-align:middle; font-weight:900; letter-spacing:1px; line-height:1.2;">
+            <?= htmlspecialchars($phim['do_tuoi'] ?? 'P') ?>
+        </span>
+        <?= htmlspecialchars($phim['ten_phim']) ?>
+      </h1>
 
       <div class="md-meta">
         <?php if (!empty($phim['the_loai'])): ?>
