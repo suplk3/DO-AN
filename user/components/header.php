@@ -188,6 +188,9 @@ document.addEventListener('DOMContentLoaded', function() {
 document.addEventListener('DOMContentLoaded', function() {
     const pcNotif = document.querySelector('.notif-link.pc-only');
     const mobNotifIcon = document.querySelector('.mobile-nav-item[href="notifications.php"] .m-icon');
+    const POLL_INTERVAL_MS = 1000;
+    let notifPollTimer = null;
+    let notifPollInFlight = false;
     
     if (!pcNotif && !mobNotifIcon) return;
     
@@ -221,7 +224,16 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function pollNotifications() {
-        fetch('../api/notif_poll_api.php?action=poll')
+        if (notifPollInFlight) return;
+        notifPollInFlight = true;
+
+        const url = '../api/notif_poll_api.php?action=poll&_=' + Date.now();
+        fetch(url, {
+            cache: 'no-store',
+            headers: {
+                'Cache-Control': 'no-cache'
+            }
+        })
             .then(r => r.json())
             .then(res => {
                 if (res.success) {
@@ -229,10 +241,21 @@ document.addEventListener('DOMContentLoaded', function() {
                     window.dispatchEvent(new CustomEvent('notifications_polled', { detail: res }));
                 }
             })
-            .catch(e => console.error('Notif poll error:', e));
+            .catch(e => console.error('Notif poll error:', e))
+            .finally(() => {
+                notifPollInFlight = false;
+            });
     }
     
     pollNotifications();
-    setInterval(pollNotifications, 10000);
+    notifPollTimer = setInterval(pollNotifications, POLL_INTERVAL_MS);
+
+    document.addEventListener('visibilitychange', function() {
+        if (!document.hidden) {
+            pollNotifications();
+        }
+    });
+
+    window.addEventListener('focus', pollNotifications);
 });
 </script>
