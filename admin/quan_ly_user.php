@@ -8,6 +8,8 @@ if (!isset($_SESSION['user_id']) || ($_SESSION['vai_tro'] ?? '') !== 'admin') {
 }
 
 $search = isset($_GET['q']) ? trim($_GET['q']) : '';
+$search_id = ctype_digit($search) ? (int)$search : 0;
+$search_is_id = ($search !== '' && ctype_digit($search));
 
 $sql_base = "SELECT v.id AS ve_id,
                     v.user_id,
@@ -30,9 +32,15 @@ $sql_base = "SELECT v.id AS ve_id,
 
 if ($search !== '') {
     $search_param = '%' . $search . '%';
-    $sql = $sql_base . " WHERE (u.ten LIKE ? OR u.email LIKE ?) ORDER BY sc.ngay DESC, sc.gio DESC";
-    $stmt = mysqli_prepare($conn, $sql);
-    mysqli_stmt_bind_param($stmt, 'ss', $search_param, $search_param);
+    if ($search_is_id) {
+        $sql = $sql_base . " WHERE u.id = ? ORDER BY sc.ngay DESC, sc.gio DESC";
+        $stmt = mysqli_prepare($conn, $sql);
+        mysqli_stmt_bind_param($stmt, 'i', $search_id);
+    } else {
+        $sql = $sql_base . " WHERE (u.ten LIKE ? OR u.email LIKE ?) ORDER BY sc.ngay DESC, sc.gio DESC";
+        $stmt = mysqli_prepare($conn, $sql);
+        mysqli_stmt_bind_param($stmt, 'ss', $search_param, $search_param);
+    }
 } else {
     $sql = $sql_base . " ORDER BY sc.ngay DESC, sc.gio DESC";
     $stmt = mysqli_prepare($conn, $sql);
@@ -44,8 +52,13 @@ $ves = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
 $users_list = [];
 if ($search !== '') {
-    $u_stmt = mysqli_prepare($conn, "SELECT id, ten, email FROM users WHERE vai_tro = 'user' AND (is_banned = 0 OR is_banned IS NULL) AND (ten LIKE ? OR email LIKE ?) ORDER BY ten");
-    mysqli_stmt_bind_param($u_stmt, 'ss', $search_param, $search_param);
+    if ($search_is_id) {
+        $u_stmt = mysqli_prepare($conn, "SELECT id, ten, email FROM users WHERE vai_tro = 'user' AND (is_banned = 0 OR is_banned IS NULL) AND id = ? ORDER BY ten");
+        mysqli_stmt_bind_param($u_stmt, 'i', $search_id);
+    } else {
+        $u_stmt = mysqli_prepare($conn, "SELECT id, ten, email FROM users WHERE vai_tro = 'user' AND (is_banned = 0 OR is_banned IS NULL) AND (ten LIKE ? OR email LIKE ?) ORDER BY ten");
+        mysqli_stmt_bind_param($u_stmt, 'ss', $search_param, $search_param);
+    }
     mysqli_stmt_execute($u_stmt);
     $u_res = mysqli_stmt_get_result($u_stmt);
 } else {
