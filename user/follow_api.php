@@ -69,10 +69,23 @@ function create_follow_notification(mysqli $conn, int $actorId, int $targetUserI
 $me = (int)$_SESSION['user_id'];
 $data = json_decode(file_get_contents('php://input'), true);
 if (!is_array($data)) {
-    $data = $_POST;
+    $data = [];
 }
 
-$fid = (int)($data['following_id'] ?? 0);
+$fid = (int)($data['following_id'] ?? $_POST['following_id'] ?? $_GET['following_id'] ?? 0);
+$refererTargetId = 0;
+
+if (!empty($_SERVER['HTTP_REFERER'])) {
+    $refererQuery = parse_url($_SERVER['HTTP_REFERER'], PHP_URL_QUERY);
+    if (is_string($refererQuery) && $refererQuery !== '') {
+        parse_str($refererQuery, $refererParams);
+        $refererTargetId = (int)($refererParams['id'] ?? 0);
+    }
+}
+
+if ((!$fid || $fid === $me) && $refererTargetId > 0 && $refererTargetId !== $me) {
+    $fid = $refererTargetId;
+}
 if (!$fid || $fid === $me) {
     echo json_encode(['error' => 'Không hợp lệ'], JSON_UNESCAPED_UNICODE);
     exit;

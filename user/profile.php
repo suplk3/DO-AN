@@ -460,6 +460,40 @@ async function submitComment(id, type, parentId = null) {
     if (data.ok) { loadedComments[id] = false; await loadComments(id, type); }
 }
 async function doFollow(userId,btn){const res=await fetch('follow_api.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({following_id:userId})});const data=await res.json();btn.textContent=data.action==='followed'?'✓ Đang theo dõi':'+ Theo dõi';btn.classList.toggle('following',data.action==='followed');}
+const followBtn = document.getElementById('followBtn');
+if (followBtn) {
+    followBtn.textContent = followBtn.classList.contains('following') ? 'Đang theo dõi' : 'Theo dõi';
+}
+
+async function doFollow(userId, btn) {
+    if (!btn) return;
+
+    btn.disabled = true;
+
+    try {
+        const res = await fetch('follow_api.php?following_id=' + encodeURIComponent(userId), {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({ following_id: userId })
+        });
+        const data = await res.json();
+
+        if (data.error) {
+            alert(data.error);
+            return;
+        }
+
+        const isFollowing = data.action === 'followed';
+        btn.textContent = isFollowing ? 'Đang theo dõi' : 'Theo dõi';
+        btn.classList.toggle('following', isFollowing);
+    } catch (error) {
+        console.error('Follow error:', error);
+        alert('Không thể theo dõi lúc này.');
+    } finally {
+        btn.disabled = false;
+    }
+}
+
 function toggleMenu(id){const el=document.getElementById('menu-'+id);el.style.display=el.style.display==='none'?'block':'none';}
 document.addEventListener('click',e=>{if(!e.target.classList.contains('post-menu-btn'))document.querySelectorAll('.post-menu-dropdown').forEach(el=>el.style.display='none');});
 function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
@@ -478,6 +512,50 @@ if (userMenuBtn && userDropdown) {
     });
     document.addEventListener('click', () => userDropdown.classList.remove('open'));
 }
+</script>
+<script>
+(function () {
+    const followBtn = document.getElementById('followBtn');
+    if (!followBtn) return;
+
+    const profileUserId = <?= (int)$uid ?>;
+    followBtn.textContent = followBtn.classList.contains('following') ? 'Đang theo dõi' : 'Theo dõi';
+    followBtn.removeAttribute('onclick');
+
+    async function handleProfileFollow(e) {
+        e.preventDefault();
+
+        const body = new URLSearchParams();
+        body.set('following_id', String(profileUserId));
+
+        const res = await fetch('follow_api.php', {
+            method: 'POST',
+            headers: {'Content-Type':'application/x-www-form-urlencoded; charset=UTF-8'},
+            body: body.toString()
+        });
+        const data = await res.json();
+
+        if (data.action === 'followed' || data.action === 'unfollowed') {
+            const isFollowing = data.action === 'followed';
+            followBtn.textContent = isFollowing ? 'Đang theo dõi' : 'Theo dõi';
+            followBtn.classList.toggle('following', isFollowing);
+            return;
+        }
+
+        if (data.error) {
+            alert(data.error);
+        }
+    }
+
+    window.doFollow = async function(userId, btn) {
+        if (Number(userId) !== Number(profileUserId) || btn !== followBtn) {
+            return handleProfileFollow(new Event('click'));
+        }
+        return handleProfileFollow(new Event('click'));
+    };
+
+    followBtn.addEventListener('click', handleProfileFollow);
+})();
 </script>
 </body>
 </html>
