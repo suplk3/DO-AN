@@ -1,4 +1,4 @@
-﻿:root {
+:root {
   --light-bg: #f6f7fb;
   --light-surface: #ffffff;
   --light-text: #0f172a;
@@ -27,49 +27,347 @@
   }
 }
 
+html[data-theme="light"],
 body[data-theme="light"] {
   background: var(--light-bg) !important;
-  color: var(--light-text);
-}
-body[data-theme="light"] .header {
-  background: var(--light-surface) !important;
-  border-bottom: 1px solid var(--light-border) !important;
-}
-body[data-theme="light"] .nav-link,
-body[data-theme="light"] .header-nav-left .nav-link {
   color: var(--light-text) !important;
 }
-body[data-theme="light"] .search-bar {
-  background: #fff !important;
+
+/* Base Structural Overrides */
+body[data-theme="light"] h1,
+body[data-theme="light"] h2,
+body[data-theme="light"] h3,
+body[data-theme="light"] h4,
+body[data-theme="light"] h5,
+body[data-theme="light"] h6,
+body[data-theme="light"] p,
+body[data-theme="light"] .movie-title,
+body[data-theme="light"] .banner-title,
+body[data-theme="light"] .genre,
+body[data-theme="light"] .duration,
+body[data-theme="light"] .section-title,
+body[data-theme="light"] .page-title,
+body[data-theme="light"] .text-white,
+body[data-theme="light"] .post-author-name,
+body[data-theme="light"] .post-text,
+body[data-theme="light"] .post-content,
+body[data-theme="light"] .comment-name,
+body[data-theme="light"] .comment-text,
+body[data-theme="light"] .profile-mini-name,
+body[data-theme="light"] .suggest-user div,
+body[data-theme="light"] .hot-movie-item div {
   color: var(--light-text) !important;
-  border: 1px solid var(--light-border) !important;
 }
+
+/* Secondary Texts */
+body[data-theme="light"] .post-time,
+body[data-theme="light"] .comment-meta,
+body[data-theme="light"] .profile-mini-bio,
+body[data-theme="light"] .profile-mini-stats span,
+body[data-theme="light"] .footer,
+body[data-theme="light"] .m-text {
+  color: var(--light-muted) !important;
+}
+
+/* Backgrounds and Cards */
+body[data-theme="light"] .header,
 body[data-theme="light"] .movie-card,
 body[data-theme="light"] .md-card,
 body[data-theme="light"] .showtime-card,
 body[data-theme="light"] .left,
 body[data-theme="light"] .right,
-body[data-theme="light"] .movie-summary {
+body[data-theme="light"] .movie-summary,
+body[data-theme="light"] .post-card,
+body[data-theme="light"] .compose-box,
+body[data-theme="light"] .suggest-box,
+body[data-theme="light"] .profile-mini-card,
+body[data-theme="light"] .community-chat-shell,
+body[data-theme="light"] .community-chat-sidebar,
+body[data-theme="light"] .community-chat-main,
+body[data-theme="light"] .social-right,
+body[data-theme="light"] .user-dropdown {
   background: var(--light-surface) !important;
   border-color: var(--light-border) !important;
   color: var(--light-text) !important;
 }
-body[data-theme="light"] .footer {
-  color: var(--light-muted) !important;
-  border-top: 1px solid var(--light-border) !important;
-}
-body[data-theme="light"] .section-title,
-body[data-theme="light"] .page-title {
+
+/* Navigation & Inputs */
+body[data-theme="light"] .nav-link,
+body[data-theme="light"] .header-nav-left .nav-link,
+body[data-theme="light"] .user-dropdown-header,
+body[data-theme="light"] .user-dropdown-item {
   color: var(--light-text) !important;
 }
+
+body[data-theme="light"] .search-bar,
+body[data-theme="light"] .compose-textarea,
+body[data-theme="light"] select,
+body[data-theme="light"] input[type="text"],
+body[data-theme="light"] input[type="search"],
+body[data-theme="light"] #communityChatInput {
+  background: var(--light-bg) !important;
+  color: var(--light-text) !important;
+  border: 1px solid var(--light-border) !important;
+}
+
+body[data-theme="light"] .mobile-nav-bar {
+  background: var(--light-surface) !important;
+  border-top-color: var(--light-border) !important;
+}
+body[data-theme="light"] .mobile-nav-item .m-text,
+body[data-theme="light"] .mobile-nav-item .m-icon {
+  color: var(--light-muted) !important;
+}
+body[data-theme="light"] .mobile-nav-item.active .m-text,
+body[data-theme="light"] .mobile-nav-item.active .m-icon {
+  color: var(--light-accent) !important;
+}
+body[data-theme="light"] .mobile-nav-item.active .m-badge {
+  background: red;
+}
+
+/* Buttons */
 body[data-theme="light"] .btn,
 body[data-theme="light"] .btn-sm,
 body[data-theme="light"] .btn-outline {
   color: var(--light-text) !important;
+}
+body[data-theme="light"] .btn-primary {
+  color: #fff !important; /* Emphasize primary button */
 }
 body[data-theme="light"] .theme-toggle-btn {
   background: #f1f5f9;
   color: var(--light-text);
   border-color: var(--light-border);
 }
+/* Extended Generic Text Rules for All Pages */
+body[data-theme="light"] .md-title, 
+body[data-theme="light"] .back, 
+body[data-theme="light"] .chip, 
+body[data-theme="light"] .md-short, 
+body[data-theme="light"] .desc-short, 
+body[data-theme="light"] .desc-full, 
+body[data-theme="light"] .desc-toggle-text, 
+body[data-theme="light"] .desc-toggle-icon, 
+body[data-theme="light"] .md-detail-label, 
+body[data-theme="light"] .md-detail-value, 
+body[data-theme="light"] .trailer-btn, 
+body[data-theme="light"] .rating-helper, 
+body[data-theme="light"] .my-rating, 
+body[data-theme="light"] .rating-summary div, 
+body[data-theme="light"] .reaction-wrap, 
+body[data-theme="light"] .action-btn, 
+body[data-theme="light"] .spoiler-toggle-btn, 
+body[data-theme="light"] #spoilerBtnText, 
+body[data-theme="light"] .film-react-summary, 
+body[data-theme="light"] .payment-title, 
+body[data-theme="light"] .ticket-info, 
+body[data-theme="light"] .summary-row, 
+body[data-theme="light"] .total-row, 
+body[data-theme="light"] .ticket-card, 
+body[data-theme="light"] .ticket-title, 
+body[data-theme="light"] .ticket-detail, 
+body[data-theme="light"] .qr-text, 
+body[data-theme="light"] .payment-method label, 
+body[data-theme="light"] .showtime-card, 
+body[data-theme="light"] .showtime-info, 
+body[data-theme="light"] .st-time, 
+body[data-theme="light"] .st-lang, 
+body[data-theme="light"] .st-date-btn, 
+body[data-theme="light"] .st-date-btn span, 
+body[data-theme="light"] .date-nav, 
+body[data-theme="light"] .date-item, 
+body[data-theme="light"] .date-item span, 
+body[data-theme="light"] .theater-group, 
+body[data-theme="light"] .theater-name, 
+body[data-theme="light"] .seat-grid .row-label, 
+body[data-theme="light"] .legend-item span, 
+body[data-theme="light"] .screen, 
+body[data-theme="light"] .ticket-header, 
+body[data-theme="light"] .profile-box, 
+body[data-theme="light"] .form-group label, 
+body[data-theme="light"] .my-tickets-title, 
+body[data-theme="light"] .notif-item { 
+  color: var(--light-text) !important; 
+}
 
+body[data-theme="light"] .react-detail-row span,
+body[data-theme="light"] .react-total-text {
+  color: var(--light-text) !important;
+}
+
+body[data-theme="light"] textarea, 
+body[data-theme="light"] input,
+body[data-theme="light"] .comment-input,
+body[data-theme="light"] .seat.selected,
+body[data-theme="light"] .checkout-box {
+  background: var(--light-surface) !important;
+  color: var(--light-text) !important;
+  border-color: var(--light-border) !important;
+}
+
+body[data-theme="light"] .seat {
+  background-color: #64748b; /* Better contrast for default seat on light background */
+}
+
+body[data-theme="light"] .seat.available {
+  background-color: #cbd5e1;
+}
+
+body[data-theme="light"] .seat.booked {
+  background-color: #ef4444; 
+}
+
+/* Make backgrounds bright white */
+body[data-theme="light"] .trailer-box,
+body[data-theme="light"] .payment-container,
+body[data-theme="light"] .ticket-container,
+body[data-theme="light"] .checkout-bar,
+body[data-theme="light"] .profile-container,
+body[data-theme="light"] .notif-dropdown {
+  background: var(--light-surface) !important;
+  border-color: var(--light-border) !important;
+  color: var(--light-text) !important;
+}
+
+body[data-theme="light"] .form-control {
+  background: var(--light-bg) !important;
+  color: var(--light-text) !important;
+  border: 1px solid var(--light-border) !important;
+}
+/* --- RATINGS & COMMENTS SPECIFIC FIXES --- */
+body[data-theme="light"] .rating-overview-value,
+body[data-theme="light"] .rating-overview-meta strong,
+body[data-theme="light"] .rating-action-title,
+body[data-theme="light"] .rating-scale-note strong,
+body[data-theme="light"] .film-social-title,
+body[data-theme="light"] .film-reactions strong,
+body[data-theme="light"] .post-username,
+body[data-theme="light"] .comment-text,
+body[data-theme="light"] #avgRating,
+body[data-theme="light"] #ratingCount,
+body[data-theme="light"] #ratingHelper,
+body[data-theme="light"] #myRatingText,
+body[data-theme="light"] .react-detail-row span {
+  color: var(--light-text) !important;
+}
+
+body[data-theme="light"] .rating-overview-label,
+body[data-theme="light"] .rating-action-subtitle,
+body[data-theme="light"] .rating-user-note,
+body[data-theme="light"] .rating-scale-note,
+body[data-theme="light"] .rating-login-hint,
+body[data-theme="light"] .film-reactions span,
+body[data-theme="light"] .post-time,
+body[data-theme="light"] .comment-meta,
+body[data-theme="light"] .reply-btn,
+body[data-theme="light"] .delete-comment-btn,
+body[data-theme="light"] .action-btn {
+  color: var(--light-muted) !important;
+}
+
+body[data-theme="light"] .comment-name {
+  color: var(--light-accent) !important;
+}
+
+body[data-theme="light"] .comment-bubble {
+  background: #f1f5f9 !important;
+  color: var(--light-text) !important;
+}
+
+body[data-theme="light"] .reaction-picker {
+  background: var(--light-surface) !important;
+  border: 1px solid var(--light-border) !important;
+}
+
+body[data-theme="light"] .reaction-emoji:hover,
+body[data-theme="light"] .action-btn:hover {
+  background: #f1f5f9 !important;
+}
+
+body[data-theme="light"] .rating-action-card,
+body[data-theme="light"] .rating-overview-badge,
+body[data-theme="light"] .rating-stars .rating-star.active,
+body[data-theme="light"] .rating-stars .rating-star:hover {
+  background: var(--light-surface) !important;
+  border-color: var(--light-border) !important;
+}
+
+body[data-theme="light"] .rating-stars .rating-star {
+  background: #f8fafc !important;
+  border-color: var(--light-border) !important;
+}
+
+body[data-theme="light"] .btn-follow {
+  color: var(--light-accent) !important;
+  border-color: var(--light-accent) !important;
+  background: transparent !important;
+}
+
+body[data-theme="light"] .btn-follow.following {
+  color: var(--light-muted) !important;
+  border-color: var(--light-border) !important;
+  background: #f1f5f9 !important;
+}
+/* --- SIDEBAR, HEADER & PLACEHOLDER FIXES --- */
+/* Sidebar Nav */
+body[data-theme="light"] .snav-item {
+  color: var(--light-muted) !important;
+}
+body[data-theme="light"] .snav-item.active {
+  color: var(--light-accent) !important;
+  background: rgba(37, 99, 235, 0.1) !important;
+}
+body[data-theme="light"] .snav-item:hover {
+  background: var(--light-bg) !important;
+}
+
+/* Sidebar Profile Stats & Headings */
+body[data-theme="light"] .profile-mini-stats strong,
+body[data-theme="light"] .suggest-title,
+body[data-theme="light"] .community-chat-kicker {
+  color: var(--light-text) !important;
+}
+
+/* Header User Name & Icons */
+body[data-theme="light"] .user-menu-name {
+  color: var(--light-text) !important;
+}
+body[data-theme="light"] .notif-link,
+body[data-theme="light"] .header-search-trigger {
+  color: var(--light-text) !important;
+  border-color: var(--light-border) !important;
+  background: var(--light-bg) !important;
+}
+
+/* Compose Box Trigger */
+body[data-theme="light"] .compose-trigger {
+  color: var(--light-muted) !important;
+  background: var(--light-bg) !important;
+  border-color: var(--light-border) !important;
+}
+body[data-theme="light"] .compose-trigger:hover {
+  color: var(--light-text) !important;
+}
+body[data-theme="light"] .compose-attach {
+  color: var(--light-muted) !important;
+  background: var(--light-bg) !important;
+  border-color: var(--light-border) !important;
+}
+
+/* Placeholders (must be separate blocks) */
+body[data-theme="light"] .comment-input::placeholder {
+  color: #94a3b8 !important;
+}
+body[data-theme="light"] .compose-textarea::placeholder {
+  color: #94a3b8 !important;
+}
+body[data-theme="light"] .search-bar::placeholder {
+  color: #94a3b8 !important;
+}
+body[data-theme="light"] #searchInput::placeholder {
+  color: #94a3b8 !important;
+}
+body[data-theme="light"] .community-chat-search-box input::placeholder {
+  color: #94a3b8 !important;
+}

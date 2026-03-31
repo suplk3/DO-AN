@@ -4,6 +4,30 @@ if (!isset($active_page)) {
     $active_page = '';
 }
 ?>
+<!-- Theme Scripts -->
+<link rel="stylesheet" href="../assets/css/theme-toggle.css">
+<script>
+(function(){
+  var stored = localStorage.getItem('theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', stored);
+})();
+document.addEventListener('DOMContentLoaded', function() {
+  var b = document.body;
+  if (!b) return;
+  var stored = localStorage.getItem('theme') || 'dark';
+  b.setAttribute('data-theme', stored);
+  
+  var btn = document.getElementById('themeToggle');
+  if (btn) {
+    btn.addEventListener('click', function(){
+      var cur = b.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+      b.setAttribute('data-theme', cur);
+      document.documentElement.setAttribute('data-theme', cur);
+      localStorage.setItem('theme', cur);
+    });
+  }
+});
+</script>
 <style>
 /* ==== MOBILE-ONLY HIDES (inline to bypass cache) ==== */
 @media (max-width: 768px) {
@@ -144,6 +168,10 @@ if (!isset($active_page)) {
         <span class="m-icon">&#128276;<?php if (($notif_unread ?? 0) > 0): ?><em class="m-badge"></em><?php endif; ?></span>
         <span class="m-text">Thông báo</span>
     </a>
+    <a href="ve_cua_toi.php" class="mobile-nav-item <?= $active_page === 've_cua_toi' ? 'active' : '' ?>">
+        <span class="m-icon">&#127903;</span>
+        <span class="m-text">Vé</span>
+    </a>
     <a href="profile.php?id=<?= (int)$_SESSION['user_id'] ?>" class="mobile-nav-item <?= $active_page === 'profile' ? 'active' : '' ?>">
         <span class="m-icon">&#128100;</span>
         <span class="m-text">Tôi</span>
@@ -155,3 +183,56 @@ if (!isset($active_page)) {
     </a>
     <?php endif; ?>
 </nav>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const pcNotif = document.querySelector('.notif-link.pc-only');
+    const mobNotifIcon = document.querySelector('.mobile-nav-item[href="notifications.php"] .m-icon');
+    
+    if (!pcNotif && !mobNotifIcon) return;
+    
+    function updateNotifBadges(count) {
+        if (pcNotif) {
+            let badge = pcNotif.querySelector('.notif-badge');
+            if (count > 0) {
+                if (!badge) {
+                    badge = document.createElement('span');
+                    badge.className = 'notif-badge';
+                    pcNotif.appendChild(badge);
+                }
+                badge.innerText = count;
+            } else {
+                if (badge) badge.remove();
+            }
+        }
+        
+        if (mobNotifIcon) {
+            let mBadge = mobNotifIcon.querySelector('.m-badge');
+            if (count > 0) {
+                if (!mBadge) {
+                    mBadge = document.createElement('em');
+                    mBadge.className = 'm-badge';
+                    mobNotifIcon.appendChild(mBadge);
+                }
+            } else {
+                if (mBadge) mBadge.remove();
+            }
+        }
+    }
+    
+    function pollNotifications() {
+        fetch('../api/notif_poll_api.php?action=poll')
+            .then(r => r.json())
+            .then(res => {
+                if (res.success) {
+                    updateNotifBadges(res.unread_count);
+                    window.dispatchEvent(new CustomEvent('notifications_polled', { detail: res }));
+                }
+            })
+            .catch(e => console.error('Notif poll error:', e));
+    }
+    
+    pollNotifications();
+    setInterval(pollNotifications, 10000);
+});
+</script>

@@ -259,7 +259,26 @@ if ($info && table_exists($conn, 'notifications')) {
     mysqli_stmt_bind_param($stmt, "isss", $user_id, $title, $body, $link);
     mysqli_stmt_execute($stmt);
     mysqli_stmt_close($stmt);
+
+    // Notify Admins
+    $booker_role = $_SESSION['vai_tro'] ?? '';
+    if ($booker_role !== 'admin') {
+        $admin_q = mysqli_query($conn, "SELECT id FROM users WHERE vai_tro='admin'");
+        if ($admin_q) {
+            $admin_title = "Có người đặt vé mới";
+            $admin_body = "User ID: $user_id vừa đặt vé phim " . ($info['ten_phim'] ?? '') . " (" . $seat_count . " ghế)";
+            $admin_link = "../admin/quan_ly_user.php?q=" . urlencode((string)$user_id);
+            $a_stmt = mysqli_prepare($conn, "INSERT INTO notifications (user_id, type, title, body, link) VALUES (?, 'ticket_booked', ?, ?, ?)");
+            while ($adm = mysqli_fetch_assoc($admin_q)) {
+                $aid = (int)$adm['id'];
+                mysqli_stmt_bind_param($a_stmt, "isss", $aid, $admin_title, $admin_body, $admin_link);
+                mysqli_stmt_execute($a_stmt);
+            }
+            if ($a_stmt) mysqli_stmt_close($a_stmt);
+        }
+    }
 }
+
 
 $movie_name = $info['ten_phim'] ?? 'N/A';
 $poster_path = (!empty($info['poster'])) ? "../assets/images/" . htmlspecialchars($info['poster']) : "https://via.placeholder.com/560x315.png?text=Movie+Poster";
@@ -302,6 +321,9 @@ if (!function_exists('fmt_m')) {
 <link rel="stylesheet" href="../assets/css/style.css">
 <link rel="stylesheet" href="../assets/css/user-index.css">
 <link rel="stylesheet" href="../assets/css/login-modal.css">
+<link rel="stylesheet" href="../assets/css/search.css">
+<link rel="stylesheet" href="../assets/css/user-menu.css">
+<link rel="stylesheet" href="../assets/css/theme-toggle.css">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -401,7 +423,6 @@ body.success-page{
   grid-template-columns:auto 1fr;
   gap:0;
 }
-@media(max-width:600px){.ticket-body{grid-template-columns:1fr;}}
 
 /* Poster strip */
 .ticket-poster{
@@ -413,10 +434,6 @@ body.success-page{
   width:110px;height:160px;
   object-fit:cover;border-radius:10px;
   box-shadow:0 8px 20px rgba(0,0,0,0.5);
-}
-@media(max-width:600px){
-  .ticket-poster{width:100%;flex-direction:row;padding:16px;align-items:flex-start;}
-  .ticket-poster img{width:80px;height:116px;}
 }
 
 /* Info section */
@@ -436,7 +453,6 @@ body.success-page{
   grid-template-columns:1fr 1fr;
   gap:12px 20px;
 }
-@media(max-width:480px){.info-grid{grid-template-columns:1fr;}}
 .info-cell label{
   display:block;font-size:10px;font-weight:700;
   text-transform:uppercase;letter-spacing:1.5px;
@@ -563,6 +579,113 @@ body.success-page{
   line-height:1.7;
 }
 .enjoy-note strong{color:var(--gold);}
+
+/* ── Mobile Redesign ── */
+@media (max-width: 768px) {
+  .success-wrap {
+    padding: 0 16px 80px;
+    margin: 20px auto;
+  }
+  .ticket-card {
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+  }
+  .ticket-header {
+    flex-direction: column;
+    text-align: center;
+    padding: 30px 20px 20px;
+    gap: 16px;
+  }
+  .success-icon {
+    width: 68px;
+    height: 68px;
+    font-size: 32px;
+    margin: 0 auto;
+  }
+  .ticket-headline h1 {
+    font-size: 32px;
+    line-height: 1.1;
+  }
+  .order-code {
+    display: inline-block;
+    margin-top: 8px;
+  }
+  .ticket-body {
+    grid-template-columns: 1fr;
+  }
+  .ticket-poster {
+    width: 100%;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 24px;
+    gap: 24px;
+    border-bottom: 1px dashed var(--border);
+  }
+  .ticket-poster img {
+    width: 100px;
+    height: 145px;
+  }
+  .ticket-poster img.qr-code {
+    margin-top: 0 !important;
+    width: 110px !important;
+    height: 110px !important;
+    border-radius: 10px;
+    background: #fff;
+    padding: 4px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  }
+  .ticket-info {
+    padding: 24px 20px;
+    text-align: center;
+  }
+  .info-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  .info-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .info-cell label {
+    font-size: 11px;
+    margin-bottom: 4px;
+  }
+  .info-cell .val {
+    font-size: 16px;
+  }
+  .info-cell .val.seats {
+    justify-content: center;
+  }
+  .ticket-perforation {
+    margin: 0 24px;
+  }
+  .ticket-price {
+    padding: 20px 24px;
+  }
+  .price-table tr td {
+    font-size: 13px !important;
+  }
+  .price-table .total-row td {
+    font-size: 16px !important;
+  }
+  .price-table .total-row td:last-child {
+    font-size: 24px !important;
+  }
+  .combo-in-ticket {
+    text-align: center;
+    padding: 0 20px 20px;
+  }
+  .ticket-actions {
+    flex-direction: column;
+    padding: 24px 20px;
+    gap: 12px;
+  }
+  .btn-home, .btn-ve {
+    width: 100%;
+  }
+}
 </style>
 <link rel="stylesheet" href="../assets/css/mobile-premium.css?v=<?php echo time(); ?>">
 </head>
@@ -591,7 +714,6 @@ body.success-page{
         <img src="../assets/images/<?= htmlspecialchars($info['poster'] ?? '') ?>"
              alt="poster"
              onerror="this.src='../assets/images/avengers.jpg'">
-        <img class="qr-code" style="width:100px; height: 100px; margin-top:20px" src="<?= $qr_code_url ?>" alt="Ticket QR Code">
       </div>
 
       <!-- Info -->
@@ -700,6 +822,19 @@ body.success-page{
     setTimeout(() => el.remove(), 6000);
   }
 })();
+</script>
+<script src="../assets/js/search.js"></script>
+<script>
+// User dropdown toggle
+const userMenuBtn = document.getElementById('userMenuBtn');
+const userDropdown = document.getElementById('userDropdown');
+if (userMenuBtn && userDropdown) {
+    userMenuBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        userDropdown.classList.toggle('open');
+    });
+    document.addEventListener('click', () => userDropdown.classList.remove('open'));
+}
 </script>
 <script src="../assets/js/login-modal.js"></script>
 </body>

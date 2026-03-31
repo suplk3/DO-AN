@@ -271,7 +271,8 @@ CREATE TABLE `phim` (
   `mo_ta` text DEFAULT NULL,
   `poster` varchar(255) DEFAULT NULL,
   `banner` varchar(255) DEFAULT NULL,
-  `ngay_khoi_chieu` date DEFAULT NULL
+  `ngay_khoi_chieu` date DEFAULT NULL,
+  `do_tuoi` varchar(10) DEFAULT 'P'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --

@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 include "../config/db.php";
 
@@ -122,7 +122,7 @@ if ($me_id) {
 <title><?= htmlspecialchars($phim['ten_phim']) ?> — TTVH Cinemas</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 <link rel="stylesheet" href="../assets/css/style.css">
-<link rel="stylesheet" href="../assets/css/movie-detail.css">
+<link rel="stylesheet" href="../assets/css/movie-detail.css?v=<?= time() ?>">
 <link rel="stylesheet" href="../assets/css/login-modal.css">
 <link rel="stylesheet" href="../assets/css/search.css">
     <link rel="stylesheet" href="../assets/css/user-menu.css">
@@ -147,7 +147,12 @@ if ($me_id) {
     </div>
 
     <div class="md-info">
-      <h1 class="md-title"><?= htmlspecialchars($phim['ten_phim']) ?></h1>
+      <h1 class="md-title">
+        <span style="display:inline-block; padding:2px 8px; background:rgba(232, 25, 44, 0.85); color:#fff; border-radius:4px; font-size:16px; margin-right:8px; vertical-align:middle; font-weight:900; letter-spacing:1px; line-height:1.2;">
+            <?= htmlspecialchars($phim['do_tuoi'] ?? 'P') ?>
+        </span>
+        <?= htmlspecialchars($phim['ten_phim']) ?>
+      </h1>
 
       <div class="md-meta">
         <?php if (!empty($phim['the_loai'])): ?>
@@ -942,19 +947,6 @@ function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(
 })();
 </script>
 <script>
-// Theme toggle
-(function(){
-  var body = document.body;
-  var btn = document.getElementById('themeToggle');
-  var stored = localStorage.getItem('theme') || 'dark';
-  body.setAttribute('data-theme', stored);
-  if (!btn) return;
-  btn.addEventListener('click', function(){
-    var cur = body.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
-    body.setAttribute('data-theme', cur);
-    localStorage.setItem('theme', cur);
-  });
-})();
 
 // Trailer modal
 (function(){
@@ -1167,6 +1159,46 @@ function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(
     });
   });
 })();
+</script>
+<script>
+/* Trailer Modal Logic */
+document.addEventListener('DOMContentLoaded', () => {
+  const trailerBtn = document.querySelector('.trailer-btn');
+  const trailerModal = document.getElementById('trailerModal');
+  const trailerClose = document.getElementById('trailerClose');
+  const trailerIframe = document.getElementById('trailerIframe');
+
+  if (trailerBtn && trailerModal && trailerIframe) {
+    trailerBtn.addEventListener('click', () => {
+      let url = trailerBtn.dataset.trailer;
+      if (url) {
+          let videoId = null;
+          let match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^&?]+)/);
+          if (match && match[1]) {
+              videoId = match[1];
+          }
+          if (videoId) {
+              trailerIframe.src = 'https://www.youtube.com/embed/' + videoId + '?autoplay=1';
+              trailerModal.classList.add('open');
+          } else {
+              alert("Lỗi: Link Trailer không hợp lệ. Vui lòng cập nhật lại link Youtube chuẩn trong trang quản trị.");
+          }
+      }
+    });
+
+    const closeTrailer = () => {
+      trailerModal.classList.remove('open');
+      trailerIframe.src = ''; // Stop video
+    };
+
+    if (trailerClose) trailerClose.addEventListener('click', closeTrailer);
+    trailerModal.addEventListener('click', (e) => {
+      if (e.target === trailerModal || e.target.classList.contains('trailer-box')) {
+          closeTrailer();
+      }
+    });
+  }
+});
 </script>
 </body>
 </html>

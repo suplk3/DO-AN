@@ -53,6 +53,8 @@ if (table_exists($conn, 'combos')) {
 <link rel="stylesheet" href="../assets/css/style.css">
 <link rel="stylesheet" href="../assets/css/user-index.css">
 <link rel="stylesheet" href="../assets/css/theme-toggle.css">
+<link rel="stylesheet" href="../assets/css/user-menu.css">
+<link rel="stylesheet" href="../assets/css/search.css">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap');
 
@@ -726,6 +728,20 @@ document.addEventListener('DOMContentLoaded', function() {
     const timer = setInterval(updateTimer, 1000);
     updateTimer();
 
+    const userMenuBtn = document.getElementById('userMenuBtn');
+    const userDropdown = document.getElementById('userDropdown');
+    if (userMenuBtn && userDropdown) {
+        userMenuBtn.addEventListener('click', e => {
+            e.stopPropagation();
+            userDropdown.classList.toggle('open');
+        });
+        document.addEventListener('click', e => {
+            if (!userMenuBtn.contains(e.target) && !userDropdown.contains(e.target)) {
+                userDropdown.classList.remove('open');
+            }
+        });
+    }
+
     const paymentDetailsContainer = document.getElementById('payment-details');
     const qrPayment = document.getElementById('qr-payment');
     const cardPayment = document.getElementById('card-payment');
@@ -925,21 +941,7 @@ document.addEventListener('DOMContentLoaded', function() {
     validate(); // Initial check
 });
 </script>
-<script>
-// Theme toggle
-(function(){
-  var body = document.body;
-  var btn = document.getElementById('themeToggle');
-  var stored = localStorage.getItem('theme') || 'dark';
-  body.setAttribute('data-theme', stored);
-  if (!btn) return;
-  btn.addEventListener('click', function(){
-    var cur = body.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
-    body.setAttribute('data-theme', cur);
-    localStorage.setItem('theme', cur);
-  });
-})();
-</script>
 
+<script src="../assets/js/search.js"></script>
 </body>
 </html>

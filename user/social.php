@@ -28,11 +28,16 @@ $REACTIONS = ['like'=>'👍','love'=>'❤️','haha'=>'😂','wow'=>'😮','sad'
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Cộng đồng — TTVH Cinemas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="../assets/css/style.css">
 <link rel="stylesheet" href="../assets/css/user-index.css">
 <link rel="stylesheet" href="../assets/css/login-modal.css">
 <link rel="stylesheet" href="../assets/css/search.css">
+<link rel="stylesheet" href="../assets/css/user-menu.css">
+<link rel="stylesheet" href="../assets/css/theme-toggle.css">
 <link rel="stylesheet" href="../assets/css/social.css">
 <link rel="stylesheet" href="../assets/css/mobile-premium.css?v=<?php echo time(); ?>">
 </head>
@@ -285,9 +290,70 @@ function time_ago($datetime) {
 ?>
 
 const REACTIONS = <?= json_encode($REACTIONS) ?>;
+const CURRENT_USER_ID = <?= json_encode($me) ?>;
+const IS_ADMIN = <?= json_encode((bool)(isset($_SESSION['vai_tro']) && $_SESSION['vai_tro'] === 'admin')) ?>;
+
+let IS_BANNED = <?= !empty($me_info['is_banned']) ? 'true' : 'false' ?>;
+
+function checkBanned(e) {
+    if (IS_BANNED) {
+        if (e && typeof e.preventDefault === 'function') { e.preventDefault(); e.stopPropagation(); }
+        showBannedWidget();
+        return true;
+    }
+    return false;
+}
+
+function showBannedWidget() {
+    let w = document.getElementById('banned-widget');
+    if (!w) {
+        w = document.createElement('div');
+        w.id = 'banned-widget';
+        w.style.cssText = 'position:fixed; bottom:20px; right:20px; background:linear-gradient(135deg, #ef4444, #b91c1c); color:#fff; padding:15px 20px; border-radius:10px; font-weight:bold; box-shadow:0 10px 25px rgba(239,68,68,0.5); z-index:9999; animation:slideIn 0.3s forwards; pointer-events:none; font-family:"Be Vietnam Pro", sans-serif; font-size:14px;';
+        w.innerHTML = '🚫 Bạn hiện tại đang bị cấm tương tác!';
+        document.body.appendChild(w);
+        
+        if (!document.getElementById('widget-keyframes')) {
+            const style = document.createElement('style');
+            style.id = 'widget-keyframes';
+            style.innerHTML = '@keyframes slideIn { from { transform: translateX(120%); opacity:0; } to { transform: translateX(0); opacity:1; } } @keyframes slideOut { from { transform: translateX(0); opacity:1; } to { transform: translateX(120%); opacity:0; } }';
+            document.head.appendChild(style);
+        }
+    }
+    
+    w.style.animation = 'none';
+    w.offsetHeight; // force reflow
+    w.style.animation = 'slideIn 0.3s forwards';
+    
+    if (w.timeoutId) clearTimeout(w.timeoutId);
+    w.timeoutId = setTimeout(() => {
+        if (w) w.style.animation = 'slideOut 0.3s forwards';
+    }, 4000);
+}
+
+function showUnbannedWidget() {
+    let w = document.getElementById('unbanned-widget');
+    if (!w) {
+        w = document.createElement('div');
+        w.id = 'unbanned-widget';
+        w.style.cssText = 'position:fixed; bottom:20px; right:20px; background:linear-gradient(135deg, #10b981, #059669); color:#fff; padding:15px 20px; border-radius:10px; font-weight:bold; box-shadow:0 10px 25px rgba(16,185,129,0.5); z-index:9999; animation:slideIn 0.3s forwards; pointer-events:none; font-family:"Be Vietnam Pro", sans-serif; font-size:14px;';
+        w.innerHTML = '✅ Bạn đã được gỡ cấm. Mọi tính năng hoạt động lại bình thường!';
+        document.body.appendChild(w);
+    }
+    
+    w.style.animation = 'none';
+    w.offsetHeight; // force reflow
+    w.style.animation = 'slideIn 0.3s forwards';
+    
+    if (w.timeoutId) clearTimeout(w.timeoutId);
+    w.timeoutId = setTimeout(() => {
+        if (w) w.style.animation = 'slideOut 0.3s forwards';
+    }, 5000);
+}
 
 // ── Toggle compose box ──
-document.getElementById('composeToggle').addEventListener('click', () => {
+document.getElementById('composeToggle').addEventListener('click', (e) => {
+    if (checkBanned(e)) return;
     document.getElementById('composeForm').style.display = 'block';
     document.getElementById('composeToggle').style.display = 'none';
     document.querySelector('.compose-form textarea').focus();
@@ -324,10 +390,12 @@ function hideReactions(postId) {
     }, 300);
 }
 function quickReact(id, type, loai) {
+    if (checkBanned()) return;
     hideReactions(id);
     doReact(id, type, loai);
 }
 async function doReact(id, type, loai) {
+    if (checkBanned()) return;
     hideReactions(id);
     const res = await fetch('reaction_api.php', {
         method: 'POST',
@@ -346,7 +414,39 @@ async function doReact(id, type, loai) {
             btn.classList.add('reacted');
         }
     }
-    if (stat) stat.textContent = data.total > 0 ? '👍 ' + data.total : '';
+    if (stat) stat.textContent = data.total > 0 ? '👍❤️ ' + data.total : '';
+}
+
+async function loadReactionBreakdown(id, type) {
+    const tooltip = document.getElementById('react-tooltip-' + id);
+    if (!tooltip) return;
+    tooltip.innerHTML = '<div style="color:#94a3b8; font-size:12px; padding:4px 8px;">Đang tải...</div>';
+    
+    try {
+        const res = await fetch(`reaction_api.php?action=breakdown&target_type=${type}&target_id=${id}`);
+        const data = await res.json();
+        if (data.success) {
+            if (data.total === 0) {
+                tooltip.innerHTML = '<div style="color:#64748b; font-size:12px; padding:4px 8px;">Chưa có cảm xúc nào</div>';
+                return;
+            }
+            let html = '';
+            for (const [loai, count] of Object.entries(data.breakdown)) {
+                let emoji = REACTIONS[loai] || '👍';
+                const names = {like:'Thích', love:'Yêu thích', haha:'Haha', wow:'Woa', sad:'Buồn', angry:'Phẫn nộ'};
+                const vnName = names[loai] || loai;
+                html += `
+                <div class="react-detail-row">
+                    <span>${emoji}</span>
+                    <span style="text-transform: capitalize; padding-left:8px;">${vnName}</span>
+                    <span class="react-detail-count">${count}</span>
+                </div>`;
+            }
+            tooltip.innerHTML = html;
+        }
+    } catch(e) {
+        tooltip.innerHTML = '<div style="color:#ef4444; font-size:12px; padding:4px 8px;">Lỗi tải</div>';
+    }
 }
 
 // ── Comments ──
@@ -386,6 +486,76 @@ async function toggleComments(id) {
         sec.style.display = 'none';
     }
 }
+function renderCommentTree(comments, postId, type, depth = 0) {
+    if (!comments || !comments.length) return '';
+    let html = '';
+    
+    comments.forEach(c => {
+        let repliesHtml = '';
+        if (c.replies && c.replies.length > 0) {
+            repliesHtml = `<div class="comment-replies" style="margin-left: ${depth === 0 ? 34 : 0}px; border-left: 2px solid rgba(255,255,255,0.05); padding-left: 12px; margin-top: 8px;">
+                ${renderCommentTree(c.replies, postId, type, depth + 1)}
+            </div>`;
+        }
+        
+        const avatarSize = depth === 0 ? 'avatar-xs' : 'avatar-xxs';
+        const parentId = depth === 0 ? c.id : c.parent_id;
+        
+        html += `
+            <div class="comment-item" id="cmt-${c.id}" style="${depth > 0 ? 'margin-top: 10px; padding:0;' : ''}">
+                <div class="comment-avatar">
+                    ${c.avatar
+                        ? `<img src="../assets/images/avatars/${c.avatar}" class="avatar-xs" alt="" style="${depth > 0 ? 'width:24px;height:24px;' : ''}">`
+                        : `<div class="avatar-placeholder-xs" style="${depth > 0 ? 'width:24px;height:24px;font-size:10px;' : ''}">${c.ten.charAt(0)}</div>`}
+                </div>
+                <div class="comment-bubble-wrap" style="flex:1;">
+                    <div class="comment-bubble" style="${depth > 0 ? 'padding:8px 10px;' : ''}">
+                        <a href="profile.php?id=${c.user_id}" class="comment-name">${escHtml(c.ten)}</a>
+                        <span class="comment-text">${escHtml(c.noi_dung)}</span>
+                        <div class="comment-meta">
+                            ${c.time_ago}
+                            <button class="btn-reply-text" style="background:none;border:none;color:#94a3b8;font-size:11px;cursor:pointer;padding:0 5px; margin-left:8px;" onclick="showReplyBox(${postId}, '${type}', ${parentId})">Trả lời</button>
+                            ${(CURRENT_USER_ID && (parseInt(c.user_id) === parseInt(CURRENT_USER_ID) || IS_ADMIN))
+                                ? `<button class="btn-delete-text" style="background:none;border:none;color:#ef4444;font-size:11px;cursor:pointer;padding:0 5px; margin-left:8px;" onclick="deleteCommentNode(${c.id}, ${postId}, '${type}')">Xoá</button>`
+                                : ''}
+                        </div>
+                    </div>
+                    
+                    <!-- Inline Reply Box placeholder -->
+                    <div id="reply-box-${postId}-${parentId}" class="reply-box-container" style="display:none; margin-top: 6px;"></div>
+                    
+                    ${repliesHtml}
+                </div>
+            </div>
+        `;
+    });
+    
+    return html;
+}
+
+function showReplyBox(postId, type, parentId) {
+    document.querySelectorAll(`.reply-box-container[id^="reply-box-${postId}-"]`).forEach(el => {
+        el.style.display = 'none';
+        el.innerHTML = '';
+    });
+    
+    const box = document.getElementById(`reply-box-${postId}-${parentId}`);
+    if (!box) return;
+    
+    box.style.display = 'block';
+    box.innerHTML = `
+        <div class="comment-compose" style="padding: 0; background: transparent; border: none; margin-top: 8px;">
+            <div class="comment-input-wrap" style="background: rgba(255,255,255,0.03);">
+                <input type="text" class="comment-input" id="ci-reply-${postId}-${parentId}" placeholder="Viết phản hồi..." onfocus="if(typeof checkBanned === 'function' && checkBanned(event)) this.blur();" onkeydown="if(event.key==='Enter')submitComment(${postId}, '${type}', ${parentId})">
+                <button class="comment-send" onclick="submitComment(${postId}, '${type}', ${parentId})">➤</button>
+            </div>
+        </div>
+    `;
+    if (typeof checkBanned === 'function' && !IS_BANNED) {
+        setTimeout(() => document.getElementById(`ci-reply-${postId}-${parentId}`).focus(), 50);
+    }
+}
+
 async function loadComments(id, type, options = {}) {
     const list = document.getElementById('clist-' + id);
     if (!options.background) {
@@ -400,35 +570,55 @@ async function loadComments(id, type, options = {}) {
         return;
     }
     setDisplayedCommentCount(id, countCommentsTree(data.comments));
-    list.innerHTML = data.comments.map(c => `
-        <div class="comment-item" id="cmt-${c.id}">
-            <div class="comment-avatar">
-                ${c.avatar
-                    ? `<img src="../assets/images/avatars/${c.avatar}" class="avatar-xs" alt="">`
-                    : `<div class="avatar-placeholder-xs">${c.ten.charAt(0)}</div>`}
-            </div>
-            <div class="comment-bubble">
-                <a href="profile.php?id=${c.user_id}" class="comment-name">${escHtml(c.ten)}</a>
-                <span class="comment-text">${escHtml(c.noi_dung)}</span>
-                <div class="comment-meta">${c.time_ago}</div>
-            </div>
-        </div>
-    `).join('');
+    list.innerHTML = renderCommentTree(data.comments, id, type);
 }
-async function submitComment(id, type) {
-    const inp = document.getElementById('ci-' + id);
+
+async function submitComment(id, type, parentId = null) {
+    if (checkBanned()) return;
+    const inpId = parentId ? `ci-reply-${id}-${parentId}` : `ci-${id}`;
+    const inp = document.getElementById(inpId);
+    if (!inp) return;
     const text = inp.value.trim();
     if (!text) return;
     inp.value = '';
+    
+    const payload = { target_type: type, target_id: id, noi_dung: text };
+    if (parentId) payload.parent_id = parentId;
+    
     const res = await fetch('comment_api.php', {
         method: 'POST',
         headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({target_type: type, target_id: id, noi_dung: text})
+        body: JSON.stringify(payload)
     });
     const data = await res.json();
     if (data.ok) {
         loadedComments[id] = false;
         await loadComments(id, type);
+    }
+}
+
+async function deleteCommentNode(cmtId, postId, type) {
+    if (!confirm('Bạn có chắc muốn xoá bình luận này?')) return;
+    const res = await fetch('comment_api.php?action=delete', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({comment_id: cmtId})
+    });
+    const data = await res.json();
+    if (data.ok) {
+        const el = document.getElementById('cmt-' + cmtId);
+        if (el) {
+            el.style.transition = 'opacity .25s, transform .25s';
+            el.style.opacity = '0';
+            el.style.transform = 'translateX(-10px)';
+            setTimeout(() => {
+                el.remove();
+                loadedComments[postId] = false;
+                loadComments(postId, type);
+            }, 250);
+        }
+    } else {
+        alert(data.msg || 'Không thể xoá');
     }
 }
 
@@ -488,6 +678,15 @@ async function pollFeed() {
             const data = await res.json();
             const commentRefreshTasks = [];
 
+            if (typeof data.is_banned !== 'undefined') {
+                if (IS_BANNED && !data.is_banned) {
+                    showUnbannedWidget();
+                } else if (!IS_BANNED && data.is_banned) {
+                    showBannedWidget();
+                }
+                IS_BANNED = data.is_banned;
+            }
+
             if (data.updates) {
                 for (const [id, stats] of Object.entries(data.updates)) {
                     const reactEl = document.getElementById('stat-react-' + id);
@@ -505,6 +704,18 @@ async function pollFeed() {
                 }
             }
             if (commentRefreshTasks.length) await Promise.allSettled(commentRefreshTasks);
+
+            if (data.deleted_posts && data.deleted_posts.length > 0) {
+                data.deleted_posts.forEach(del_id => {
+                    const postEl = document.getElementById('post-' + del_id);
+                    if (postEl) {
+                        postEl.style.transition = "all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1)";
+                        postEl.style.opacity = "0";
+                        postEl.style.transform = "scale(0.9) translateY(20px)";
+                        setTimeout(() => postEl.remove(), 400);
+                    }
+                });
+            }
 
             if (data.new_posts_html) {
                 const feedContainer = document.querySelector('.social-feed');
@@ -980,5 +1191,18 @@ document.getElementById('chatMobileTrigger')?.addEventListener('click', () => {
 <script src="../assets/js/search.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="../assets/js/login-modal.js"></script>
+<script>
+// User dropdown toggle
+const userMenuBtn = document.getElementById('userMenuBtn');
+const userDropdown = document.getElementById('userDropdown');
+if (userMenuBtn && userDropdown) {
+    userMenuBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        userDropdown.classList.toggle('open');
+    });
+    document.addEventListener('click', () => userDropdown.classList.remove('open'));
+}
+</script>
+
 </body>
 </html>

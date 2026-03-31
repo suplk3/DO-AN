@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require_once __DIR__ . '/../config/db.php';
 
@@ -8,6 +8,8 @@ if (!isset($_SESSION['user_id']) || ($_SESSION['vai_tro'] ?? '') !== 'admin') {
 }
 
 $search = isset($_GET['q']) ? trim($_GET['q']) : '';
+$search_id = ctype_digit($search) ? (int)$search : 0;
+$search_is_id = ($search !== '' && ctype_digit($search));
 
 $sql_base = "SELECT v.id AS ve_id,
                     v.user_id,
@@ -30,9 +32,15 @@ $sql_base = "SELECT v.id AS ve_id,
 
 if ($search !== '') {
     $search_param = '%' . $search . '%';
-    $sql = $sql_base . " WHERE (u.ten LIKE ? OR u.email LIKE ?) ORDER BY sc.ngay DESC, sc.gio DESC";
-    $stmt = mysqli_prepare($conn, $sql);
-    mysqli_stmt_bind_param($stmt, 'ss', $search_param, $search_param);
+    if ($search_is_id) {
+        $sql = $sql_base . " WHERE u.id = ? ORDER BY sc.ngay DESC, sc.gio DESC";
+        $stmt = mysqli_prepare($conn, $sql);
+        mysqli_stmt_bind_param($stmt, 'i', $search_id);
+    } else {
+        $sql = $sql_base . " WHERE (u.ten LIKE ? OR u.email LIKE ?) ORDER BY sc.ngay DESC, sc.gio DESC";
+        $stmt = mysqli_prepare($conn, $sql);
+        mysqli_stmt_bind_param($stmt, 'ss', $search_param, $search_param);
+    }
 } else {
     $sql = $sql_base . " ORDER BY sc.ngay DESC, sc.gio DESC";
     $stmt = mysqli_prepare($conn, $sql);
@@ -44,12 +52,17 @@ $ves = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
 $users_list = [];
 if ($search !== '') {
-    $u_stmt = mysqli_prepare($conn, "SELECT id, ten, email FROM users WHERE vai_tro = 'user' AND (ten LIKE ? OR email LIKE ?) ORDER BY ten");
-    mysqli_stmt_bind_param($u_stmt, 'ss', $search_param, $search_param);
+    if ($search_is_id) {
+        $u_stmt = mysqli_prepare($conn, "SELECT id, ten, email FROM users WHERE vai_tro = 'user' AND (is_banned = 0 OR is_banned IS NULL) AND id = ? ORDER BY ten");
+        mysqli_stmt_bind_param($u_stmt, 'i', $search_id);
+    } else {
+        $u_stmt = mysqli_prepare($conn, "SELECT id, ten, email FROM users WHERE vai_tro = 'user' AND (is_banned = 0 OR is_banned IS NULL) AND (ten LIKE ? OR email LIKE ?) ORDER BY ten");
+        mysqli_stmt_bind_param($u_stmt, 'ss', $search_param, $search_param);
+    }
     mysqli_stmt_execute($u_stmt);
     $u_res = mysqli_stmt_get_result($u_stmt);
 } else {
-    $u_res = mysqli_query($conn, "SELECT id, ten, email FROM users WHERE vai_tro = 'user' ORDER BY ten");
+    $u_res = mysqli_query($conn, "SELECT id, ten, email FROM users WHERE vai_tro = 'user' AND (is_banned = 0 OR is_banned IS NULL) ORDER BY ten");
 }
 if ($u_res) {
     while ($u = mysqli_fetch_assoc($u_res)) {
@@ -106,6 +119,22 @@ foreach ($ves as $v) {
 }
 .admin-search-bar .btn-clear:hover { background: rgba(255,255,255,.06); color: #fff; }
 
+.btn-header {
+  padding: 10px 18px; border-radius: 10px; border: none; color: #fff; font-weight: 700; font-size: 13px; cursor: pointer; transition: all .3s cubic-bezier(0.25, 0.8, 0.25, 1); text-decoration: none; display: inline-flex; align-items: center; gap: 8px; position: relative; overflow: hidden;
+}
+.btn-header-danger {
+  background: linear-gradient(135deg, #ef4444, #b91c1c); box-shadow: 0 4px 15px rgba(239, 68, 68, 0.25);
+}
+.btn-header-danger:hover {
+  transform: translateY(-2px); box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4); filter: brightness(1.1); color: #fff;
+}
+.btn-header-danger::after {
+  content: ''; position: absolute; top:0; left:-100%; width:50%; height:100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transform: skewX(-20deg); transition: 0.5s;
+}
+.btn-header-danger:hover::after { left: 150%; }
+
 .user-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px,1fr));
@@ -138,9 +167,19 @@ foreach ($ves as $v) {
 .user-name { font-size: 14px; font-weight: 800; color: #f1f5f9; }
 .user-email { font-size: 12px; color: #64748b; margin-top: 2px; }
 .user-badge {
-  margin-left: auto; font-size: 11px; font-weight: 700;
-  padding: 3px 10px; border-radius: 999px;
-  background: rgba(232,25,44,.12); border: 1px solid rgba(232,25,44,.2); color: #fca5a5;
+  font-size: 11px; font-weight: 700;
+  padding: 4px 10px; border-radius: 999px;
+  background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.2); color: #7dd3fc;
+}
+.btn-ban-sm {
+  font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 999px;
+  background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); color: #f87171;
+  text-decoration: none; cursor: pointer; transition: all 0.2s;
+  display: flex; align-items: center; gap: 4px;
+}
+.btn-ban-sm:hover {
+  background: rgba(239,68,68,0.2); border-color: rgba(239,68,68,0.4); color: #fca5a5;
+  transform: translateY(-1px); box-shadow: 0 2px 10px rgba(239,68,68,0.2);
 }
 .ticket-list { padding: 0 16px 8px; }
 .ticket-item {
@@ -194,7 +233,10 @@ foreach ($ves as $v) {
 </header>
 
 <main class="container">
-  <h1 class="page-title">👥 Quản lý người dùng</h1>
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+    <h1 class="page-title" style="margin-bottom:0;">👥 Quản lý người dùng</h1>
+    <a href="quan_ly_ban_user.php" class="btn-header btn-header-danger" title="Xem những người dùng đã bị cấm tương tác">🚫 Danh sách bị cấm</a>
+  </div>
 
   <!-- Stats -->
   <div class="stats-bar">
@@ -233,11 +275,14 @@ foreach ($ves as $v) {
     <div class="user-card">
       <div class="user-card-header">
         <div class="user-avatar">👤</div>
-        <div>
+        <div style="flex:1;">
           <div class="user-name"><?= htmlspecialchars($user['ten'] ?? 'Khách') ?></div>
           <div class="user-email"><?= htmlspecialchars($user['email'] ?? '') ?></div>
         </div>
-        <span class="user-badge"><?= count($list) ?> vé</span>
+        <div style="display:flex; align-items:center; gap:8px; margin-left:auto;">
+          <span class="user-badge" title="Số vé đã mua"><?= count($list) ?> vé</span>
+          <a href="ban_user.php?id=<?= $uid ?>" onclick="return confirm('Bạn có chắc chắn muốn cấm người dùng này?');" class="btn-ban-sm" title="Cấm tương tác trong cộng đồng">🚫 Cấm</a>
+        </div>
       </div>
       <div class="ticket-list">
         <?php if (empty($list)): ?>

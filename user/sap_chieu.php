@@ -205,6 +205,9 @@ function fmt_date($d) {
 
             <div class="card-body">
                 <h3 class="movie-title" title="<?= htmlspecialchars($row['ten_phim']) ?>">
+                    <span style="display:inline-block; padding:1px 5px; background:rgba(232, 25, 44, 0.85); color:#fff; border-radius:3px; font-size:10px; margin-right:6px; vertical-align:middle; font-weight:900; font-family:'Inter', sans-serif;">
+                        <?= htmlspecialchars($row['do_tuoi'] ?? 'P') ?>
+                    </span>
                     <?= htmlspecialchars($row['ten_phim']) ?>
                 </h3>
 
@@ -305,21 +308,7 @@ function fmt_date($d) {
 <script src="../assets/js/search.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 <script src="../assets/js/login-modal.js"></script>
-<script>
-// Theme toggle
-(function(){
-  var body = document.body;
-  var btn = document.getElementById('themeToggle');
-  var stored = localStorage.getItem('theme') || 'dark';
-  body.setAttribute('data-theme', stored);
-  if (!btn) return;
-  btn.addEventListener('click', function(){
-    var cur = body.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
-    body.setAttribute('data-theme', cur);
-    localStorage.setItem('theme', cur);
-  });
-})();
-</script>
+
 
 <script>
 // User dropdown toggle

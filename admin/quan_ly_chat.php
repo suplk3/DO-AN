@@ -82,7 +82,6 @@ include "../config/db.php";
 </div>
 
 <script>
-let currentUserId = 0;
 let lastMsgCount = 0;
 
 function loadUsers() {
@@ -156,6 +155,14 @@ setInterval(() => {
     loadUsers();
     if(currentUserId !== 0) loadMessages();
 }, 2500);
+
+let currentUserId = new URLSearchParams(window.location.search).get('user_id') || 0;
+if (currentUserId > 0) {
+    document.getElementById('chatEmpty').style.display = 'none';
+    document.getElementById('chatMain').style.display = 'flex';
+    document.getElementById('currentChatName').innerText = "Hỗ trợ ID: " + currentUserId;
+    loadMessages();
+}
 
 loadUsers();
 </script>
