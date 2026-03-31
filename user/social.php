@@ -290,6 +290,8 @@ function time_ago($datetime) {
 ?>
 
 const REACTIONS = <?= json_encode($REACTIONS) ?>;
+const CURRENT_USER_ID = <?= json_encode($me) ?>;
+const IS_ADMIN = <?= json_encode((bool)(isset($_SESSION['vai_tro']) && $_SESSION['vai_tro'] === 'admin')) ?>;
 
 let IS_BANNED = <?= !empty($me_info['is_banned']) ? 'true' : 'false' ?>;
 
@@ -513,6 +515,9 @@ function renderCommentTree(comments, postId, type, depth = 0) {
                         <div class="comment-meta">
                             ${c.time_ago}
                             <button class="btn-reply-text" style="background:none;border:none;color:#94a3b8;font-size:11px;cursor:pointer;padding:0 5px; margin-left:8px;" onclick="showReplyBox(${postId}, '${type}', ${parentId})">Trả lời</button>
+                            ${(CURRENT_USER_ID && (parseInt(c.user_id) === parseInt(CURRENT_USER_ID) || IS_ADMIN))
+                                ? `<button class="btn-delete-text" style="background:none;border:none;color:#ef4444;font-size:11px;cursor:pointer;padding:0 5px; margin-left:8px;" onclick="deleteCommentNode(${c.id}, ${postId}, '${type}')">Xoá</button>`
+                                : ''}
                         </div>
                     </div>
                     
@@ -589,6 +594,31 @@ async function submitComment(id, type, parentId = null) {
     if (data.ok) {
         loadedComments[id] = false;
         await loadComments(id, type);
+    }
+}
+
+async function deleteCommentNode(cmtId, postId, type) {
+    if (!confirm('Bạn có chắc muốn xoá bình luận này?')) return;
+    const res = await fetch('comment_api.php?action=delete', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({comment_id: cmtId})
+    });
+    const data = await res.json();
+    if (data.ok) {
+        const el = document.getElementById('cmt-' + cmtId);
+        if (el) {
+            el.style.transition = 'opacity .25s, transform .25s';
+            el.style.opacity = '0';
+            el.style.transform = 'translateX(-10px)';
+            setTimeout(() => {
+                el.remove();
+                loadedComments[postId] = false;
+                loadComments(postId, type);
+            }, 250);
+        }
+    } else {
+        alert(data.msg || 'Không thể xoá');
     }
 }
 

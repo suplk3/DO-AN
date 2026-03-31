@@ -110,86 +110,34 @@ $notShowingCount = max(0, $count - $showingCount);
             border-color: rgba(96, 165, 250, 0.55);
             box-shadow: 0 16px 32px rgba(30, 64, 175, 0.28);
         }
-        .top-bar {
+        .unified-toolbar {
             display: grid;
-            grid-template-columns: minmax(500px, 560px) minmax(280px, 1fr);
+            grid-template-columns: auto 1fr minmax(130px, 180px) minmax(130px, 180px);
             gap: 12px;
-            margin-bottom: 12px;
-            align-items: stretch;
-        }
-        .toolbar-actions {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 12px;
-            align-items: stretch;
-        }
-        .toolbar-search {
-            min-width: 0;
-            height: 48px;
-            display: flex;
-            align-items: stretch;
-        }
-        .toolbar-search .search-box {
-            width: 100%;
-            height: 48px;
-            display: flex;
+            margin-bottom: 20px;
             align-items: center;
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.5), rgba(15, 23, 42, 0.7));
+            padding: 16px;
+            border-radius: 16px;
+            border: 1px solid rgba(59, 130, 246, 0.25);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
         }
-        .filter-row {
-            display: grid;
-            grid-template-columns: minmax(180px, 240px) minmax(180px, 240px) 1fr;
-            gap: 10px;
-            margin-bottom: 14px;
-            align-items: center;
+        .ut-actions { display: flex; gap: 8px; }
+        .ut-actions .btn.toolbar-btn { padding: 0 16px; }
+        .ut-actions .btn.toolbar-btn[title] { padding: 0 12px; }
+        .ut-search { position: relative; width: 100%; height: 48px; }
+        .ut-filter { position: relative; width: 100%; height: 48px; }
+        .ut-search input, .ut-filter select {
+            width: 100%; height: 100%; box-sizing: border-box;
+            border-radius: 12px; border: 1px solid rgba(59, 130, 246, 0.35);
+            background: rgba(15, 23, 42, 0.6); color: #f8fafc;
+            padding: 0 16px; outline: none; transition: all .2s;
         }
-        .filter-hint {
-            justify-self: end;
-            color: rgba(226, 232, 240, 0.78);
-            font-size: 13px;
-            letter-spacing: .3px;
-        }
-        .search-box,
-        .filter-select {
-            position: relative;
-        }
-        .admin-shell .search-box input,
-        .admin-shell .filter-select select {
-            width: 100%;
-            height: 48px;
-            box-sizing: border-box;
-            border-radius: 12px;
-            border: 1px solid rgba(59, 130, 246, 0.42);
-            color: #e2e8f0;
-            background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 58, 95, 0.32));
-            outline: none;
-            transition: border-color .2s ease, box-shadow .2s ease;
-        }
-        .admin-shell .search-box input {
-            padding: 0 14px 0 42px;
-        }
-        .admin-shell .filter-select select {
-            padding: 0 12px;
-        }
-        .admin-shell .search-box input::placeholder {
-            color: rgba(203, 213, 225, 0.74);
-        }
-        .search-icon {
-            position: absolute;
-            left: 14px;
-            top: 50%;
-            transform: translateY(-50%);
-            opacity: .9;
-            color: #60a5fa;
-        }
-        .admin-shell .search-box input:focus,
-        .admin-shell .filter-select select:focus {
-            border-color: rgba(96, 165, 250, 0.82);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.22);
-        }
-        .filter-select select option {
-            background: #0f172a;
-            color: #e2e8f0;
-        }
+        .ut-search input { padding-left: 44px; }
+        .ut-search .search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #60a5fa; opacity: 0.9; }
+        .ut-search input:focus, .ut-filter select:focus { border-color: #60a5fa; box-shadow: 0 0 0 3px rgba(59,130,246,0.2); background: rgba(15, 23, 42, 0.8); }
+        .ut-filter select { appearance: none; cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2360a5fa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px;}
+        .ut-filter select option { background: #0f172a; color: #f8fafc; }
         .msg.success {
             margin-bottom: 14px;
             border: 1px solid rgba(16, 185, 129, 0.45);
@@ -413,22 +361,10 @@ $notShowingCount = max(0, $count - $showingCount);
             }
         }
         @media (max-width: 960px) {
-            .top-bar {
-                grid-template-columns: 1fr;
-            }
-            .toolbar-actions {
-                grid-template-columns: repeat(3, minmax(0, 1fr));
-            }
-            .toolbar-search {
-                width: 100%;
-            }
-            .filter-row {
-                grid-template-columns: 1fr 1fr;
-            }
-            .filter-hint {
-                grid-column: 1 / -1;
-                justify-self: start;
-            }
+            .unified-toolbar { grid-template-columns: 1fr 1fr; }
+            .ut-actions, .ut-search { grid-column: 1 / -1; width: 100%; }
+            .ut-actions { justify-content: stretch; }
+            .ut-actions .btn.toolbar-btn { flex: 1; text-align: center; }
             .stat-card .number {
                 font-size: 26px;
             }
@@ -444,17 +380,9 @@ $notShowingCount = max(0, $count - $showingCount);
             .quick-stats {
                 grid-template-columns: 1fr;
             }
-            .toolbar-btn {
-                width: 100%;
-                justify-content: center;
-            }
-            .toolbar-actions {
-                width: 100%;
-                grid-template-columns: 1fr;
-            }
-            .filter-row {
-                grid-template-columns: 1fr;
-            }
+            .unified-toolbar { grid-template-columns: 1fr; }
+            .ut-actions { flex-direction: column; }
+            .toolbar-btn { width: 100%; justify-content: center; }
             table {
                 font-size: 13px;
             }
@@ -475,27 +403,7 @@ $notShowingCount = max(0, $count - $showingCount);
         <h1 class="page-title">🎬 Quản lý phim</h1>
     </div>
 
-    <div class="top-bar">
-        <div class="toolbar-actions">
-            <a href="them_phim.php" class="btn toolbar-btn primary">
-                <span>➕</span> Thêm phim mới
-            </a>
-            <a href="../user/index.php" class="btn toolbar-btn outline">
-                <span>🏠</span> Về trang chính
-            </a>
-            <a href="reset_id.php" class="btn toolbar-btn neutral">
-                <span>🔄</span> Reset ID
-            </a>
-        </div>
-        <div class="toolbar-search">
-            <div class="search-box">
-                <span class="search-icon">🔍</span>
-                <input type="text" id="searchInput" placeholder="Tìm tên phim, thể loại..." onkeyup="filterMovies()">
-            </div>
-        </div>
-    </div>
-
-    <!-- Thống kê nhanh -->
+    <!-- Thống kê nhanh (Chuyển lên đầu) -->
     <div class="quick-stats">
         <div class="stat-card total clickable" title="Nhấn để hiện tất cả phim" onclick="showAllMovies()">
             <span class="stat-icon">🎬</span>
@@ -520,9 +428,24 @@ $notShowingCount = max(0, $count - $showingCount);
         </div>
     </div>
 
-    <!-- Bộ lọc -->
-    <div class="filter-row">
-        <div class="filter-select">
+    <!-- Unified Toolbar: Functions, Search, Filters -->
+    <div class="unified-toolbar">
+        <div class="ut-actions">
+            <a href="them_phim.php" class="btn toolbar-btn primary">
+                <span>➕</span> Thêm ngay
+            </a>
+            <a href="../user/index.php" class="btn toolbar-btn outline" title="Về trang chính">
+                <span>🏠</span>
+            </a>
+            <a href="reset_id.php" class="btn toolbar-btn neutral" title="Reset ID">
+                <span>🔄</span>
+            </a>
+        </div>
+        <div class="ut-search">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="Tìm tên phim, thể loại..." onkeyup="filterMovies()">
+        </div>
+        <div class="ut-filter">
             <select id="genreFilter" onchange="filterMovies()">
                 <option value="">Tất cả thể loại</option>
                 <?php
@@ -542,14 +465,13 @@ $notShowingCount = max(0, $count - $showingCount);
                 ?>
             </select>
         </div>
-        <div class="filter-select">
+        <div class="ut-filter">
             <select id="statusFilter" onchange="filterMovies()">
                 <option value="">Tất cả trạng thái</option>
                 <option value="showing">Đã có suất chiếu</option>
                 <option value="not_showing">Chưa có suất chiếu</option>
             </select>
         </div>
-        <div class="filter-hint">Tổng: <strong><?= $count ?></strong> phim</div>
     </div>
 
     <?php if (!empty($_SESSION['success'])): ?>
@@ -561,8 +483,9 @@ $notShowingCount = max(0, $count - $showingCount);
         <table>
             <thead>
                 <tr>
-                    <th># ID</th>
+                    <th style="width: 60px;"># ID</th>
                     <th>🎬 Tên phim</th>
+                    <th style="width: 90px; text-align:center;">🔞 Độ tuổi</th>
                     <th>🏷️ Thể loại</th>
                     <th>🖼️ Poster</th>
                     <th>🔒 Trạng thái</th>
@@ -572,7 +495,7 @@ $notShowingCount = max(0, $count - $showingCount);
             <tbody id="movieTableBody">
                 <?php 
                 if ($count === 0) {
-                    echo '<tr class="empty-row"><td colspan="6">
+                    echo '<tr class="empty-row"><td colspan="7">
                         <div class="empty-state">
                             <div class="icon">🎬</div>
                             <div class="message">Chưa có phim nào trong hệ thống</div>
@@ -591,9 +514,12 @@ $notShowingCount = max(0, $count - $showingCount);
                     data-genres="<?= htmlspecialchars(str_replace(',', '|', $row['the_loai'])) ?>"
                     data-title="<?= htmlspecialchars(strtolower($row['ten_phim'])) ?>"
                     data-showing="<?= $isShowing ? '1' : '0' ?>">
-                    <td class="movie-title">
+                    <td style="color: #94a3b8; font-weight: 600;">#<?= $row['id'] ?></td>
+                    <td class="movie-title" style="font-weight: 700; color: #f8fafc;">
                         <?= htmlspecialchars($row['ten_phim']) ?>
-                        <span style="display:inline-block; padding:2px 6px; background:rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.5); color:#fca5a5; border-radius:4px; font-size:10px; margin-left:6px; vertical-align:middle; font-weight:bold;">
+                    </td>
+                    <td style="text-align: center;">
+                        <span style="display:inline-block; padding:4px 8px; background:rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color:#fca5a5; border-radius:6px; font-size:11px; font-weight:bold; letter-spacing:0.5px;">
                             <?= htmlspecialchars($row['do_tuoi'] ?? 'P') ?>
                         </span>
                     </td>

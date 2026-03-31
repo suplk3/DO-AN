@@ -76,6 +76,172 @@ function time_ago($datetime) {
 <?php $active_page = ''; include 'components/header.php'; ?>
 <main class="container" style="padding-top:20px;">
 
+<style>
+/* Z-INDEX FIX CHO HEADER */
+.header {
+    position: relative;
+    z-index: 1000 !important;
+}
+
+/* PREMIUM PROFILE REDESIGN */
+.profile-header-card {
+    background: linear-gradient(145deg, rgba(30,41,59,0.7), rgba(15,23,42,0.9));
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 24px;
+    overflow: hidden;
+    margin-bottom: 30px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    position: relative;
+}
+.profile-cover {
+    height: 240px;
+    background: linear-gradient(135deg, #1e3a8a, #7e22ce, #be185d);
+    background-size: 200% 200%;
+    animation: gradientMove 10s ease infinite;
+    position: relative;
+    overflow: hidden;
+}
+@keyframes gradientMove { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+.profile-cover::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 120px;
+    background: linear-gradient(to top, rgba(15,23,42,1), transparent);
+}
+.profile-header-body {
+    padding: 0 32px 32px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: -70px;
+}
+.profile-avatar-wrap {
+    position: relative;
+    margin-bottom: 16px;
+    z-index: 10;
+}
+.profile-avatar-big {
+    width: 150px; height: 150px;
+    border-radius: 50%;
+    border: 6px solid #0f172a;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    object-fit: cover;
+    background: #0f172a;
+}
+.avatar-placeholder-big {
+    width: 150px; height: 150px;
+    border-radius: 50%;
+    border: 6px solid #0f172a;
+    background: linear-gradient(135deg, #7c3aed, #ec4899);
+    color: white; font-size: 60px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+.avatar-edit-btn {
+    position: absolute;
+    bottom: 8px; right: 8px;
+    background: rgba(15,23,42,0.85);
+    border: 2px solid rgba(255,255,255,0.15);
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0;
+    font: inherit;
+    line-height: 1;
+    cursor: pointer; backdrop-filter: blur(8px);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    color: #fff;
+}
+.avatar-edit-btn:hover { background: #3b82f6; border-color: #60a5fa; transform: scale(1.15); box-shadow: 0 8px 20px rgba(59,130,246,0.4); }
+.profile-name { font-size: 32px; font-weight: 800; color: #f8fafc; margin: 0 0 8px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); text-align: center; letter-spacing: -0.5px;}
+.profile-bio { font-size: 15px; color: #94a3b8; max-width: 500px; text-align: center; margin: 0 0 24px; line-height: 1.6; }
+
+.profile-stats-glass {
+    display: flex; gap: 8px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    backdrop-filter: blur(20px);
+    padding: 16px 24px;
+    border-radius: 20px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    justify-content: center;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+}
+.glass-stat {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 0 20px;
+    position: relative;
+    transition: transform 0.2s;
+    cursor: default;
+}
+.glass-stat:hover { transform: translateY(-3px); }
+.glass-stat:not(:last-child)::after {
+    content: ''; position: absolute;
+    right: 0; top: 15%; height: 70%; width: 1px;
+    background: rgba(255,255,255,0.08);
+}
+.glass-stat strong { font-size: 24px; font-weight: 800; color: #e2e8f0; line-height: 1.2; }
+.glass-stat span { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.8px; margin-top:2px; }
+
+.btn-edit-profile, .btn-follow {
+    padding: 12px 32px; border-radius: 99px;
+    font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
+    cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex; align-items: center; gap: 8px;
+}
+.btn-edit-profile {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #e2e8f0; backdrop-filter: blur(8px);
+}
+.btn-edit-profile:hover { background: rgba(255,255,255,0.12); transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.3); border-color: rgba(255,255,255,0.2); color: #fff; }
+
+.btn-follow { background: linear-gradient(135deg, #3b82f6, #6366f1); border: none; color: #fff; box-shadow: 0 8px 20px rgba(59,130,246,0.3); }
+.btn-follow:hover { filter: brightness(1.08); transform: translateY(-2px); box-shadow: 0 12px 24px rgba(59,130,246,0.4); }
+.btn-follow.following { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #94a3b8; box-shadow: none; }
+
+/* Edit Panel Premium */
+.edit-premium-panel {
+    background: rgba(15,23,42,0.8);
+    border: 1px solid rgba(255,255,255,0.08);
+    backdrop-filter: blur(16px);
+    border-radius: 24px;
+    padding: 24px;
+    margin-top: 24px;
+    width: 100%; max-width: 600px;
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.05), 0 20px 40px rgba(0,0,0,0.5);
+    animation: slideDown 0.4s ease-out;
+}
+@keyframes slideDown { from { opacity: 0; transform: translateY(-15px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+.ep-row { display: grid; grid-template-columns: 1fr 1.5fr; gap: 16px; margin-bottom: 16px; }
+.ep-group { display: flex; flex-direction: column; gap: 6px; }
+.ep-group label { font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+.ep-input {
+    background: rgba(0,0,0,0.25) !important;
+    border: 1px solid rgba(255,255,255,0.08) !important;
+    border-radius: 12px; padding: 12px 16px; color: #f8fafc;
+    font-size: 14px; width: 100%; transition: all 0.3s;
+}
+.ep-input:focus { border-color: #3b82f6 !important; box-shadow: 0 0 0 3px rgba(59,130,246,0.15) !important; outline: none; }
+.ep-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.05); }
+.btn-ep-save { background: linear-gradient(135deg, #10b981, #059669); border: none; padding: 10px 24px; border-radius: 10px; color: white; font-weight: 700; cursor: pointer; transition: 0.2s;}
+.btn-ep-save:hover { transform: translateY(-2px); box-shadow: 0 8px 16px rgba(16,185,129,0.3); }
+.btn-ep-cancel { background: transparent; border: 1px solid rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 10px; color: #94a3b8; font-weight: 700; cursor: pointer; transition: 0.2s;}
+.btn-ep-cancel:hover { background: rgba(255,255,255,0.05); color: #fff; }
+
+@media(max-width: 600px) {
+    .ep-row { grid-template-columns: 1fr; }
+    .profile-stats-glass { gap: 0; padding: 16px 10px; }
+    .glass-stat { padding: 0 12px; }
+    .profile-avatar-big, .avatar-placeholder-big { width: 120px; height: 120px; font-size: 48px; border-width: 4px; }
+    .profile-name { font-size: 26px; }
+    .profile-header-body { padding: 0 20px 24px; }
+}
+</style>
+
   <!-- Profile header card -->
   <div class="profile-header-card">
     <div class="profile-cover"></div>
@@ -88,32 +254,31 @@ function time_ago($datetime) {
           <div class="avatar-placeholder-big" id="avatarImg"><?= mb_substr($user['ten'],0,1) ?></div>
         <?php endif; ?>
         <?php if ($is_me): ?>
-        <label class="avatar-edit-btn" title="Đổi ảnh đại diện">
+        <button type="button" class="avatar-edit-btn" id="avatarTrigger" title="Đổi ảnh đại diện">
           📷
-          <input type="file" accept="image/*" style="display:none" id="avatarUpload">
-        </label>
+        </button>
         <?php endif; ?>
       </div>
 
-      <div class="profile-header-info">
+      <div class="profile-header-info" style="display:flex;flex-direction:column;align-items:center;width:100%;">
         <h1 class="profile-name"><?= htmlspecialchars($user['ten']) ?></h1>
         <?php if ($user['bio']): ?>
           <p class="profile-bio"><?= htmlspecialchars($user['bio']) ?></p>
         <?php elseif ($is_me): ?>
-          <p class="profile-bio" style="color:#475569;font-style:italic;">Thêm tiểu sử...</p>
+          <p class="profile-bio" style="font-style:italic;opacity:0.5;">Thêm tiểu sử để mọi người hiểu hơn về bạn...</p>
         <?php endif; ?>
 
-        <div class="profile-stats-row">
-          <div class="pstat"><strong><?= $stats['bai_dang'] ?></strong><span>Bài đăng</span></div>
-          <div class="pstat"><strong><?= $stats['followers'] ?></strong><span>Người theo dõi</span></div>
-          <div class="pstat"><strong><?= $stats['following'] ?></strong><span>Đang theo dõi</span></div>
-          <div class="pstat"><strong><?= $stats['ve_dat'] ?></strong><span>Vé đã đặt</span></div>
+        <div class="profile-stats-glass">
+          <div class="glass-stat"><strong><?= $stats['bai_dang'] ?></strong><span>Bài viết</span></div>
+          <div class="glass-stat"><strong><?= $stats['followers'] ?></strong><span>Follower</span></div>
+          <div class="glass-stat"><strong><?= $stats['following'] ?></strong><span>Đang Theo</span></div>
+          <div class="glass-stat"><strong style="color:#60a5fa;"><?= $stats['ve_dat'] ?></strong><span style="color:#93c5fd;">Vé đặt</span></div>
         </div>
       </div>
 
       <div class="profile-header-actions">
         <?php if ($is_me): ?>
-          <button class="btn-edit-profile" id="editProfileBtn">✏️ Chỉnh sửa</button>
+          <button class="btn-edit-profile" id="editProfileBtn">✏️ Chỉnh sửa hồ sơ</button>
         <?php else: ?>
           <button class="btn-follow <?= $is_following ? 'following' : '' ?>"
                   id="followBtn" onclick="doFollow(<?= $uid ?>, this)">
@@ -121,36 +286,34 @@ function time_ago($datetime) {
           </button>
         <?php endif; ?>
       </div>
+      <!-- Edit profile panel (only for self) -->
+      <?php if ($is_me): ?>
+      <div class="edit-premium-panel" id="editPanel" style="display:none">
+        <form action="profile_action.php" method="POST" enctype="multipart/form-data" id="editProfileForm">
+          <div class="ep-row">
+            <div class="ep-group">
+              <label>Tên hiển thị</label>
+              <input type="text" name="ten" value="<?= htmlspecialchars($user['ten']) ?>" class="ep-input" required>
+            </div>
+            <div class="ep-group">
+              <label>Tiểu sử (Bio)</label>
+              <input type="text" name="bio" value="<?= htmlspecialchars($user['bio'] ?? '') ?>" class="ep-input" placeholder="Viết gì đó về bản thân...">
+            </div>
+          </div>
+          <div class="ep-group">
+            <label>Cập nhật ảnh đại diện (hoặc nhấn 📷 ở Avatar)</label>
+            <input type="file" name="avatar" accept="image/*" class="ep-input" style="padding: 9px 16px;" id="editAvatarInput">
+          </div>
+
+          <div class="ep-actions">
+            <button type="button" class="btn-ep-cancel" onclick="document.getElementById('editPanel').style.display='none'">Hủy bỏ</button>
+            <button type="submit" class="btn-ep-save">💾 Lưu thay đổi</button>
+          </div>
+        </form>
+      </div>
+      <?php endif; ?>
     </div>
   </div>
-
-  <!-- Edit profile panel (only for self) -->
-  <?php if ($is_me): ?>
-  <div class="edit-profile-panel" id="editPanel" style="display:none">
-    <form action="profile_action.php" method="POST" enctype="multipart/form-data">
-      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;">
-        <div style="flex:1;min-width:200px;">
-          <label style="font-size:12px;color:#64748b;font-weight:700;display:block;margin-bottom:4px;">TÊN</label>
-          <input type="text" name="ten" value="<?= htmlspecialchars($user['ten']) ?>"
-                 class="edit-input" required>
-        </div>
-        <div style="flex:2;min-width:260px;">
-          <label style="font-size:12px;color:#64748b;font-weight:700;display:block;margin-bottom:4px;">TIỂU SỬ</label>
-          <input type="text" name="bio" value="<?= htmlspecialchars($user['bio'] ?? '') ?>"
-                 class="edit-input" placeholder="Viết gì đó về bản thân...">
-        </div>
-        <div>
-          <label style="font-size:12px;color:#64748b;font-weight:700;display:block;margin-bottom:4px;">ẢNH ĐẠI DIỆN</label>
-          <input type="file" name="avatar" accept="image/*" class="edit-input" style="padding:6px;">
-        </div>
-        <div style="display:flex;gap:8px;">
-          <button type="submit" class="btn-post">Lưu</button>
-          <button type="button" class="btn-cancel-compose" onclick="document.getElementById('editPanel').style.display='none'">Hủy</button>
-        </div>
-      </div>
-    </form>
-  </div>
-  <?php endif; ?>
 
   <!-- Posts grid -->
   <div class="profile-posts-area">
@@ -180,10 +343,21 @@ function time_ago($datetime) {
 const REACTIONS = <?= json_encode($REACTIONS) ?>;
 
 <?php if ($is_me): ?>
-document.getElementById('editProfileBtn').addEventListener('click', () => {
-    const p = document.getElementById('editPanel');
-    p.style.display = p.style.display === 'none' ? 'block' : 'none';
+const editPanel = document.getElementById('editPanel');
+const editProfileBtn = document.getElementById('editProfileBtn');
+const avatarTrigger = document.getElementById('avatarTrigger');
+const editAvatarInput = document.getElementById('editAvatarInput');
+
+editProfileBtn.addEventListener('click', () => {
+    editPanel.style.display = editPanel.style.display === 'none' ? 'block' : 'none';
 });
+
+if (avatarTrigger && editAvatarInput) {
+    avatarTrigger.addEventListener('click', () => {
+        editPanel.style.display = 'block';
+        editAvatarInput.click();
+    });
+}
 <?php endif; ?>
 
 // Reuse same JS functions from social.php
@@ -293,5 +467,17 @@ const h=document.querySelector('.header'),b=document.querySelector('body.user-in
 if(h&&b){const fn=()=>{h.classList.toggle('shrink',scrollY>50);b.classList.toggle('header-shrink',scrollY>50);};window.addEventListener('scroll',fn,{passive:true});fn();}
 </script>
 <script src="../assets/js/search.js"></script>
+<script>
+// User dropdown toggle
+const userMenuBtn = document.getElementById('userMenuBtn');
+const userDropdown = document.getElementById('userDropdown');
+if (userMenuBtn && userDropdown) {
+    userMenuBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        userDropdown.classList.toggle('open');
+    });
+    document.addEventListener('click', () => userDropdown.classList.remove('open'));
+}
+</script>
 </body>
 </html>
