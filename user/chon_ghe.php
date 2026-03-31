@@ -78,6 +78,9 @@ $pct_trong = $tong_ghe > 0 ? round($ghe_trong / $tong_ghe * 100) : 0;
 <link rel="stylesheet" href="../assets/css/style.css">
 <link rel="stylesheet" href="../assets/css/movie-detail.css">
 <link rel="stylesheet" href="../assets/css/search.css">
+<link rel="stylesheet" href="../assets/css/user-menu.css">
+<link rel="stylesheet" href="../assets/css/login-modal.css">
+<link rel="stylesheet" href="../assets/css/theme-toggle.css">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;800;900&display=swap');
 
@@ -680,6 +683,18 @@ const sse = new EventSource(`seat_events.php?suat_id=${suatChieuId}`);
   if(!h) return;
   window.addEventListener('scroll',()=>h.classList.toggle('shrink',scrollY>50),{passive:true});
 })();
+</script>
+<script>
+// User dropdown toggle
+const userMenuBtn = document.getElementById('userMenuBtn');
+const userDropdown = document.getElementById('userDropdown');
+if (userMenuBtn && userDropdown) {
+    userMenuBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        userDropdown.classList.toggle('open');
+    });
+    document.addEventListener('click', () => userDropdown.classList.remove('open'));
+}
 </script>
 </body>
 </html>

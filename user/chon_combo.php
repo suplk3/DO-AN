@@ -47,6 +47,10 @@ function fmt_time($t){ return $t ? date('H:i', strtotime($t)) : ''; }
 <title>Chọn Combo – <?= htmlspecialchars($info['ten_phim']) ?></title>
 <link rel="stylesheet" href="../assets/css/style.css">
 <link rel="stylesheet" href="../assets/css/movie-detail.css">
+<link rel="stylesheet" href="../assets/css/search.css">
+<link rel="stylesheet" href="../assets/css/user-menu.css">
+<link rel="stylesheet" href="../assets/css/login-modal.css">
+<link rel="stylesheet" href="../assets/css/theme-toggle.css">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* ── Combo page variables ── */
@@ -645,5 +649,17 @@ updateSummary();
 <footer class="footer">
   <div>© <?= date('Y') ?> CGV Cinemas — Mọi quyền được bảo lưu.</div>
 </footer>
+<script>
+// User dropdown toggle
+const userMenuBtn = document.getElementById('userMenuBtn');
+const userDropdown = document.getElementById('userDropdown');
+if (userMenuBtn && userDropdown) {
+    userMenuBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        userDropdown.classList.toggle('open');
+    });
+    document.addEventListener('click', () => userDropdown.classList.remove('open'));
+}
+</script>
 </body>
 </html>
