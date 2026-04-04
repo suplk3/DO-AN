@@ -38,4 +38,11 @@ function column_exists($conn, $table, $column) {
     mysqli_stmt_close($stmt);
     return (bool)$ok;
 }
+
+// Tự động xóa suất chiếu quá 36h so với thời gian thực (để suất chiếu tự mất ở trang người dùng)
+// Chạy ở cấp độ toàn cục (Global) mỗi khi database được kết nối
+if (table_exists($conn, 'suat_chieu') && table_exists($conn, 've')) {
+    mysqli_query($conn, "DELETE ve FROM ve JOIN suat_chieu sc ON ve.suat_chieu_id = sc.id WHERE CONCAT(sc.ngay, ' ', sc.gio) < DATE_SUB(NOW(), INTERVAL 36 HOUR)");
+    mysqli_query($conn, "DELETE FROM suat_chieu WHERE CONCAT(ngay, ' ', gio) < DATE_SUB(NOW(), INTERVAL 36 HOUR)");
+}
 ?>

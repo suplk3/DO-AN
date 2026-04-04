@@ -20,6 +20,16 @@ $fl = mysqli_fetch_assoc(mysqli_query($conn, "SELECT
 $me_info = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM users WHERE id=$me"));
 $show_community_chat = (($_SESSION['vai_tro'] ?? '') !== 'admin');
 
+// Lấy danh sách bạn bè
+$following_list_data = [];
+$q_following = mysqli_query($conn, "SELECT u.id, u.ten, u.avatar, u.bio FROM users u INNER JOIN follows f ON u.id = f.following_id WHERE f.follower_id = $me ORDER BY u.ten ASC");
+while($r = mysqli_fetch_assoc($q_following)) $following_list_data[] = $r;
+
+$followers_list_data = [];
+$q_followers = mysqli_query($conn, "SELECT u.id, u.ten, u.avatar, u.bio, (SELECT 1 FROM follows WHERE follower_id=$me AND following_id=u.id) AS is_following FROM users u INNER JOIN follows f ON u.id = f.follower_id WHERE f.following_id = $me ORDER BY u.ten ASC");
+while($r = mysqli_fetch_assoc($q_followers)) $followers_list_data[] = $r;
+
+
 $REACTIONS = ['like'=>'👍','love'=>'❤️','haha'=>'😂','wow'=>'😮','sad'=>'😢','angry'=>'😡'];
 ?>
 <!DOCTYPE html>
@@ -73,6 +83,7 @@ $REACTIONS = ['like'=>'👍','love'=>'❤️','haha'=>'😂','wow'=>'😮','sad'
         <?php if ($show_community_chat): ?>
         <a href="#" class="snav-item" id="chatNavTrigger"><span>💬</span> Trò chuyện</a>
         <?php endif; ?>
+        <a href="#" class="snav-item" id="friendsNavTrigger"><span>👥</span> Bạn bè</a>
         <a href="profile.php?id=<?= $me ?>" class="snav-item"><span>👤</span> Trang cá nhân</a>
         <a href="index.php" class="snav-item"><span>🎬</span> Xem phim</a>
         <a href="ve_cua_toi.php" class="snav-item"><span>🎟️</span> Vé của tôi</a>
@@ -81,12 +92,13 @@ $REACTIONS = ['like'=>'👍','love'=>'❤️','haha'=>'😂','wow'=>'😮','sad'
 
     <!-- CENTER: Feed -->
     <div class="social-feed">
-      <?php if ($show_community_chat): ?>
       <div class="social-mobile-tabs">
         <button type="button" class="social-mobile-tab active" id="feedMobileTrigger">Bảng tin</button>
+        <?php if ($show_community_chat): ?>
         <button type="button" class="social-mobile-tab" id="chatMobileTrigger">Trò chuyện</button>
+        <?php endif; ?>
+        <button type="button" class="social-mobile-tab" id="friendsMobileTrigger">Bạn bè</button>
       </div>
-      <?php endif; ?>
 
       <!-- Compose box -->
       <div class="compose-box">
@@ -188,6 +200,73 @@ $REACTIONS = ['like'=>'👍','love'=>'❤️','haha'=>'😂','wow'=>'😮','sad'
         </div>
       </section>
       <?php endif; ?>
+
+      <section class="friends-view" id="friendsView" style="display:none; padding-top:20px; animation:slideIn 0.3s forwards;">
+        <div class="friends-tabs" style="display:flex; gap:16px; margin-bottom:16px; border-bottom:1px solid rgba(255,255,255,0.1);">
+            <button class="ftab-btn active" onclick="switchFriendsTab('following')" style="background:none; border:none; color:#f1f5f9; padding:8px 8px 12px; font-weight:700; border-bottom:2px solid #3b82f6; cursor:pointer;">Đang theo dõi (<?= $fl['following'] ?>)</button>
+            <button class="ftab-btn" onclick="switchFriendsTab('followers')" style="background:none; border:none; color:#94a3b8; padding:8px 8px 12px; font-weight:700; border-bottom:2px solid transparent; cursor:pointer;">Người theo dõi (<?= $fl['followers'] ?>)</button>
+        </div>
+        
+        <div id="ftab-following" class="ftab-content" style="display:block;">
+            <?php if(empty($following_list_data)): ?>
+                <div style="padding:40px 20px; text-align:center; color:#64748b; background:rgba(255,255,255,0.02); border-radius:12px; border:1px dashed rgba(255,255,255,0.1);">Bạn chưa theo dõi ai.</div>
+            <?php else: ?>
+                <?php foreach($following_list_data as $fu): ?>
+                    <div style="display:flex; align-items:center; justify-content:space-between; padding:16px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.05); border-radius:16px; margin-bottom:12px; transition:transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)';" onmouseout="this.style.transform='none';">
+                        <a href="profile.php?id=<?= $fu['id'] ?>" style="display:flex; align-items:center; gap:12px; text-decoration:none;">
+                            <?php if($fu['avatar']): ?>
+                                <img src="../assets/images/avatars/<?= htmlspecialchars($fu['avatar']) ?>" class="avatar-sm" style="width:48px;height:48px;" alt="">
+                            <?php else: ?>
+                                <div class="avatar-placeholder-sm" style="width:48px;height:48px;font-size:18px;"><?= mb_substr($fu['ten'],0,1) ?></div>
+                            <?php endif; ?>
+                            <div>
+                                <div style="font-weight:700; color:#f1f5f9; font-size:15px;"><?= htmlspecialchars($fu['ten']) ?></div>
+                                <div style="font-size:13px; color:#64748b; margin-top:2px;"><?= htmlspecialchars(mb_strimwidth($fu['bio'] ?? '', 0, 40, '...')) ?></div>
+                            </div>
+                        </a>
+                        <button class="btn-follow following" onclick="doFollow(<?= $fu['id'] ?>, this)">Đang theo dõi</button>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </div>
+
+        <div id="ftab-followers" class="ftab-content" style="display:none;">
+            <?php if(empty($followers_list_data)): ?>
+                <div style="padding:40px 20px; text-align:center; color:#64748b; background:rgba(255,255,255,0.02); border-radius:12px; border:1px dashed rgba(255,255,255,0.1);">Chưa có ai theo dõi bạn.</div>
+            <?php else: ?>
+                <?php foreach($followers_list_data as $fu): ?>
+                    <div style="display:flex; align-items:center; justify-content:space-between; padding:16px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.05); border-radius:16px; margin-bottom:12px; transition:transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)';" onmouseout="this.style.transform='none';">
+                        <a href="profile.php?id=<?= $fu['id'] ?>" style="display:flex; align-items:center; gap:12px; text-decoration:none;">
+                            <?php if($fu['avatar']): ?>
+                                <img src="../assets/images/avatars/<?= htmlspecialchars($fu['avatar']) ?>" class="avatar-sm" style="width:48px;height:48px;" alt="">
+                            <?php else: ?>
+                                <div class="avatar-placeholder-sm" style="width:48px;height:48px;font-size:18px;"><?= mb_substr($fu['ten'],0,1) ?></div>
+                            <?php endif; ?>
+                            <div>
+                                <div style="font-weight:700; color:#f1f5f9; font-size:15px;"><?= htmlspecialchars($fu['ten']) ?></div>
+                                <div style="font-size:13px; color:#64748b; margin-top:2px;"><?= htmlspecialchars(mb_strimwidth($fu['bio'] ?? '', 0, 40, '...')) ?></div>
+                            </div>
+                        </a>
+                        <button class="btn-follow <?= $fu['is_following'] ? 'following' : '' ?>" onclick="doFollow(<?= $fu['id'] ?>, this)">
+                            <?= $fu['is_following'] ? 'Đang theo dõi' : 'Theo dõi lại' ?>
+                        </button>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </div>
+      </section>
+      <script>
+      function switchFriendsTab(tab) {
+          document.getElementById('ftab-following').style.display = tab === 'following' ? 'block' : 'none';
+          document.getElementById('ftab-followers').style.display = tab === 'followers' ? 'block' : 'none';
+          const btns = document.querySelectorAll('.ftab-btn');
+          btns[0].style.borderBottomColor = tab === 'following' ? '#3b82f6' : 'transparent';
+          btns[0].style.color = tab === 'following' ? '#f1f5f9' : '#94a3b8';
+          btns[1].style.borderBottomColor = tab === 'followers' ? '#3b82f6' : 'transparent';
+          btns[1].style.color = tab === 'followers' ? '#f1f5f9' : '#94a3b8';
+      }
+      </script>
+
     </div>
 
     <!-- RIGHT: Suggestions -->
@@ -766,21 +845,30 @@ const communityChatState = {
 
 function setCommunityView(view) {
     const showChat = ENABLE_COMMUNITY_CHAT && view === 'chat';
+    const showFriends = view === 'friends';
     document.querySelectorAll('.compose-box, .post-card, .feed-empty').forEach(el => {
-        el.style.display = showChat ? 'none' : '';
+        el.style.display = (showChat || showFriends) ? 'none' : '';
     });
 
     const chatView = document.getElementById('communityChatView');
     if (chatView) chatView.style.display = showChat ? 'block' : 'none';
+    
+    const friendsView = document.getElementById('friendsView');
+    if (friendsView) friendsView.style.display = showFriends ? 'block' : 'none';
 
     const feedNav = document.getElementById('feedNavTrigger');
     const chatNav = document.getElementById('chatNavTrigger');
+    const friendsNav = document.getElementById('friendsNavTrigger');
     const feedMobile = document.getElementById('feedMobileTrigger');
     const chatMobile = document.getElementById('chatMobileTrigger');
-    if (feedNav) feedNav.classList.toggle('active', !showChat);
-    if (chatNav) chatNav.classList.toggle('active', showChat);
-    if (feedMobile) feedMobile.classList.toggle('active', !showChat);
-    if (chatMobile) chatMobile.classList.toggle('active', showChat);
+    const friendsMobile = document.getElementById('friendsMobileTrigger');
+    
+    if (feedNav) feedNav.classList.toggle('active', view === 'feed');
+    if (chatNav) chatNav.classList.toggle('active', view === 'chat');
+    if (friendsNav) friendsNav.classList.toggle('active', view === 'friends');
+    if (feedMobile) feedMobile.classList.toggle('active', view === 'feed');
+    if (chatMobile) chatMobile.classList.toggle('active', view === 'chat');
+    if (friendsMobile) friendsMobile.classList.toggle('active', view === 'friends');
 
     if (showChat) initCommunityChat();
 }
@@ -1180,12 +1268,21 @@ document.getElementById('chatNavTrigger')?.addEventListener('click', event => {
     setCommunityView('chat');
 });
 
+document.getElementById('friendsNavTrigger')?.addEventListener('click', event => {
+    event.preventDefault();
+    setCommunityView('friends');
+});
+
 document.getElementById('feedMobileTrigger')?.addEventListener('click', () => {
     setCommunityView('feed');
 });
 
 document.getElementById('chatMobileTrigger')?.addEventListener('click', () => {
     setCommunityView('chat');
+});
+
+document.getElementById('friendsMobileTrigger')?.addEventListener('click', () => {
+    setCommunityView('friends');
 });
 </script>
 <script src="../assets/js/search.js"></script>
