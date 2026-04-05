@@ -53,10 +53,9 @@ function getReactions($conn, $phim_id) {
 
 function getCommentCount($conn, $phim_id) {
     if (!@mysqli_ping($conn)) return null;
-    $r = mysqli_fetch_assoc(mysqli_query($conn,
-        "SELECT SQL_NO_CACHE COUNT(*) AS c FROM comments
-         WHERE target_type='phim' AND target_id=$phim_id"
-    ));
+    $res_r = mysqli_query($conn, "SELECT SQL_NO_CACHE COUNT(*) AS c FROM comments
+         WHERE target_type='phim' AND target_id=$phim_id");
+        $r = $res_r ? mysqli_fetch_assoc($res_r) : null;
     return (int)($r['c'] ?? 0);
 }
 

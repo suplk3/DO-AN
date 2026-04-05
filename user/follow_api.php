@@ -91,10 +91,8 @@ if (!$fid || $fid === $me) {
     exit;
 }
 
-$exist = mysqli_fetch_assoc(mysqli_query(
-    $conn,
-    "SELECT 1 FROM follows WHERE follower_id=$me AND following_id=$fid"
-));
+$res_exist = mysqli_query($conn, "SELECT 1 FROM follows WHERE follower_id=$me AND following_id=$fid");
+        $exist = $res_exist ? mysqli_fetch_assoc($res_exist) : null;
 
 if ($exist) {
     mysqli_query($conn, "DELETE FROM follows WHERE follower_id=$me AND following_id=$fid");

@@ -181,7 +181,7 @@ $latest = admin_query($conn,
       <a class="btn" href="quan_ly_combo.php">🍿 Quản lý Combo</a>
       <a class="btn" href="quan_ly_voucher.php">🎟️ Quản lý Voucher</a>
       <a class="btn" href="quan_ly_the.php">💎 Thẻ &amp; Điểm</a>
-      <a class="btn" href="quan_ly_chat.php" style="background: rgba(234,179,8,0.2); border-color: rgba(234,179,8,0.5); color: #fef08a;">💬 Quản lý Tin nhắn</a>
+      <a class="btn" href="quan_ly_tin_nhan.php" style="background: rgba(234,179,8,0.2); border-color: rgba(234,179,8,0.5); color: #fef08a;">💬 Quản lý Tin nhắn</a>
       <a class="btn" href="../user/index.php">🏠 Trang người dùng</a>
     </div>
 

@@ -3,13 +3,18 @@ session_start();
 include "../config/db.php";
 $force_show_login = (isset($_GET['show_login']) && !isset($_SESSION['user_id']));
 $notif_unread = 0;
+$notif_unread = 0;
 if (isset($_SESSION['user_id'])) {
-    if (table_exists($conn, 'notifications')) {
-        $uid = (int)$_SESSION['user_id'];
-        $nr = mysqli_fetch_assoc(mysqli_query($conn,
+    $uid = (int)$_SESSION['user_id'];
+    $check = mysqli_query($conn, "SHOW TABLES LIKE 'notifications'");
+    if ($check && mysqli_num_rows($check) > 0) {
+        $nr = mysqli_query($conn,
             "SELECT COUNT(*) AS c FROM notifications WHERE user_id=$uid AND is_read=0"
-        ));
-        $notif_unread = (int)($nr['c'] ?? 0);
+        );
+        if ($nr) {
+            $row = mysqli_fetch_assoc($nr);
+            $notif_unread = (int)($row['c'] ?? 0);
+        }
     }
 }
 ?>

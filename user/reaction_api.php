@@ -30,9 +30,8 @@ $tid  = (int)($d['target_id'] ?? 0);
 $loai = in_array($d['loai']??'', ['like','love','haha','wow','sad','angry']) ? $d['loai'] : 'like';
 if (!$type || !$tid) { echo json_encode(['error'=>'Thieu du lieu']); exit; }
 
-$exist = mysqli_fetch_assoc(mysqli_query($conn,
-    "SELECT id, loai FROM reactions WHERE user_id=$me AND target_type='$type' AND target_id=$tid"
-));
+$res_exist = mysqli_query($conn, "SELECT id, loai FROM reactions WHERE user_id=$me AND target_type='$type' AND target_id=$tid");
+        $exist = $res_exist ? mysqli_fetch_assoc($res_exist) : null;
 
 if ($exist) {
     if ($exist['loai'] === $loai) {
@@ -51,11 +50,13 @@ if ($exist) {
     
     // Notify the post owner if an external user reacts
     if ($type === 'post') {
-        $owner_row = mysqli_fetch_assoc(mysqli_query($conn, "SELECT user_id FROM posts WHERE id=$tid"));
+        $res_owner_row = mysqli_query($conn, "SELECT user_id FROM posts WHERE id=$tid");
+        $owner_row = $res_owner_row ? mysqli_fetch_assoc($res_owner_row) : null;
         if ($owner_row) {
             $owner_id = (int)$owner_row['user_id'];
             if ($owner_id !== $me) {
-                $me_row = mysqli_fetch_assoc(mysqli_query($conn, "SELECT ten FROM users WHERE id=$me"));
+                $res_me_row = mysqli_query($conn, "SELECT ten FROM users WHERE id=$me");
+        $me_row = $res_me_row ? mysqli_fetch_assoc($res_me_row) : null;
                 $me_name = $me_row ? $me_row['ten'] : 'Ai đó';
                 
                 $react_str = 'cảm xúc';
@@ -89,9 +90,8 @@ while ($r = mysqli_fetch_assoc($rc)) {
 
 $current_loai = null;
 if ($action !== 'removed') {
-    $cur = mysqli_fetch_assoc(mysqli_query($conn,
-        "SELECT loai FROM reactions WHERE user_id=$me AND target_type='$type' AND target_id=$tid"
-    ));
+    $res_cur = mysqli_query($conn, "SELECT loai FROM reactions WHERE user_id=$me AND target_type='$type' AND target_id=$tid");
+        $cur = $res_cur ? mysqli_fetch_assoc($res_cur) : null;
     $current_loai = $cur['loai'] ?? null;
 }
 

@@ -26,7 +26,8 @@ $res = [
 ];
 
 // 0. Cập nhật trạng thái Ban/Unban thời gian thực.
-$me_status = mysqli_fetch_assoc(mysqli_query($conn, "SELECT is_banned FROM users WHERE id=$me"));
+$res_me_status = mysqli_query($conn, "SELECT is_banned FROM users WHERE id=$me");
+        $me_status = $res_me_status ? mysqli_fetch_assoc($res_me_status) : null;
 $res['is_banned'] = !empty($me_status['is_banned']);
 
 // 1. Cap nhat so like/comment cho cac bai dang dang hien co.
@@ -90,7 +91,8 @@ $sql_new = "
 
 $q_new = mysqli_query($conn, $sql_new);
 if ($q_new && mysqli_num_rows($q_new) > 0) {
-    $me_info = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM users WHERE id=$me"));
+    $res_me_info = mysqli_query($conn, "SELECT * FROM users WHERE id=$me");
+        $me_info = $res_me_info ? mysqli_fetch_assoc($res_me_info) : null;
     $REACTIONS = ['like' => '👍', 'love' => '❤️', 'haha' => '😂', 'wow' => '😮', 'sad' => '😢', 'angry' => '😡'];
 
     ob_start();

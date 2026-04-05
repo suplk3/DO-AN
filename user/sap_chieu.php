@@ -5,9 +5,8 @@ $notif_unread = 0;
 if (isset($_SESSION['user_id'])) {
     if (table_exists($conn, 'notifications')) {
         $uid = (int)$_SESSION['user_id'];
-        $nr = mysqli_fetch_assoc(mysqli_query($conn,
-            "SELECT COUNT(*) AS c FROM notifications WHERE user_id=$uid AND is_read=0"
-        ));
+        $res_nr = mysqli_query($conn, "SELECT COUNT(*) AS c FROM notifications WHERE user_id=$uid AND is_read=0");
+        $nr = $res_nr ? mysqli_fetch_assoc($res_nr) : null;
         $notif_unread = (int)($nr['c'] ?? 0);
     }
 }

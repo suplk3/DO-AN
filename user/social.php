@@ -13,11 +13,13 @@ $ranker    = new FeedRanker($conn, $me);
 $feed_rows = $ranker->getFeed(limit: 30);
 
 // Đếm người đang follow / follower
-$fl = mysqli_fetch_assoc(mysqli_query($conn, "SELECT
+$res_fl = mysqli_query($conn, "SELECT
     (SELECT COUNT(*) FROM follows WHERE follower_id=$me) AS following,
     (SELECT COUNT(*) FROM follows WHERE following_id=$me) AS followers
-"));
-$me_info = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM users WHERE id=$me"));
+");
+        $fl = $res_fl ? mysqli_fetch_assoc($res_fl) : null;
+$res_me_info = mysqli_query($conn, "SELECT * FROM users WHERE id=$me");
+        $me_info = $res_me_info ? mysqli_fetch_assoc($res_me_info) : null;
 $show_community_chat = (($_SESSION['vai_tro'] ?? '') !== 'admin');
 
 // Lấy danh sách bạn bè
@@ -1120,8 +1122,8 @@ async function loadCommunityMessages(forceScroll = false) {
     if (!communityChatState.activeType) return;
 
     const url = communityChatState.activeType === 'admin'
-        ? '../api/chat_api.php?action=get_messages'
-        : `../api/chat_api.php?action=get_messages&scope=direct&user_id=${communityChatState.activeUserId}`;
+        ? '../api/ho_tro_api.php?action=get_messages'
+        : `../api/ho_tro_api.php?action=get_messages&scope=direct&user_id=${communityChatState.activeUserId}`;
 
     try {
         const res = await fetch(url);
@@ -1151,7 +1153,7 @@ function selectCommunityConversation(type, userId) {
 
 async function loadCommunityContacts() {
     try {
-        const res = await fetch('../api/chat_api.php?action=get_chat_contacts');
+        const res = await fetch('../api/ho_tro_api.php?action=get_chat_contacts');
         const data = await res.json();
         if (!data.success) return;
 
@@ -1190,7 +1192,7 @@ async function submitCommunityMessage(event) {
     }
 
     try {
-        const res = await fetch('../api/chat_api.php?action=send', {
+        const res = await fetch('../api/ho_tro_api.php?action=send', {
             method: 'POST',
             body: formData
         });

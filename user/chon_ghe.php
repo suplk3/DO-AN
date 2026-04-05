@@ -63,7 +63,8 @@ $count_sql = "
     FROM ghe
     WHERE ghe.phong_id = (SELECT phong_id FROM suat_chieu WHERE id = $suat_chieu_id LIMIT 1)
 ";
-$count_row = mysqli_fetch_assoc(mysqli_query($conn, $count_sql));
+$res_count_row = mysqli_query($conn, $count_sql);
+        $count_row = $res_count_row ? mysqli_fetch_assoc($res_count_row) : null;
 $tong_ghe  = (int)($count_row['tong_ghe'] ?? 0);
 $ghe_dat   = (int)($count_row['da_dat']   ?? 0);
 $ghe_trong = $tong_ghe - $ghe_dat;
