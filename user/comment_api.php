@@ -8,7 +8,8 @@ $me = (int)$_SESSION['user_id'];
 function time_ago($dt) {
     // Lấy thời gian hiện tại trực tiếp từ MySQL để đảm bảo cùng timezone với created_at
     global $conn;
-    $now_row = mysqli_fetch_assoc(mysqli_query($conn, "SELECT UNIX_TIMESTAMP(NOW()) AS now_ts, UNIX_TIMESTAMP('$dt') AS dt_ts"));
+    $res_now_row = mysqli_query($conn, "SELECT UNIX_TIMESTAMP(NOW()) AS now_ts, UNIX_TIMESTAMP('$dt') AS dt_ts");
+        $now_row = $res_now_row ? mysqli_fetch_assoc($res_now_row) : null;
     $d = max(0, (int)$now_row['now_ts'] - (int)$now_row['dt_ts']);
     if ($d < 60)     return 'Vừa xong';
     if ($d < 3600)   return floor($d/60).' phút trước';
@@ -69,10 +70,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_GET['action']??'') !== 'delete')
 
     // Chỉ cho reply 1 cấp — validate parent thuộc đúng target và là comment gốc
     if ($parent_id) {
-        $chk = mysqli_fetch_assoc(mysqli_query($conn,
-            "SELECT id FROM comments
-             WHERE id=$parent_id AND target_type='$type' AND target_id=$tid AND parent_id IS NULL"
-        ));
+        $res_chk = mysqli_query($conn, "SELECT id FROM comments
+             WHERE id=$parent_id AND target_type='$type' AND target_id=$tid AND parent_id IS NULL");
+        $chk = $res_chk ? mysqli_fetch_assoc($res_chk) : null;
         if (!$chk) $parent_id = null;
     }
 
@@ -115,10 +115,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_GET['action']??'') !== 'delete')
 
     $new = null;
     if ($ok && $newid) {
-        $row = mysqli_fetch_assoc(mysqli_query($conn,
-            "SELECT c.*, u.ten, u.avatar FROM comments c
-             JOIN users u ON c.user_id=u.id WHERE c.id=$newid"
-        ));
+        $res_row = mysqli_query($conn, "SELECT c.*, u.ten, u.avatar FROM comments c
+             JOIN users u ON c.user_id=u.id WHERE c.id=$newid");
+        $row = $res_row ? mysqli_fetch_assoc($res_row) : null;
         if ($row) {
             $row['time_ago'] = time_ago($row['created_at']);
             $row['replies']  = [];
@@ -141,9 +140,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE' ||
     $is_admin = (isset($_SESSION['vai_tro']) && $_SESSION['vai_tro'] === 'admin');
 
     // Lấy comment để kiểm tra quyền
-    $row = mysqli_fetch_assoc(mysqli_query($conn,
-        "SELECT user_id, parent_id, target_type, target_id FROM comments WHERE id=$cmt_id"
-    ));
+    $res_row = mysqli_query($conn, "SELECT user_id, parent_id, target_type, target_id FROM comments WHERE id=$cmt_id");
+        $row = $res_row ? mysqli_fetch_assoc($res_row) : null;
     if (!$row) { echo json_encode(['ok'=>false,'msg'=>'Không tìm thấy']); exit; }
 
     // Chỉ chủ comment hoặc admin mới được xoá

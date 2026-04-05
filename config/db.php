@@ -1,4 +1,7 @@
 <?php
+// Disable strict exception throwing for mysqli in PHP 8.1+ to prevent fatal errors
+mysqli_report(MYSQLI_REPORT_OFF);
+
 $host = "localhost";
 $user = "root";
 $pass = ""; // XAMPP mặc định

@@ -9,25 +9,24 @@ $me      = (int)$_SESSION['user_id'];
 $uid     = isset($_GET['id']) ? (int)$_GET['id'] : $me;
 $is_me   = ($uid === $me);
 
-$user = mysqli_fetch_assoc(mysqli_query($conn,
-    "SELECT * FROM users WHERE id=$uid"
-));
+$res_user = mysqli_query($conn, "SELECT * FROM users WHERE id=$uid");
+        $user = $res_user ? mysqli_fetch_assoc($res_user) : null;
 if (!$user) { http_response_code(404); die("Không tìm thấy người dùng"); }
 
 // Stats
-$stats = mysqli_fetch_assoc(mysqli_query($conn, "
+$res_stats = mysqli_query($conn, "
     SELECT
         (SELECT COUNT(*) FROM posts    WHERE user_id=$uid) AS bai_dang,
         (SELECT COUNT(*) FROM follows  WHERE following_id=$uid) AS followers,
         (SELECT COUNT(*) FROM follows  WHERE follower_id=$uid)  AS following,
         (SELECT COUNT(*) FROM ve       WHERE user_id=$uid)      AS ve_dat
-"));
+");
+        $stats = $res_stats ? mysqli_fetch_assoc($res_stats) : null;
 
 $is_following = false;
 if (!$is_me) {
-    $chk = mysqli_fetch_assoc(mysqli_query($conn,
-        "SELECT 1 FROM follows WHERE follower_id=$me AND following_id=$uid"
-    ));
+    $res_chk = mysqli_query($conn, "SELECT 1 FROM follows WHERE follower_id=$me AND following_id=$uid");
+        $chk = $res_chk ? mysqli_fetch_assoc($res_chk) : null;
     $is_following = (bool)$chk;
 }
 

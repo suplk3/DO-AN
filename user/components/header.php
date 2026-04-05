@@ -93,14 +93,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 <?php if (isset($_SESSION['user_id'])):
                     $is_admin = (isset($_SESSION['vai_tro']) && $_SESSION['vai_tro'] === 'admin');
                     $ten = htmlspecialchars($_SESSION['ten_nguoi_dung'] ?? ($_SESSION['ten'] ?? 'Tôi'));
-                    $avatar_sql = mysqli_fetch_assoc(mysqli_query($conn, "SELECT avatar FROM users WHERE id=".(int)$_SESSION['user_id']));
+                    
+                    // Fixed unsafe fetching
+                    $avatar_res = mysqli_query($conn, "SELECT avatar FROM users WHERE id=".(int)$_SESSION['user_id']);
+                    $avatar_sql = $avatar_res ? mysqli_fetch_assoc($avatar_res) : null;
                     $avatar = $avatar_sql['avatar'] ?? null;
                     
                     if (!isset($notif_unread)) {
                         $notif_unread = 0;
                         if (table_exists($conn, 'notifications')) {
                             $uid = (int)$_SESSION['user_id'];
-                            $nr = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS c FROM notifications WHERE user_id=$uid AND is_read=0"));
+                            $nr_res = mysqli_query($conn, "SELECT COUNT(*) AS c FROM notifications WHERE user_id=$uid AND is_read=0");
+                            $nr = $nr_res ? mysqli_fetch_assoc($nr_res) : null;
                             $notif_unread = (int)($nr['c'] ?? 0);
                         }
                     }
@@ -131,7 +135,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <a href="../admin/phim.php" class="user-dropdown-item">&#127916; Quản lý phim</a>
                         <a href="../admin/suat_chieu.php" class="user-dropdown-item">&#128197; Quản lý suất chiếu</a>
                         <a href="../admin/quan_ly_user.php" class="user-dropdown-item">&#128101; Quản lý user</a>
-                        <a href="../admin/quan_ly_chat.php" class="user-dropdown-item">&#128172; Quản lý tin nhắn</a>
+                        <a href="../admin/quan_ly_tin_nhan.php" class="user-dropdown-item">&#128172; Quản lý tin nhắn</a>
                         <?php endif; ?>
                         <div class="user-dropdown-divider"></div>
                         <a href="../auth/logout.php" class="user-dropdown-item danger"

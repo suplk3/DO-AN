@@ -58,7 +58,8 @@ if ($action === 'create' && $_SERVER['REQUEST_METHOD'] === 'POST') {
 if ($action === 'delete' && isset($_GET['id'])) {
     $pid = (int)$_GET['id'];
     // Chỉ chủ bài hoặc admin mới xoá được
-    $post = mysqli_fetch_assoc(mysqli_query($conn,"SELECT user_id,hinh_anh FROM posts WHERE id=$pid"));
+    $res_post = mysqli_query($conn, "SELECT user_id,hinh_anh FROM posts WHERE id=$pid");
+        $post = $res_post ? mysqli_fetch_assoc($res_post) : null;
     if ($post && ($post['user_id']==$me || ($_SESSION['vai_tro']??'')==='admin')) {
         if ($post['hinh_anh']) {
             @unlink(__DIR__.'/../assets/images/posts/'.$post['hinh_anh']);

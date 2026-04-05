@@ -23,6 +23,14 @@ while ($r = mysqli_fetch_assoc($suat_result)) $suats[] = $r;
 function fmt_date($d){ return $d ? date('d/m/Y', strtotime($d)) : ''; }
 function fmt_time($t){ return $t ? date('H:i', strtotime($t)) : ''; }
 function fmt_money($n){ return $n !== null ? number_format($n,0,',','.') . '₫' : '—'; }
+
+function get_vietnamese_dow($d) {
+    if (!$d) return '';
+    $dow = date('w', strtotime($d));
+    $days = ['Chủ nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
+    return $days[$dow];
+}
+
 function fmt_rating_value($n){
     $n = (float)$n;
     if ($n <= 0) return '0';
@@ -46,16 +54,14 @@ $tong_react = array_sum($react_counts);
 
 $my_react = null;
 if ($me_id) {
-    $mr = mysqli_fetch_assoc(mysqli_query($conn,
-        "SELECT loai FROM reactions WHERE target_type='phim' AND target_id=$id AND user_id=$me_id LIMIT 1"
-    ));
+    $res_mr = mysqli_query($conn, "SELECT loai FROM reactions WHERE target_type='phim' AND target_id=$id AND user_id=$me_id LIMIT 1");
+        $mr = $res_mr ? mysqli_fetch_assoc($res_mr) : null;
     $my_react = $mr['loai'] ?? null;
 }
 
 $tong_cmt = 0;
-$tc = mysqli_fetch_assoc(mysqli_query($conn,
-    "SELECT COUNT(*) AS c FROM comments WHERE target_type='phim' AND target_id=$id"
-));
+$res_tc = mysqli_query($conn, "SELECT COUNT(*) AS c FROM comments WHERE target_type='phim' AND target_id=$id");
+        $tc = $res_tc ? mysqli_fetch_assoc($res_tc) : null;
 if ($tc) $tong_cmt = (int)$tc['c'];
 
 // ── Rating (1-5) ──
@@ -72,13 +78,12 @@ if ($me_id) {
         $can_rate_movie = true;
         $rating_permission_message = 'Admin có thể đánh giá mà không cần mua vé.';
     } else {
-        $ticket_check = mysqli_fetch_assoc(mysqli_query($conn,
-            "SELECT 1 AS ok
+        $res_ticket_check = mysqli_query($conn, "SELECT 1 AS ok
              FROM ve v
              INNER JOIN suat_chieu sc ON sc.id = v.suat_chieu_id
              WHERE v.user_id = $me_id AND sc.phim_id = $id
-             LIMIT 1"
-        ));
+             LIMIT 1");
+        $ticket_check = $res_ticket_check ? mysqli_fetch_assoc($res_ticket_check) : null;
         $has_ticket_for_rating = (bool)$ticket_check;
         $can_rate_movie = $has_ticket_for_rating;
         $rating_permission_message = $can_rate_movie
@@ -88,17 +93,15 @@ if ($me_id) {
 }
 
 if (table_exists($conn, 'ratings')) {
-    $rating_row = mysqli_fetch_assoc(mysqli_query($conn,
-        "SELECT AVG(rating) AS avg_rating, COUNT(*) AS total FROM ratings WHERE phim_id=$id"
-    ));
+    $res_rating_row = mysqli_query($conn, "SELECT AVG(rating) AS avg_rating, COUNT(*) AS total FROM ratings WHERE phim_id=$id");
+        $rating_row = $res_rating_row ? mysqli_fetch_assoc($res_rating_row) : null;
     if ($rating_row) {
         $rating_avg = $rating_row['avg_rating'] !== null ? round((float)$rating_row['avg_rating'], 1) : 0;
         $rating_total = (int)$rating_row['total'];
     }
     if ($me_id) {
-        $mr = mysqli_fetch_assoc(mysqli_query($conn,
-            "SELECT rating FROM ratings WHERE user_id=$me_id AND phim_id=$id LIMIT 1"
-        ));
+        $res_mr = mysqli_query($conn, "SELECT rating FROM ratings WHERE user_id=$me_id AND phim_id=$id LIMIT 1");
+        $mr = $res_mr ? mysqli_fetch_assoc($res_mr) : null;
         if ($mr) $my_rating = (float)$mr['rating'];
     }
 }
@@ -107,9 +110,8 @@ if (table_exists($conn, 'ratings')) {
 $notif_unread = 0;
 if ($me_id) {
     if (table_exists($conn, 'notifications')) {
-        $nr = mysqli_fetch_assoc(mysqli_query($conn,
-            "SELECT COUNT(*) AS c FROM notifications WHERE user_id=$me_id AND is_read=0"
-        ));
+        $res_nr = mysqli_query($conn, "SELECT COUNT(*) AS c FROM notifications WHERE user_id=$me_id AND is_read=0");
+        $nr = $res_nr ? mysqli_fetch_assoc($res_nr) : null;
         $notif_unread = (int)($nr['c'] ?? 0);
     }
 }
@@ -300,72 +302,152 @@ if ($me_id) {
 
     <?php if (empty($suats)): ?>
       <p class="muted">Hiện chưa có suất chiếu cho phim này.</p>
-    <?php else: ?>
-      <div class="showtimes-grid">
-        <?php foreach ($suats as $s):
-          $suat_id  = (int)$s['id'];
-          $phong_id = (int)$s['phong_id'];
-          $total    = null;
-          if ($phong_id > 0) {
-            $q = mysqli_query($conn,"SELECT COUNT(*) AS t FROM ghe WHERE phong_id = $phong_id");
-            $total = (int)mysqli_fetch_assoc($q)['t'];
-          }
-          $bq = mysqli_query($conn,"SELECT COUNT(*) AS b FROM ve WHERE suat_chieu_id = $suat_id");
-          $booked = (int)mysqli_fetch_assoc($bq)['b'];
-          $avail  = is_null($total) ? null : max(0, $total - $booked);
+    <?php else: 
+      $suats_by_date = [];
+      foreach ($suats as $s) {
+          $suats_by_date[$s['ngay']][] = $s;
+      }
+    ?>
+      <style>
+      .date-tabs-container {
+        display: flex;
+        overflow-x: auto;
+        gap: 12px;
+        padding-bottom: 12px;
+        margin-bottom: 24px;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255,255,255,0.2) transparent;
+      }
+      .date-tabs-container::-webkit-scrollbar { height: 6px; }
+      .date-tabs-container::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 6px; }
+      .date-tab {
+        flex: 0 0 auto;
+        background: rgba(30,41,59,0.7);
+        border: 1px solid rgba(255,255,255,0.05);
+        border-radius: 16px;
+        padding: 12px 24px;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        text-align: center;
+        min-width: 100px;
+        color: #94a3b8;
+      }
+      .date-tab:hover { background: rgba(255,255,255,0.08); transform: translateY(-2px); }
+      .date-tab.active {
+        background: linear-gradient(135deg, #ef4444, #b91c1c);
+        color: #fff;
+        border-color: rgba(255,255,255,0.2);
+        box-shadow: 0 8px 16px rgba(239, 68, 68, 0.3);
+      }
+      .dt-day { font-size: 20px; font-weight: 800; margin-bottom: 4px; }
+      .dt-dow { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+      
+      .showtime-panel {
+        display: none;
+        animation: fadeIn 0.4s ease-out;
+      }
+      .showtime-panel.active { display: block; }
+      @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+      </style>
 
-          // Badge class
-          $badge_class = 'available';
-          if (!is_null($avail)) {
-            if ($avail === 0) $badge_class = 'full';
-            elseif ($total > 0 && $avail / $total < 0.25) $badge_class = 'few';
-          }
-        ?>
-        <article class="showtime-card">
-          <div class="st-top">
-            <div class="st-datetime">
-              <div class="st-date"><?= fmt_date($s['ngay']) ?></div>
-              <div class="st-time"><?= fmt_time($s['gio']) ?></div>
-            </div>
-            <div class="st-price"><?= fmt_money($s['gia']) ?></div>
+      <div class="date-tabs-container" id="dateTabs">
+        <?php $idx = 0; foreach ($suats_by_date as $d => $list): ?>
+          <div class="date-tab <?= $idx === 0 ? 'active' : '' ?>" data-target="panel-<?= $d ?>">
+            <div class="dt-day"><?= date('d/m', strtotime($d)) ?></div>
+            <div class="dt-dow"><?= get_vietnamese_dow($d) ?></div>
           </div>
-
-          <div class="st-body">
-            <div class="st-room">
-              <?= htmlspecialchars($s['ten_rap'] ?: 'Rạp chưa đặt') ?>
-              <?php if (!empty($s['ten_phong'])): ?> — <?= htmlspecialchars($s['ten_phong']) ?><?php endif; ?>
-            </div>
-            <div class="st-seats">
-              <span class="badge <?= $badge_class ?>" data-suat-id="<?= $suat_id ?>" id="badge-<?= $suat_id ?>">
-                <?php if (is_null($total) || $total == 0): ?>
-                  Không xác định
-                <?php elseif ($avail === 0): ?>
-                  🔴 Hết ghế
-                <?php else: ?>
-                  <?= $badge_class === 'few' ? '🟡' : '🟢' ?> <?= $avail ?> / <?= $total ?> ghế trống
-                <?php endif; ?>
-              </span>
-            </div>
-          </div>
-
-          <div class="st-actions">
-            <?php if (isset($_SESSION['user_id'])): ?>
-              <?php if (!is_null($avail) && $avail === 0): ?>
-                <button class="btn-outline" disabled style="opacity:.5;cursor:not-allowed;width:100%;justify-content:center;">Hết ghế</button>
-              <?php else: ?>
-                <a href="chon_ghe.php?suat_id=<?= $suat_id ?>" class="btn-primary">Đặt ngay →</a>
-              <?php endif; ?>
-            <?php else: ?>
-              <a href="../auth/login.php" class="btn-outline open-login-modal">🔐 Đăng nhập để đặt</a>
-            <?php endif; ?>
-          </div>
-        </article>
-        <?php endforeach; ?>
+        <?php $idx++; endforeach; ?>
       </div>
+
+      <div class="showtimes-panels" id="showtimesPanels">
+        <?php $idx = 0; foreach ($suats_by_date as $d => $list): ?>
+          <div class="showtime-panel <?= $idx === 0 ? 'active' : '' ?>" id="panel-<?= $d ?>">
+            <div class="showtimes-grid">
+              <?php foreach ($list as $s): 
+                $suat_id  = (int)$s['id'];
+                $phong_id = (int)$s['phong_id'];
+                $total    = null;
+                if ($phong_id > 0) {
+                  $res_q = mysqli_query($conn,"SELECT COUNT(*) AS t FROM ghe WHERE phong_id = $phong_id");
+                  $q = $res_q ? mysqli_fetch_assoc($res_q) : null;
+                  $total = (int)($q['t'] ?? 0);
+                }
+                $res_bq = mysqli_query($conn,"SELECT COUNT(*) AS b FROM ve WHERE suat_chieu_id = $suat_id");
+                $bq = $res_bq ? mysqli_fetch_assoc($res_bq) : null;
+                $booked = (int)($bq['b'] ?? 0);
+                $avail  = is_null($total) ? null : max(0, $total - $booked);
+
+                $badge_class = 'available';
+                if (!is_null($avail)) {
+                  if ($avail === 0) $badge_class = 'full';
+                  elseif ($total > 0 && $avail / $total < 0.25) $badge_class = 'few';
+                }
+              ?>
+              <article class="showtime-card">
+                <div class="st-top">
+                  <div class="st-datetime">
+                    <div class="st-time"><?= fmt_time($s['gio']) ?></div>
+                    <div style="font-size:12px;color:#94a3b8;font-weight:600;margin-top:2px;">Suất chiếu</div>
+                  </div>
+                  <div class="st-price"><?= fmt_money($s['gia']) ?></div>
+                </div>
+      
+                <div class="st-body">
+                  <div class="st-room">
+                    <?= htmlspecialchars($s['ten_rap'] ?: 'Rạp chưa đặt') ?>
+                    <?php if (!empty($s['ten_phong'])): ?> — <?= htmlspecialchars($s['ten_phong']) ?><?php endif; ?>
+                  </div>
+                  <div class="st-seats">
+                    <span class="badge <?= $badge_class ?>" data-suat-id="<?= $suat_id ?>" id="badge-<?= $suat_id ?>">
+                      <?php if (is_null($total) || $total == 0): ?>
+                        Không xác định
+                      <?php elseif ($avail === 0): ?>
+                        🔴 Hết ghế
+                      <?php else: ?>
+                        <?= $badge_class === 'few' ? '🟡' : '🟢' ?> <?= $avail ?> / <?= $total ?> ghế trống
+                      <?php endif; ?>
+                    </span>
+                  </div>
+                </div>
+      
+                <div class="st-actions">
+                  <?php if (isset($_SESSION['user_id'])): ?>
+                    <?php if (!is_null($avail) && $avail === 0): ?>
+                      <button class="btn-outline" disabled style="opacity:.5;cursor:not-allowed;width:100%;justify-content:center;">Hết ghế</button>
+                    <?php else: ?>
+                      <a href="chon_ghe.php?suat_id=<?= $suat_id ?>" class="btn-primary">Đặt ngay →</a>
+                    <?php endif; ?>
+                  <?php else: ?>
+                    <a href="../auth/login.php" class="btn-outline open-login-modal">🔐 Đăng nhập để đặt</a>
+                  <?php endif; ?>
+                </div>
+              </article>
+              <?php endforeach; ?>
+            </div>
+          </div>
+        <?php $idx++; endforeach; ?>
+      </div>
+      
+      <script>
+      document.addEventListener('DOMContentLoaded', () => {
+          const tabs = document.querySelectorAll('.date-tab');
+          if (!tabs.length) return;
+          tabs.forEach(tab => {
+              tab.addEventListener('click', () => {
+                  tabs.forEach(t => t.classList.remove('active'));
+                  tab.classList.add('active');
+                  const targetId = tab.getAttribute('data-target');
+                  document.querySelectorAll('.showtime-panel').forEach(panel => {
+                      panel.classList.remove('active');
+                  });
+                  document.getElementById(targetId).classList.add('active');
+              });
+          });
+      });
+      </script>
     <?php endif; ?>
   </section>
-  
-  
+
   <section class="film-social-block">
   <div class="film-social-title">🎭 Cảm xúc & Bình luận</div>
  
@@ -424,7 +506,8 @@ if ($me_id) {
     <div class="comment-list" id="fclist-<?= $id ?>"></div>
  
     <?php if ($me_id):
-      $me_info_c = mysqli_fetch_assoc(mysqli_query($conn,"SELECT ten,avatar FROM users WHERE id=$me_id"));
+      $res_me_info_c = mysqli_query($conn, "SELECT ten,avatar FROM users WHERE id=$me_id");
+        $me_info_c = $res_me_info_c ? mysqli_fetch_assoc($res_me_info_c) : null;
     ?>
     <div class="comment-compose" style="margin-top:10px;">
       <?php if (!empty($me_info_c['avatar'])): ?>

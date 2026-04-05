@@ -74,7 +74,7 @@ function toggleChat() {
 }
 
 function fetchChatMessages() {
-    fetch('../api/chat_api.php?action=get_messages')
+    fetch('../api/ho_tro_api.php?action=get_messages')
         .then(r => r.json())
         .then(res => {
             if(res.success) {
@@ -111,7 +111,7 @@ function sendChatMessage() {
     const fd = new FormData();
     fd.append('message', msg);
     
-    fetch('../api/chat_api.php?action=send', { method: 'POST', body: fd })
+    fetch('../api/ho_tro_api.php?action=send', { method: 'POST', body: fd })
         .then(() => fetchChatMessages());
 }
 

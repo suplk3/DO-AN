@@ -102,7 +102,8 @@ $q_suat = mysqli_query($conn, $sql_suat);
   <a href="chi_tiet_phim.php?id=<?= $phim_id ?>" style="display:inline-flex;align-items:center;gap:6px;color:#64748b;text-decoration:none;font-size:13px;font-weight:600;margin-bottom:20px;">← Quay lại chi tiết phim</a>
 
   <?php
-  $pi = mysqli_fetch_assoc(mysqli_query($conn, "SELECT ten_phim,poster,the_loai,thoi_luong FROM phim WHERE id=$phim_id"));
+  $res_pi = mysqli_query($conn, "SELECT ten_phim,poster,the_loai,thoi_luong FROM phim WHERE id=$phim_id");
+        $pi = $res_pi ? mysqli_fetch_assoc($res_pi) : null;
   if ($pi): ?>
   <div class="movie-info-card">
     <img src="../assets/images/<?= htmlspecialchars($pi['poster']) ?>" style="width:52px;height:74px;object-fit:cover;border-radius:8px;flex-shrink:0;" alt="">

@@ -24,7 +24,8 @@ LEFT JOIN phong_chieu pc ON sc.phong_id = pc.id
 LEFT JOIN rap r ON pc.rap_id = r.id
 WHERE sc.id = $suat_chieu_id
 ";
-$info = mysqli_fetch_assoc(mysqli_query($conn, $info_sql));
+$res_info = mysqli_query($conn, $info_sql);
+        $info = $res_info ? mysqli_fetch_assoc($res_info) : null;
 if (!$info) { header('Location: index.php'); exit; }
 
 // Lấy danh sách combo
