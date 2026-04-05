@@ -334,6 +334,22 @@ if ($action === 'send') {
         $ok = $stmt->execute();
         $stmt->close();
 
+        if ($ok && function_exists('table_exists') && table_exists($conn, 'notifications')) {
+            $u_res = $conn->query("SELECT ten FROM users WHERE id = $currentUserId LIMIT 1");
+            $u_name = ($u_res && $u_row = $u_res->fetch_assoc()) ? $u_row['ten'] : "User #$currentUserId";
+            
+            $title = "Tin nhắn mới từ $u_name";
+            $body = mb_strimwidth($message, 0, 50, "...");
+            $link = "../user/social.php?chat_user=" . $currentUserId;
+            
+            $n_stmt = $conn->prepare("INSERT INTO notifications (user_id, type, target_id, title, body, link) VALUES (?, 'new_chat', ?, ?, ?, ?)");
+            if ($n_stmt) {
+                $n_stmt->bind_param("iisss", $otherUserId, $currentUserId, $title, $body, $link);
+                $n_stmt->execute();
+                $n_stmt->close();
+            }
+        }
+
         respond(['success' => $ok]);
     }
 
