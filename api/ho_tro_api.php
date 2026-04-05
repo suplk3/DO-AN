@@ -373,7 +373,8 @@ if ($action === 'send') {
     $ok = $stmt->execute();
     $stmt->close();
 
-    if ($ok && $senderIsAdmin === 0 && table_exists($conn, 'notifications')) {
+    if ($ok && table_exists($conn, 'notifications')) {
+        if ($senderIsAdmin === 0) {
         $v_res = $conn->query("SELECT id FROM ve WHERE user_id = $chatUserId LIMIT 1");
         $has_booked = ($v_res && $v_res->num_rows > 0);
         
@@ -395,6 +396,18 @@ if ($action === 'send') {
                     $a_stmt->execute();
                 }
                 $a_stmt->close();
+            }
+        }
+        } else {
+            $title = "Tin nhắn mới từ Admin";
+            $body = mb_strimwidth($message, 0, 50, "...");
+            $link = "../user/social.php?chat_admin=1";
+
+            $u_stmt = $conn->prepare("INSERT INTO notifications (user_id, type, target_id, title, body, link) VALUES (?, 'new_chat', 0, ?, ?, ?)");
+            if ($u_stmt) {
+                $u_stmt->bind_param("isss", $chatUserId, $title, $body, $link);
+                $u_stmt->execute();
+                $u_stmt->close();
             }
         }
     }
