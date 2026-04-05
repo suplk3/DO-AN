@@ -154,7 +154,7 @@ function handleKey(e) { if(e.key === 'Enter') sendAdminMsg(); }
 setInterval(() => {
     loadUsers();
     if(currentUserId !== 0) loadMessages();
-}, 10000);
+}, 2500);
 
 let currentUserId = new URLSearchParams(window.location.search).get('user_id') || 0;
 if (currentUserId > 0) {
