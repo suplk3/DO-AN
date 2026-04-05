@@ -2,13 +2,12 @@
 include "check_admin.php";
 include "../config/db.php";
 
-// tự động xóa các suất chiếu đã quá 2 ngày (ngày trước ngày hiện tại 2 ngày trở lên)
-// chạy mỗi khi trang quản lý suất chiếu được tải
-// xóa vé trước để tránh dữ liệu mồ côi (bảng không có khóa ngoại)
-$deleteTickets = "DELETE ve FROM ve JOIN suat_chieu sc ON ve.suat_chieu_id = sc.id WHERE sc.ngay < DATE_SUB(CURDATE(), INTERVAL 2 DAY)";
+// Tự động xóa các suất chiếu đã quá 36 giờ so với thời gian hiện tại
+// Xóa vé trước để tránh dữ liệu mồ côi
+$deleteTickets = "DELETE ve FROM ve JOIN suat_chieu sc ON ve.suat_chieu_id = sc.id WHERE CONCAT(sc.ngay, ' ', sc.gio) < DATE_SUB(NOW(), INTERVAL 36 HOUR)";
 mysqli_query($conn, $deleteTickets);
 
-$deleteOldSql = "DELETE FROM suat_chieu WHERE ngay < DATE_SUB(CURDATE(), INTERVAL 2 DAY)";
+$deleteOldSql = "DELETE FROM suat_chieu WHERE CONCAT(ngay, ' ', gio) < DATE_SUB(NOW(), INTERVAL 36 HOUR)";
 mysqli_query($conn, $deleteOldSql);
 
 
