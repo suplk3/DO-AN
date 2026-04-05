@@ -1286,6 +1286,17 @@ document.getElementById('chatMobileTrigger')?.addEventListener('click', () => {
 document.getElementById('friendsMobileTrigger')?.addEventListener('click', () => {
     setCommunityView('friends');
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const chatUser = urlParams.get('chat_user');
+    if (chatUser) {
+        setTimeout(() => {
+            setCommunityView('chat');
+            selectCommunityConversation('user', chatUser);
+        }, 50);
+    }
+});
 </script>
 <script src="../assets/js/search.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
