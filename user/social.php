@@ -1290,10 +1290,16 @@ document.getElementById('friendsMobileTrigger')?.addEventListener('click', () =>
 document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const chatUser = urlParams.get('chat_user');
+    const chatAdmin = urlParams.get('chat_admin');
     if (chatUser) {
         setTimeout(() => {
             setCommunityView('chat');
             selectCommunityConversation('user', chatUser);
+        }, 50);
+    } else if (chatAdmin) {
+        setTimeout(() => {
+            setCommunityView('chat');
+            selectCommunityConversation('admin', 0);
         }, 50);
     }
 });
