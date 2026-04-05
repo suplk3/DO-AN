@@ -91,23 +91,69 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_GET['action']??'') !== 'delete')
     $ok    = mysqli_stmt_execute($stmt);
     $newid = (int)mysqli_insert_id($conn);
 
-    if ($ok && $newid && $parent_id) {
-        $p_res = mysqli_query($conn, "SELECT user_id FROM comments WHERE id = $parent_id LIMIT 1");
-        if ($p_res && $p_row = mysqli_fetch_assoc($p_res)) {
-            $parent_owner = (int)$p_row['user_id'];
-            if ($parent_owner !== $me) { 
-                $u_res = mysqli_query($conn, "SELECT ten FROM users WHERE id = $me");
-                $u_name = ($u_res && $u_row = mysqli_fetch_assoc($u_res)) ? $u_row['ten'] : "Ai đó";
-                
-                $title = "Có người trả lời bình luận";
-                $body = "$u_name vừa trả lời bình luận của bạn.";
-                $link = ($type === 'post') ? "social.php#post_$tid" : "chi_tiet_phim.php?id=$tid";
+    if ($ok && $newid) {
+        if ($parent_id) {
+            $parent_owner = 0;
+            $p_res = mysqli_query($conn, "SELECT user_id FROM comments WHERE id = $parent_id LIMIT 1");
+            if ($p_res && $p_row = mysqli_fetch_assoc($p_res)) {
+                $parent_owner = (int)$p_row['user_id'];
+                if ($parent_owner !== $me) { 
+                    $u_res = mysqli_query($conn, "SELECT ten FROM users WHERE id = $me");
+                    $u_name = ($u_res && $u_row = mysqli_fetch_assoc($u_res)) ? $u_row['ten'] : "Ai đó";
+                    
+                    $title = "Có người trả lời bình luận";
+                    $body = "$u_name vừa trả lời bình luận của bạn.";
+                    $link = ($type === 'post') ? "social.php#post-{$tid}-cmt-{$newid}" : "chi_tiet_phim.php?id=$tid#cmt-{$newid}";
 
-                $n_stmt = mysqli_prepare($conn, "INSERT INTO notifications (user_id, actor_id, type, target_id, title, body, link) VALUES (?, ?, 'new_reply', ?, ?, ?, ?)");
-                if ($n_stmt) {
-                    mysqli_stmt_bind_param($n_stmt, 'iiisss', $parent_owner, $me, $newid, $title, $body, $link);
-                    mysqli_stmt_execute($n_stmt);
-                    mysqli_stmt_close($n_stmt);
+                    $n_stmt = mysqli_prepare($conn, "INSERT INTO notifications (user_id, actor_id, type, target_id, title, body, link) VALUES (?, ?, 'new_reply', ?, ?, ?, ?)");
+                    if ($n_stmt) {
+                        mysqli_stmt_bind_param($n_stmt, 'iiisss', $parent_owner, $me, $newid, $title, $body, $link);
+                        mysqli_stmt_execute($n_stmt);
+                        mysqli_stmt_close($n_stmt);
+                    }
+                }
+            }
+            // Thêm: Nếu là bài viết, thông báo thêm cho chủ bài viết về comment reply này
+            if ($type === 'post') {
+                $p_res2 = mysqli_query($conn, "SELECT user_id FROM posts WHERE id = $tid LIMIT 1");
+                if ($p_res2 && $p_row2 = mysqli_fetch_assoc($p_res2)) {
+                    $post_owner = (int)$p_row2['user_id'];
+                    // Chỉ thông báo cho chủ bài viết nếu họ KHÔNG PHẢI là người đang comment VÀ KHÔNG PHẢI là chủ comment cha (đã nhận thông báo trên)
+                    if ($post_owner !== $me && $post_owner !== $parent_owner) {
+                        $u_res = mysqli_query($conn, "SELECT ten FROM users WHERE id = $me");
+                        $u_name = ($u_res && $u_row = mysqli_fetch_assoc($u_res)) ? $u_row['ten'] : "Ai đó";
+                        
+                        $title = "Bình luận mới";
+                        $body = "$u_name vừa bình luận trong bài viết của bạn.";
+                        $link = "social.php#post-{$tid}-cmt-{$newid}";
+
+                        $n_stmt2 = mysqli_prepare($conn, "INSERT INTO notifications (user_id, actor_id, type, target_id, title, body, link) VALUES (?, ?, 'new_comment', ?, ?, ?, ?)");
+                        if ($n_stmt2) {
+                            mysqli_stmt_bind_param($n_stmt2, 'iiisss', $post_owner, $me, $newid, $title, $body, $link);
+                            mysqli_stmt_execute($n_stmt2);
+                            mysqli_stmt_close($n_stmt2);
+                        }
+                    }
+                }
+            }
+        } else if ($type === 'post') {
+            $p_res = mysqli_query($conn, "SELECT user_id FROM posts WHERE id = $tid LIMIT 1");
+            if ($p_res && $p_row = mysqli_fetch_assoc($p_res)) {
+                $post_owner = (int)$p_row['user_id'];
+                if ($post_owner !== $me) { 
+                    $u_res = mysqli_query($conn, "SELECT ten FROM users WHERE id = $me");
+                    $u_name = ($u_res && $u_row = mysqli_fetch_assoc($u_res)) ? $u_row['ten'] : "Ai đó";
+                    
+                    $title = "Bình luận mới";
+                    $body = "$u_name vừa bình luận bài viết của bạn.";
+                    $link = "social.php#post-{$tid}-cmt-{$newid}";
+
+                    $n_stmt = mysqli_prepare($conn, "INSERT INTO notifications (user_id, actor_id, type, target_id, title, body, link) VALUES (?, ?, 'new_comment', ?, ?, ?, ?)");
+                    if ($n_stmt) {
+                        mysqli_stmt_bind_param($n_stmt, 'iiisss', $post_owner, $me, $newid, $title, $body, $link);
+                        mysqli_stmt_execute($n_stmt);
+                        mysqli_stmt_close($n_stmt);
+                    }
                 }
             }
         }

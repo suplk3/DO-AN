@@ -38,7 +38,7 @@ if ($action === 'create' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         $actor_name = $u_row ? $u_row['ho_ten'] : 'Ai đó';
         $title = "Bài viết mới";
         $body = $actor_name . " vừa đăng một bài viết mới.";
-        $link = "social.php#post_" . $post_id;
+        $link = "social.php#post-" . $post_id;
         
         $f_q = mysqli_query($conn, "SELECT id FROM users WHERE id != $me");
         if ($f_q) {

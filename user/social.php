@@ -1313,6 +1313,63 @@ if (userMenuBtn && userDropdown) {
     document.addEventListener('click', () => userDropdown.classList.remove('open'));
 }
 </script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(async () => {
+        const hash = window.location.hash;
+        if (!hash) return;
+        
+        let postId = null, cmtId = null;
+        
+        // Handle #cmt-123 (from chi_tiet_phim maybe, or if any)
+        // Handle #post_123 or #post-123
+        // Handle #post-123-cmt-456 or #post_123-cmt-456
+        if (hash.startsWith('#post-') || hash.startsWith('#post_')) {
+            let pIdStr;
+            if (hash.includes('-cmt-')) {
+                const parts = hash.substring(1).split('-cmt-');
+                pIdStr = parts[0];
+                cmtId = parts[1];
+            } else {
+                pIdStr = hash.substring(1);
+            }
+            postId = pIdStr.replace('post-', '').replace('post_', '');
+        }
 
+        if (postId) {
+            const postEl = document.getElementById('post-' + postId);
+            if (postEl) {
+                // Scroll to post
+                const y = postEl.getBoundingClientRect().top + window.scrollY - 100;
+                window.scrollTo({top: y, behavior: 'smooth'});
+                postEl.style.boxShadow = '0 0 0 2px rgba(59, 130, 246, 0.5)';
+                setTimeout(() => postEl.style.boxShadow = '', 3000);
+
+                if (cmtId) {
+                    const sec = document.getElementById('comments-' + postId);
+                    if (sec && sec.style.display === 'none') {
+                        sec.style.display = 'block';
+                        if (typeof loadedComments !== 'undefined' && !loadedComments[postId]) {
+                            await loadComments(postId, 'post');
+                        }
+                    }
+                    
+                    // Wait for comments to render
+                    setTimeout(() => {
+                        const cmtEl = document.getElementById('cmt-' + cmtId);
+                        if (cmtEl) {
+                            const cy = cmtEl.getBoundingClientRect().top + window.scrollY - 150;
+                            window.scrollTo({top: cy, behavior: 'smooth'});
+                            cmtEl.style.backgroundColor = 'rgba(59, 130, 246, 0.15)';
+                            cmtEl.style.transition = 'background-color 1s';
+                            setTimeout(() => cmtEl.style.backgroundColor = 'transparent', 3000);
+                        }
+                    }, 500);
+                }
+            }
+        }
+    }, 300); // slight delay to allow layout to settle
+});
+</script>
 </body>
 </html>

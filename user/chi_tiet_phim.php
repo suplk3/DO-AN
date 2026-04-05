@@ -1283,5 +1283,29 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 </script>
+<script>
+window.addEventListener('load', async () => {
+    const hash = window.location.hash;
+    if (hash && hash.startsWith('#cmt-')) {
+        const cmtId = hash.substring(1).replace('cmt-', '');
+        const btn = document.getElementById('spoilerBtn');
+        if (btn) {
+            if (!spoilerOpen) {
+                toggleSpoilerComments();
+            }
+            setTimeout(() => {
+                const cmtEl = document.getElementById('cmt-' + cmtId);
+                if (cmtEl) {
+                    const cy = cmtEl.getBoundingClientRect().top + window.scrollY - 150;
+                    window.scrollTo({top: cy, behavior: 'smooth'});
+                    cmtEl.style.backgroundColor = 'rgba(59, 130, 246, 0.2)';
+                    cmtEl.style.transition = 'background-color 1s';
+                    setTimeout(() => cmtEl.style.backgroundColor = 'transparent', 3000);
+                }
+            }, 1200);
+        }
+    }
+});
+</script>
 </body>
 </html>
