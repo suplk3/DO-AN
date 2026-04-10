@@ -346,16 +346,128 @@ const editPanel = document.getElementById('editPanel');
 const editProfileBtn = document.getElementById('editProfileBtn');
 const avatarTrigger = document.getElementById('avatarTrigger');
 const editAvatarInput = document.getElementById('editAvatarInput');
+const editProfileForm = document.getElementById('editProfileForm');
 
 editProfileBtn.addEventListener('click', () => {
     editPanel.style.display = editPanel.style.display === 'none' ? 'block' : 'none';
 });
 
-if (avatarTrigger && editAvatarInput) {
-    avatarTrigger.addEventListener('click', () => {
-        editPanel.style.display = 'block';
-        editAvatarInput.click();
+if (editProfileForm) {
+    editProfileForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(editProfileForm);
+        formData.append('is_ajax', '1');
+        
+        const btnSave = editProfileForm.querySelector('.btn-ep-save');
+        const originalText = btnSave ? btnSave.innerHTML : '';
+        if (btnSave) {
+            btnSave.innerHTML = 'Đang lưu...';
+            btnSave.disabled = true;
+        }
+
+        try {
+            const res = await fetch('profile_action.php', { method: 'POST', body: formData });
+            const data = await res.json();
+            
+            if (btnSave) {
+                btnSave.innerHTML = originalText;
+                btnSave.disabled = false;
+            }
+
+            if (data.success) {
+                // Update text
+                const nameEl = document.querySelector('.profile-name');
+                if (nameEl) nameEl.textContent = data.ten;
+                
+                const bioEl = document.querySelector('.profile-bio');
+                if (bioEl) {
+                    if (data.bio) {
+                        bioEl.textContent = data.bio;
+                        bioEl.style.fontStyle = 'normal';
+                        bioEl.style.opacity = '1';
+                    } else {
+                        bioEl.textContent = 'Thêm tiểu sử để mọi người hiểu hơn về bạn...';
+                        bioEl.style.fontStyle = 'italic';
+                        bioEl.style.opacity = '0.5';
+                    }
+                }
+                
+                // Update header user-name if available
+                const hdrNameEl = document.querySelector('.user-menu-btn .d-none.d-md-inline');
+                if (hdrNameEl) hdrNameEl.textContent = data.ten;
+                
+                // Update avatar
+                if (data.avatar) {
+                    const avatarSrc = `../assets/images/avatars/${data.avatar}?v=${new Date().getTime()}`;
+                    
+                    // Main profile avatar
+                    let imgEl = document.querySelector('.profile-avatar-big');
+                    if (!imgEl) {
+                        const placeholder = document.querySelector('.avatar-placeholder-big');
+                        if (placeholder) {
+                            imgEl = document.createElement('img');
+                            imgEl.className = 'profile-avatar-big';
+                            imgEl.id = 'avatarImg';
+                            imgEl.alt = '';
+                            placeholder.parentNode.replaceChild(imgEl, placeholder);
+                        }
+                    }
+                    if (imgEl) imgEl.src = avatarSrc;
+                    
+                    // Header dropdown avatar
+                    const headerAvatar = document.querySelector('.user-menu-btn img');
+                    if (headerAvatar) {
+                         headerAvatar.src = avatarSrc;
+                    } else {
+                        const headerPlaceholder = document.querySelector('.user-menu-btn .avatar-placeholder');
+                        if (headerPlaceholder) {
+                            const newImg = document.createElement('img');
+                            newImg.src = avatarSrc;
+                            newImg.alt = "Avatar";
+                            newImg.style.width = "36px";
+                            newImg.style.height = "36px";
+                            newImg.style.borderRadius = "50%";
+                            newImg.style.objectFit = "cover";
+                            headerPlaceholder.parentNode.replaceChild(newImg, headerPlaceholder);
+                        }
+                    }
+                } else {
+                    const placeholder = document.querySelector('.avatar-placeholder-big');
+                    if (placeholder && data.ten) placeholder.textContent = data.ten.charAt(0).toUpperCase();
+
+                    const headerPlaceholder = document.querySelector('.user-menu-btn .avatar-placeholder');
+                    if (headerPlaceholder && data.ten) headerPlaceholder.textContent = data.ten.charAt(0).toUpperCase();
+                }
+                
+                // Close panel if open
+                if(editPanel) editPanel.style.display = 'none';
+                
+            } else {
+                alert(data.error || 'Có lỗi xảy ra');
+            }
+        } catch(err) {
+            console.error(err);
+            if (btnSave) {
+                btnSave.innerHTML = originalText;
+                btnSave.disabled = false;
+            }
+            alert('Lỗi kết nối khi lưu hồ sơ.');
+        }
     });
+
+    if (avatarTrigger && editAvatarInput) {
+        avatarTrigger.addEventListener('click', () => {
+            editPanel.style.display = 'block'; // Show panel if they want
+            editAvatarInput.click();
+        });
+
+        editAvatarInput.addEventListener('change', function() {
+            if (this.files && this.files.length > 0) {
+                // Real-time update avatar without redirecting
+                editProfileForm.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+            }
+        });
+    }
 }
 <?php endif; ?>
 
