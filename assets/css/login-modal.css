@@ -1,4 +1,4 @@
-﻿@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap');
 
 /* ============================================================
    TTVH Cinemas â€“ Login Modal  (Cinematic Luxury Theme)
@@ -6,251 +6,537 @@
 
 /* â”€â”€ Overlay â”€â”€ */
 .login-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.7);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-    backdrop-filter: blur(12px) saturate(120%);
-    -webkit-backdrop-filter: blur(12px) saturate(120%);
-    padding: 20px;
-    animation: overlayIn 0.25s ease;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  backdrop-filter: blur(12px) saturate(120%);
+  -webkit-backdrop-filter: blur(12px) saturate(120%);
+  padding: 20px;
+  animation: overlayIn 0.25s ease;
 }
+
 @keyframes overlayIn {
-    from { opacity: 0; }
-    to   { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
+
 .login-modal {
-    max-width: 880px;
-    width: 100%;
-    animation: modalIn 0.35s cubic-bezier(0.34,1.4,0.64,1);
+  max-width: 880px;
+  width: 100%;
+  animation: modalIn 0.35s cubic-bezier(0.34, 1.4, 0.64, 1);
 }
+
 @keyframes modalIn {
-    from { opacity: 0; transform: scale(0.94) translateY(20px); }
-    to   { opacity: 1; transform: scale(1) translateY(0); }
+  from {
+    opacity: 0;
+    transform: scale(0.94) translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
+
 .auth-card {
-    position: relative;
-    border-radius: 24px;
-    overflow: hidden;
-    background: #07090e;
-    border: 1px solid rgba(255,255,255,0.08);
-    box-shadow: 0 30px 80px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.06);
-    color: #f1f5f9;
+  position: relative;
+  border-radius: 24px;
+  overflow: hidden;
+  background: #07090e;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  color: #f1f5f9;
 }
+
 .auth-card::before {
-    content: '';
-    position: absolute;
-    top: 0; bottom: 0;
-    width: 50%;
-    left: 50%;
-    background: linear-gradient(145deg, #1a0d3e, #2d1b69, #1e3a8a);
-    transform: translateX(0);
-    transition: transform 0.6s cubic-bezier(0.25,0.8,0.25,1);
-    z-index: 0;
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  left: 50%;
+  background: linear-gradient(145deg, #1a0d3e, #2d1b69, #1e3a8a);
+  transform: translateX(0);
+  transition: transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+  z-index: 0;
 }
-.auth-card.show-signup::before { transform: translateX(-100%); }
+
+.auth-card.show-signup::before {
+  transform: translateX(-100%);
+}
+
 .login-close {
-    position: absolute;
-    top: 16px; right: 16px;
-    width: 32px; height: 32px;
-    border-radius: 50%;
-    border: 1px solid rgba(255,255,255,0.12);
-    background: rgba(255,255,255,0.06);
-    color: rgba(255,255,255,0.7);
-    cursor: pointer;
-    font-size: 16px;
-    display: flex; align-items: center; justify-content: center;
-    z-index: 20;
-    transition: all 0.2s ease;
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  transition: all 0.2s ease;
 }
-.login-close:hover { background: rgba(232,25,44,0.2); border-color: rgba(232,25,44,0.4); color: #fff; }
+
+.login-close:hover {
+  background: rgba(232, 25, 44, 0.2);
+  border-color: rgba(232, 25, 44, 0.4);
+  color: #fff;
+}
+
 .auth-inner {
-    display: flex;
-    min-height: 460px;
-    position: relative;
-    z-index: 2;
+  display: flex;
+  min-height: 460px;
+  position: relative;
+  z-index: 2;
 }
-.auth-panel-form, .auth-panel-hero { flex: 1 0 50%; }
-.auth-panel-form { order: 1; }
-.auth-panel-hero { order: 2; }
-.auth-card.show-signup .auth-panel-form { order: 2; }
-.auth-card.show-signup .auth-panel-hero { order: 1; }
+
+.auth-panel-form,
+.auth-panel-hero {
+  flex: 1 0 50%;
+}
+
+.auth-panel-form {
+  order: 1;
+}
+
+.auth-panel-hero {
+  order: 2;
+}
+
+.auth-card.show-signup .auth-panel-form {
+  order: 2;
+}
+
+.auth-card.show-signup .auth-panel-hero {
+  order: 1;
+}
+
 .auth-panel {
-    position: relative;
-    display: flex; align-items: center; justify-content: center;
-    padding: 40px 36px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 36px;
 }
+
 .auth-view {
-    width: 100%;
-    max-width: 300px;
-    transition: opacity 0.32s ease, transform 0.32s ease;
+  width: 100%;
+  max-width: 300px;
+  transition: opacity 0.32s ease, transform 0.32s ease;
 }
-.auth-view-login { position: absolute; }
-.auth-view-register { position: absolute; opacity: 0; transform: translateX(32px); pointer-events: none; }
-.auth-card.show-signup .auth-view-login { opacity: 0; transform: translateX(-32px); pointer-events: none; }
-.auth-card.show-signup .auth-view-register { opacity: 1; transform: translateX(0); pointer-events: auto; }
+
+.auth-view-login {
+  position: absolute;
+}
+
+.auth-view-register {
+  position: absolute;
+  opacity: 0;
+  transform: translateX(32px);
+  pointer-events: none;
+}
+
+.auth-card.show-signup .auth-view-login {
+  opacity: 0;
+  transform: translateX(-32px);
+  pointer-events: none;
+}
+
+.auth-card.show-signup .auth-view-register {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
 .auth-heading {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 32px;
-    letter-spacing: 1.5px;
-    margin-bottom: 4px;
-    color: #f1f5f9;
+  font-family: 'Be Vietnam Pro', system-ui, sans-serif;
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+  color: #f1f5f9;
 }
-.auth-subtitle { font-size: 13px; color: #64748b; margin-bottom: 20px; line-height: 1.5; }
-.input-group { position: relative; margin: 10px 0; }
+
+.auth-subtitle {
+  font-size: 13px;
+  color: #64748b;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.input-group {
+  position: relative;
+  margin: 10px 0;
+}
+
 .input-group input {
-    width: 100%;
-    padding: 12px 44px 12px 14px;
-    border-radius: 12px;
-    border: 1px solid rgba(255,255,255,0.08);
-    background: rgba(255,255,255,0.04);
-    color: #f1f5f9;
-    outline: none;
-    font-size: 14px;
-    font-family: 'Be Vietnam Pro', system-ui, sans-serif;
-    box-sizing: border-box;
-    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  width: 100% !important;
+  padding: 12px 44px 12px 14px !important;
+  border-radius: 12px !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.3) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: #f1f5f9 !important;
+  outline: none !important;
+  -webkit-appearance: none;
+  appearance: none;
+  font-size: 14px;
+  font-family: 'Be Vietnam Pro', system-ui, sans-serif;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
 }
+
 .input-group input:focus {
-    border-color: rgba(124,58,237,0.5);
-    background: rgba(124,58,237,0.05);
-    box-shadow: 0 0 0 3px rgba(124,58,237,0.1);
+  border-color: #e8192c !important;
+  background: rgba(232, 25, 44, 0.05) !important;
+  box-shadow: 0 0 0 3px rgba(232, 25, 44, 0.1) !important;
 }
-.input-group input::placeholder { color: #475569; }
+
+.input-group input::placeholder {
+  color: #475569;
+}
+
+/* Style for autocomplete to maintain dark theme */
+.input-group input:-webkit-autofill,
+.input-group input:-webkit-autofill:hover,
+.input-group input:-webkit-autofill:focus,
+.input-group input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px #07090e inset !important;
+  -webkit-text-fill-color: #f1f5f9 !important;
+  caret-color: #f1f5f9 !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
 .input-group .icon {
-    position: absolute; right: 13px; top: 50%; transform: translateY(-50%);
-    opacity: 0.6; cursor: pointer; font-size: 15px; transition: opacity 0.2s;
+  position: absolute;
+  right: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0.6;
+  cursor: pointer;
+  font-size: 15px;
+  transition: opacity 0.2s;
 }
-.input-group .icon:hover { opacity: 1; }
+
+.input-group .icon:hover {
+  opacity: 1;
+}
+
 .auth-card .btn-primary {
-    width: 100%;
-    padding: 12px 14px;
-    border-radius: 999px;
-    border: none;
-    background: linear-gradient(135deg, #e8192c, #c01020);
-    color: #fff;
-    font-weight: 700;
-    font-size: 14px;
-    letter-spacing: 0.5px;
-    margin-top: 16px;
-    cursor: pointer;
-    box-shadow: 0 8px 24px rgba(232,25,44,0.4);
-    transition: all 0.22s ease;
-    font-family: 'Be Vietnam Pro', system-ui, sans-serif;
-    overflow: hidden;
-    position: relative;
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(135deg, #e8192c, #c01020);
+  color: #fff;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+  margin-top: 16px;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(232, 25, 44, 0.4);
+  transition: all 0.22s ease;
+  font-family: 'Be Vietnam Pro', system-ui, sans-serif;
+  overflow: hidden;
+  position: relative;
 }
-.auth-card .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(232,25,44,0.55); }
-.auth-small { margin-top: 14px; font-size: 13px; color: #64748b; }
+
+.auth-card .btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(232, 25, 44, 0.55);
+}
+
+.auth-small {
+  margin-top: 14px;
+  font-size: 13px;
+  color: #64748b;
+}
+
 .link-btn {
-    background: none; border: none; color: #a78bfa; font-weight: 700;
-    cursor: pointer; padding: 0 0 0 4px; font-size: 13px; font-family: inherit; transition: color 0.2s;
+  background: none;
+  border: none;
+  color: #a78bfa;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0 0 0 4px;
+  font-size: 13px;
+  font-family: inherit;
+  transition: color 0.2s;
 }
-.link-btn:hover { color: #c4b5fd; text-decoration: underline; }
-.forgot-link { color: #60a5fa; font-size: 12px; text-decoration: none; transition: color 0.2s; }
-.forgot-link:hover { color: #93c5fd; text-decoration: underline; }
-.message { font-size: 13px; margin-top: 8px; min-height: 18px; }
+
+.link-btn:hover {
+  color: #c4b5fd;
+  text-decoration: underline;
+}
+
+.forgot-link {
+  color: #60a5fa;
+  font-size: 12px;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.forgot-link:hover {
+  color: #93c5fd;
+  text-decoration: underline;
+}
+
+.message {
+  font-size: 13px;
+  margin-top: 8px;
+  min-height: 18px;
+}
+
 .login-toast {
-    display: flex; align-items: flex-start; gap: 10px;
-    margin-top: 10px; padding: 12px 14px; border-radius: 12px;
-    background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25);
-    color: #fca5a5; font-size: 13px; line-height: 1.5;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: #fca5a5;
+  font-size: 13px;
+  line-height: 1.5;
 }
+
 .login-toast .toast-icon {
-    width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center;
-    border-radius: 6px; background: #ef4444; color: #fff; font-weight: 800; font-size: 11px;
-    flex-shrink: 0; margin-top: 1px;
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  background: #ef4444;
+  color: #fff;
+  font-weight: 800;
+  font-size: 11px;
+  flex-shrink: 0;
+  margin-top: 1px;
 }
+
 .hero {
-    position: absolute; inset: 0;
-    padding: 44px 38px;
-    display: flex; flex-direction: column; justify-content: center; gap: 16px;
-    transition: opacity 0.32s ease, transform 0.32s ease;
+  position: absolute;
+  inset: 0;
+  padding: 44px 38px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 16px;
+  transition: opacity 0.32s ease, transform 0.32s ease;
 }
-.hero-login  { opacity: 1; transform: translateX(0); }
-.hero-register { opacity: 0; transform: translateX(32px); pointer-events: none; }
-.auth-card.show-signup .hero-login { opacity: 0; transform: translateX(-32px); pointer-events: none; }
-.auth-card.show-signup .hero-register { opacity: 1; transform: translateX(0); pointer-events: auto; }
+
+.hero-login {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.hero-register {
+  opacity: 0;
+  transform: translateX(32px);
+  pointer-events: none;
+}
+
+.auth-card.show-signup .hero-login {
+  opacity: 0;
+  transform: translateX(-32px);
+  pointer-events: none;
+}
+
+.auth-card.show-signup .hero-register {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
 .hero h3 {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 34px; letter-spacing: 1.5px; margin: 0;
-    color: #f1f5f9; line-height: 1.1;
+  font-family: 'Be Vietnam Pro', system-ui, sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  margin: 0;
+  color: #f1f5f9;
+  line-height: 1.2;
 }
-.hero p { font-size: 14px; color: rgba(226,232,240,0.75); max-width: 240px; line-height: 1.6; }
+
+.hero p {
+  font-size: 14px;
+  color: rgba(226, 232, 240, 0.75);
+  max-width: 240px;
+  line-height: 1.6;
+}
+
 .hero-btn {
-    align-self: flex-start;
-    margin-top: 10px; padding: 11px 24px;
-    border-radius: 999px; border: 1.5px solid rgba(255,255,255,0.6);
-    background: transparent; color: #fff;
-    font-family: 'Be Vietnam Pro', system-ui, sans-serif; font-weight: 700;
-    font-size: 13px; letter-spacing: 0.4px; cursor: pointer; transition: all 0.22s ease;
+  align-self: flex-start;
+  margin-top: 10px;
+  padding: 11px 24px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(255, 255, 255, 0.6);
+  background: transparent;
+  color: #fff;
+  font-family: 'Be Vietnam Pro', system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.4px;
+  cursor: pointer;
+  transition: all 0.22s ease;
 }
-.hero-btn:hover { background: rgba(255,255,255,0.12); border-color: #fff; transform: translateY(-2px); }
+
+.hero-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: #fff;
+  transform: translateY(-2px);
+}
+
 @media (max-width: 768px) {
-    .auth-inner { flex-direction: column; min-height: auto; }
-    .auth-panel-hero { display: none; }
-    .auth-panel { padding: 32px 24px 28px; }
-    .auth-view-login, .auth-view-register { position: relative; max-width: 100%; }
-    .auth-card::before { display: none; }
+  .auth-inner {
+    flex-direction: column;
+    min-height: auto;
+  }
+
+  .auth-panel-hero {
+    display: none;
+  }
+
+  .auth-panel {
+    padding: 32px 24px 28px;
+  }
+
+  .auth-view-login,
+  .auth-view-register {
+    position: relative;
+    max-width: 100%;
+  }
+
+  .auth-card::before {
+    display: none;
+  }
 }
+
 @media (max-width: 480px) {
-    .login-modal { width: 100%; }
-    .auth-card { border-radius: 18px; }
-    .auth-heading { font-size: 28px; }
-    .auth-panel { padding: 24px 20px; }
+  .login-modal {
+    width: 100%;
+  }
+
+  .auth-card {
+    border-radius: 18px;
+  }
+
+  .auth-heading {
+    font-size: 28px;
+  }
+
+  .auth-panel {
+    padding: 24px 20px;
+  }
 }
 
 /* â”€â”€ Hero features list â”€â”€ */
 .hero-features {
-  display: flex; flex-direction: column; gap: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
   margin: 8px 0;
 }
+
 .hero-feature {
-  display: flex; align-items: center; gap: 10px;
-  font-size: 13px; color: rgba(229,231,235,0.85);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: rgba(229, 231, 235, 0.85);
   font-family: 'Be Vietnam Pro', system-ui, sans-serif;
 }
+
 .hero-feature-icon {
-  width: 28px; height: 28px; border-radius: 8px;
-  background: rgba(255,255,255,0.1);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 14px; flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
 }
 
 /* â”€â”€ Mobile full-screen overlay â”€â”€ */
 @media (max-width: 600px) {
   .login-overlay {
-    padding: 0;
-    align-items: flex-end;
+    padding: 20px;
+    align-items: center;
   }
+
   .login-modal {
     max-width: 100%;
     width: 100%;
   }
+
   .auth-card {
-    border-radius: 20px 20px 0 0;
+    border-radius: 24px;
     max-height: 92vh;
     overflow-y: auto;
   }
+
   .auth-inner {
     flex-direction: column;
     min-height: auto;
   }
-  .auth-panel-hero { display: none; }
-  .auth-panel-form { padding: 32px 24px 28px; }
-  .auth-card::before, .auth-card::after { display: none; }
-  .auth-card.show-signup .auth-panel-form { order: 1; }
-  .auth-view-login, .auth-view-register {
+
+  .auth-panel-hero {
+    display: none;
+  }
+
+  .auth-panel-form {
+    padding: 32px 24px 28px;
+  }
+
+  .auth-card::before,
+  .auth-card::after {
+    display: none;
+  }
+
+  .auth-card.show-signup .auth-panel-form {
+    order: 1;
+  }
+
+  .auth-view-login {
     position: relative;
     transform: none !important;
+    display: block;
+    opacity: 1 !important;
+    pointer-events: auto !important;
   }
+
+  .auth-view-register {
+    position: relative;
+    transform: none !important;
+    display: none;
+  }
+
   .auth-card.show-signup .auth-view-login {
     display: none;
   }
+
   .auth-card.show-signup .auth-view-register {
-    opacity: 1; pointer-events: auto;
+    display: block;
+    opacity: 1 !important;
+    pointer-events: auto !important;
   }
 }
