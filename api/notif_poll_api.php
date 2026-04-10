@@ -59,10 +59,24 @@ if ($action === 'poll') {
         }
     }
 
+    $updated_profiles = [];
+    $client_last_ts = (int)($_GET['p_ts'] ?? 0);
+    $recent_file = __DIR__ . '/recent_profiles.json';
+    if ($client_last_ts > 0 && file_exists($recent_file)) {
+        $recent = json_decode(file_get_contents($recent_file), true) ?: [];
+        foreach ($recent as $v) {
+            if ($v['ts'] >= $client_last_ts) {
+                $updated_profiles[] = $v;
+            }
+        }
+    }
+
     echo json_encode([
         'success' => true,
         'unread_count' => $unreadCount,
-        'notifications' => $notifs
+        'notifications' => $notifs,
+        'updated_profiles' => $updated_profiles,
+        'p_ts' => time()
     ]);
     exit;
 }

@@ -195,8 +195,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const POLL_INTERVAL_MS = 1000;
     let notifPollTimer = null;
     let notifPollInFlight = false;
-    
-    if (!pcNotif && !mobNotifIcon) return;
+    let lastProfilePollTs = Math.floor(Date.now() / 1000) - 2;
+    const currentUserId = <?= isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : 0 ?>;
+    let appliedProfiles = new Set();
     
     function updateNotifBadges(count) {
         if (pcNotif) {
@@ -227,21 +228,105 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
+    function updateProfileOnPage(p) {
+        const cacheKey = p.id + '-' + p.ts;
+        if (appliedProfiles.has(cacheKey)) return;
+        appliedProfiles.add(cacheKey);
+
+        window.dispatchEvent(new CustomEvent('profile_updated', { detail: p }));
+
+        // Update basic links wrapping avatars and names
+        document.querySelectorAll(`a[href*="profile.php?id=${p.id}"]`).forEach(link => {
+            const nameEl = link.querySelector('.post-username');
+            if (nameEl) {
+                nameEl.textContent = p.ten;
+            } else if (link.classList.contains('comment-name') || link.classList.contains('post-author-name')) {
+                link.textContent = p.ten;
+            }
+
+            if (p.avatar) {
+                const img = link.querySelector('img');
+                if (img) {
+                    img.src = `../assets/images/avatars/${p.avatar}?t=${p.ts}`;
+                } else {
+                    const polder = link.querySelector('[class*="avatar-placeholder"]');
+                    if (polder) {
+                        const newImg = document.createElement('img');
+                        newImg.src = `../assets/images/avatars/${p.avatar}?t=${p.ts}`;
+                        newImg.className = polder.className.replace('placeholder-', '');
+                        if (newImg.className.includes('avatar-sm')) newImg.alt = '';
+                        polder.parentNode.replaceChild(newImg, polder);
+                    }
+                }
+            }
+        });
+
+        // Update comment elements explicitly
+        document.querySelectorAll(`a.comment-name[href*="profile.php?id=${p.id}"]`).forEach(el => {
+             el.textContent = p.ten;
+             const item = el.closest('.comment-item');
+             if (item && p.avatar) {
+                 const avtWrap = item.querySelector('.comment-avatar');
+                 if (avtWrap) {
+                     avtWrap.innerHTML = `<img src="../assets/images/avatars/${p.avatar}?t=${p.ts}" class="avatar-xs" alt="">`;
+                 }
+             }
+        });
+        
+        // Active user updates
+        if (currentUserId === p.id) {
+            document.querySelectorAll('.user-menu-name.pc-only, .user-dropdown-header span').forEach(el => {
+                el.textContent = p.ten;
+            });
+            
+            if (p.avatar) {
+                const headerAvatar = document.querySelector('.user-menu-btn img');
+                if (headerAvatar) {
+                     headerAvatar.src = `../assets/images/avatars/${p.avatar}?t=${p.ts}`;
+                } else {
+                     const polder = document.querySelector('.user-menu-btn .user-menu-initial');
+                     if (polder) {
+                         const newImg = document.createElement('img');
+                         newImg.src = `../assets/images/avatars/${p.avatar}?t=${p.ts}`;
+                         newImg.className = 'user-menu-avatar';
+                         polder.parentNode.replaceChild(newImg, polder);
+                     }
+                }
+                
+                // Update comment composer avatar
+                const composePolder = document.querySelector('.comment-compose .avatar-placeholder-xs');
+                if (composePolder) {
+                    const newImg = document.createElement('img');
+                    newImg.src = `../assets/images/avatars/${p.avatar}?t=${p.ts}`;
+                    newImg.className = 'avatar-xs';
+                    composePolder.parentNode.replaceChild(newImg, composePolder);
+                } else {
+                    const composeImg = document.querySelector('.comment-compose .avatar-xs');
+                    if (composeImg) composeImg.src = `../assets/images/avatars/${p.avatar}?t=${p.ts}`;
+                }
+            }
+        }
+    }
+
     function pollNotifications() {
         if (notifPollInFlight) return;
         notifPollInFlight = true;
 
-        const url = '../api/notif_poll_api.php?action=poll&_=' + Date.now();
+        const url = '../api/notif_poll_api.php?action=poll&p_ts=' + lastProfilePollTs + '&_=' + Date.now();
         fetch(url, {
             cache: 'no-store',
-            headers: {
-                'Cache-Control': 'no-cache'
-            }
+            headers: { 'Cache-Control': 'no-cache' }
         })
             .then(r => r.json())
             .then(res => {
                 if (res.success) {
                     updateNotifBadges(res.unread_count);
+                    
+                    if (res.p_ts) lastProfilePollTs = res.p_ts;
+                    if (res.updated_profiles && res.updated_profiles.length > 0) {
+                        res.updated_profiles.forEach(p => updateProfileOnPage(p));
+                    }
+                    
                     window.dispatchEvent(new CustomEvent('notifications_polled', { detail: res }));
                 }
             })
